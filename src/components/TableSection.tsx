@@ -6,9 +6,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
-import type { Encounter, Handout, InitiativeRow } from '../types'
+import type { Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
 import { MapBoard } from './MapBoard'
 import { Btn, C, Eyebrow, H, Section, TextArea, TextInput, display } from './ui'
+
+interface DmRace {
+  raceId: string
+  lanes: Record<string, number>
+  finished: string[]
+  ended: boolean
+}
+
+const RACE_GOAL = 40
 
 interface TableSectionProps {
   store: Store
@@ -19,13 +28,32 @@ export function TableSection({ store, roster }: TableSectionProps) {
   const channelRef = useRef<TableChannel | null>(null)
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [feed, setFeed] = useState<RollEvent[]>([])
+  const [race, setRace] = useState<DmRace | null>(null)
+  const raceRef = useRef<DmRace | null>(null)
+  raceRef.current = race
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       const [channelId, active] = await Promise.all([store.getChannelId(), store.getActiveEncounter()])
       if (cancelled) return
-      channelRef.current = joinTableChannel(channelId, {})
+      channelRef.current = joinTableChannel(channelId, {
+        roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
+        race: (r: RaceEvent) => {
+          const cur = raceRef.current
+          if (!cur || r.raceId !== cur.raceId || cur.ended) return
+          if (r.phase === 'progress' && r.playerName) {
+            setRace({ ...cur, lanes: { ...cur.lanes, [r.playerName]: r.progress ?? 0 } })
+          } else if (r.phase === 'finish' && r.playerName && !cur.finished.includes(r.playerName)) {
+            setRace({
+              ...cur,
+              lanes: { ...cur.lanes, [r.playerName]: RACE_GOAL },
+              finished: [...cur.finished, r.playerName],
+            })
+          }
+        },
+      })
       if (active) setEncounter(active)
       setLoaded(true)
     })()
@@ -34,6 +62,25 @@ export function TableSection({ store, roster }: TableSectionProps) {
       channelRef.current?.close()
     }
   }, [store])
+
+  const startRace = () => {
+    const lanes: Record<string, number> = {}
+    roster.forEach((r) => (lanes[r.playerName] = 0))
+    const raceId = crypto.randomUUID()
+    setRace({ raceId, lanes, finished: [], ended: false })
+    channelRef.current?.sendRace({ raceId, phase: 'start' })
+  }
+
+  const endRace = () => {
+    if (!race) return
+    const stragglers = Object.entries(race.lanes)
+      .filter(([n]) => !race.finished.includes(n))
+      .sort((a, b) => b[1] - a[1])
+      .map(([n]) => n)
+    const results = [...race.finished, ...stragglers]
+    channelRef.current?.sendRace({ raceId: race.raceId, phase: 'end', results })
+    setRace({ ...race, ended: true, finished: results })
+  }
 
   const pcRows: InitiativeRow[] = useMemo(
     () =>
@@ -70,6 +117,107 @@ export function TableSection({ store, roster }: TableSectionProps) {
       <Section style={{ marginTop: 12 }}>
         {loaded && (
           <InitiativePanel encounter={encounter} pcRows={pcRows} onChange={update} />
+        )}
+      </Section>
+
+      <Section>
+        <Eyebrow>Carnival games — the Snail Derby 🐌</Eyebrow>
+        {!race && (
+          <>
+            <p className="text-sm" style={{ color: C.faint }}>
+              Every player's phone becomes a sprinting snail. First across the line takes the
+              glory; the carnival remembers.
+            </p>
+            <Btn shimmer onClick={startRace} disabled={roster.length === 0 || !store.shared}>
+              Start the Snail Derby ✦
+            </Btn>
+            {!store.shared && (
+              <p className="text-xs" style={{ color: C.faint }}>
+                (Needs the campaign lantern — Supabase — to reach the phones.)
+              </p>
+            )}
+          </>
+        )}
+        {race && (
+          <>
+            {Object.entries(race.lanes).map(([name, progress]) => {
+              const place = race.finished.indexOf(name)
+              return (
+                <div key={name} className="mb-2">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span>
+                      {name}
+                      {place === 0 ? ' 🥇' : place === 1 ? ' 🥈' : place === 2 ? ' 🥉' : ''}
+                    </span>
+                    <span style={{ color: C.faint }}>
+                      {progress}/{RACE_GOAL}
+                    </span>
+                  </div>
+                  <div
+                    className="relative rounded-full"
+                    style={{ height: 22, background: C.night, border: `1px solid ${C.panelEdge}` }}
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        left: `${Math.min(96, (progress / RACE_GOAL) * 96)}%`,
+                        top: -1,
+                        fontSize: 17,
+                        transition: 'left .2s linear',
+                      }}
+                    >
+                      🐌
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+            {!race.ended ? (
+              <Btn onClick={endRace}>Call the race — judges' decision 🏁</Btn>
+            ) : (
+              <>
+                <p className="text-sm mt-2" style={{ color: C.gold }}>
+                  Final order: {race.finished.map((n, i) => `${i + 1}. ${n}`).join(' · ')}
+                </p>
+                <Btn secondary onClick={() => setRace(null)}>
+                  Clear the track
+                </Btn>
+              </>
+            )}
+          </>
+        )}
+      </Section>
+
+      <Section>
+        <Eyebrow>The table's dice — live</Eyebrow>
+        {feed.length === 0 ? (
+          <p className="text-sm" style={{ color: C.faint }}>
+            The dice are quiet. Every roll from every phone lands here.
+          </p>
+        ) : (
+          feed.map((r, i) => (
+            <div
+              key={`${r.at}-${i}`}
+              className="flex items-center justify-between rounded-lg px-3 py-2 mb-1"
+              style={{
+                background: r.isNat20 ? C.gold : r.isNat1 ? '#3d2030' : C.night,
+                color: r.isNat20 ? C.ink : C.parchment,
+                border: `1px solid ${r.isNat20 ? C.gold : r.isNat1 ? '#C96A6A' : C.panelEdge}`,
+                boxShadow: r.isNat20 && i === 0 ? `0 0 22px ${C.gold}88` : 'none',
+              }}
+            >
+              <span className="text-sm">
+                <strong>{r.characterName || r.playerName}</strong>{' '}
+                <span style={{ opacity: 0.75 }}>· {r.label}</span>
+                {r.mode !== 'normal' && <span style={{ opacity: 0.6 }}> · {r.mode}</span>}
+              </span>
+              <span style={{ ...display, fontSize: 22, fontWeight: 700 }}>
+                {r.total}
+                {r.isNat20 ? ' ✦' : r.isNat1 ? ' 🎺' : ''}
+              </span>
+            </div>
+          ))
         )}
       </Section>
 

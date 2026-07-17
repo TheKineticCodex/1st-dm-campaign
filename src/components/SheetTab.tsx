@@ -3,10 +3,12 @@
 // death-save pips, spell slots, rest buttons, conditions, and free-text
 // sections including the private "What I lost".
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
+import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
 import { Btn, C, Eyebrow, H, Section, TextArea, display } from './ui'
@@ -16,13 +18,31 @@ interface SheetTabProps {
   onUpdate: (c: SavedCharacter) => void
   onEdit: () => void
   onGoFortune: () => void
+  store: Store
+  playerName: string
 }
 
-export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabProps) {
+export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName }: SheetTabProps) {
   const [rollMode, setRollMode] = useState<RollMode>('normal')
   const [roll, setRoll] = useState<RollResult | null>(null)
   const [damage, setDamage] = useState<{ rolls: number[]; total: number } | null>(null)
   const [showConditionPicker, setShowConditionPicker] = useState(false)
+  const [concPrompt, setConcPrompt] = useState(false)
+  const [concOutcome, setConcOutcome] = useState<'held' | 'slipped' | null>(null)
+  const channelRef = useRef<TableChannel | null>(null)
+
+  // Send-only channel: rolls stream to the table's feed (A5).
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const id = await store.getChannelId()
+      if (!cancelled) channelRef.current = joinTableChannel(id, {})
+    })()
+    return () => {
+      cancelled = true
+      channelRef.current?.close()
+    }
+  }, [store])
 
   // Auto-dismiss the roll card after a few beats.
   useEffect(() => {
@@ -69,14 +89,43 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabP
   const updateState = (patch: Partial<SavedCharacter['state']>) => update({ state: { ...state, ...patch } })
   const updateNotes = (patch: Partial<SavedCharacter['notes']>) => update({ notes: { ...notes, ...patch } })
 
+  const broadcastRoll = (r: RollResult) => {
+    channelRef.current?.sendRoll({
+      playerName,
+      characterName: build.name,
+      label: r.label,
+      total: r.total,
+      kept: r.kept,
+      modifier: r.modifier,
+      mode: r.mode,
+      isNat20: r.isNat20,
+      isNat1: r.isNat1,
+      at: new Date().toISOString(),
+    })
+  }
+
   const doRoll = (label: string, modifier: number) => {
     setDamage(null)
-    setRoll(rollD20(label, modifier, rollMode))
+    const r = rollD20(label, modifier, rollMode)
+    setRoll(r)
+    broadcastRoll(r)
   }
 
   const rollAttack = () => {
-    setRoll(rollD20(`${sheet.K.weapon.name} attack`, sheet.atkMod, rollMode))
+    const r = rollD20(`${sheet.K.weapon.name} attack`, sheet.atkMod, rollMode)
+    setRoll(r)
+    broadcastRoll(r)
     setDamage(rollDamage(sheet.K.weapon.die, mod(sheet.A[sheet.K.weapon.ab])))
+  }
+
+  const rollConcentration = () => {
+    const r = rollD20('Concentration (CON save)', saveMod(sheet, 'CON'), rollMode)
+    setRoll(r)
+    broadcastRoll(r)
+    const held = r.total >= 10
+    setConcOutcome(held ? 'held' : 'slipped')
+    setConcPrompt(false)
+    if (!held) updateState({ concentrating: false })
   }
 
   const changeHp = (delta: number) => {
@@ -86,6 +135,11 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabP
     // Healing from 0 HP wakes you: clear death saves.
     if (hpCurrent === 0 && delta > 0) patch.deathSaves = { successes: 0, failures: 0 }
     updateState(patch)
+    // Concentration co-pilot: damage while concentrating prompts the check.
+    if (delta < 0 && state.concentrating) {
+      setConcPrompt(true)
+      setConcOutcome(null)
+    }
   }
 
   const shortRest = () => {
@@ -286,6 +340,32 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabP
         </Section>
       )}
 
+      {/* Concentration co-pilot */}
+      {concPrompt && (
+        <Section style={{ marginTop: 12, border: `2px solid ${C.gold}` }}>
+          <Eyebrow>The spell wavers —</Eyebrow>
+          <p className="text-sm">
+            You took damage while concentrating. <strong>Concentration check, DC 10</strong>
+            <span className="text-xs" style={{ color: C.faint }}>
+              {' '}
+              (or half the damage if that's higher — ask your DM){/* VERIFY */}
+            </span>
+          </p>
+          <Btn shimmer onClick={rollConcentration}>
+            Hold the spell — roll CON {fmt(saveMod(sheet, 'CON'))}
+          </Btn>
+        </Section>
+      )}
+      {concOutcome && (
+        <p
+          role="status"
+          className="text-sm mt-2 text-center italic"
+          style={{ color: concOutcome === 'held' ? C.sea : '#C96A6A' }}
+        >
+          {concOutcome === 'held' ? '✦ The spell holds.' : 'The spell slips away like water…'}
+        </p>
+      )}
+
       {/* Attack */}
       <Section style={{ marginTop: 16 }}>
         <Eyebrow>Attack — tap to roll</Eyebrow>
@@ -322,6 +402,25 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabP
             </button>{' '}
             · Save DC {sheet.spellDc}
           </p>
+          <button
+            type="button"
+            aria-pressed={!!state.concentrating}
+            onClick={() => {
+              updateState({ concentrating: !state.concentrating })
+              setConcPrompt(false)
+              setConcOutcome(null)
+            }}
+            className="mt-3 rounded-md px-3 py-2 text-sm"
+            style={{
+              background: state.concentrating ? C.gold : C.night,
+              color: state.concentrating ? C.ink : C.faint,
+              border: `1px solid ${state.concentrating ? C.gold : C.panelEdge}`,
+              minHeight: 44,
+              cursor: 'pointer',
+            }}
+          >
+            ◐ {state.concentrating ? 'Concentrating — tap when the spell ends' : 'Tap when you cast a concentration spell'}
+          </button>
           {sheet.slotCount > 0 && (
             <div className="mt-3">
               <p className="text-sm mb-1" style={{ color: C.sea }}>

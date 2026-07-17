@@ -172,6 +172,26 @@ select {
   animation: glow-pulse 2.8s ease-in-out infinite;
 }
 
+/* in-app motion toggle ("calm the lanterns") — mirrors reduced-motion for
+   shared devices and users who haven't set the OS flag */
+html.calm .btn-shimmer,
+html.calm .title-glow,
+html.calm .gate-card,
+html.calm .twinkle,
+html.calm .spark,
+html.calm .rise {
+  animation: none !important;
+}
+
+html.calm .lantern {
+  display: none;
+}
+
+html.calm * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
 /* shimmering sweep across gold buttons */
 @keyframes shimmer-sweep {
   0% {

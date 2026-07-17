@@ -26,6 +26,8 @@ export interface CharacterState {
   slotsUsed: number
   deathSaves: { successes: number; failures: number }
   conditions: string[]
+  /** Concentration co-pilot: set when holding a concentration spell. */
+  concentrating?: boolean
 }
 
 /** Player free text. `lost` is private: visible to this player and the DM only. */
@@ -133,6 +135,37 @@ export interface Handout {
   /** A2 Sealed Whispers: the message fades 60s after the seal breaks. */
   ephemeral?: boolean
   sentAt: string
+}
+
+// ---- NEXT-1: live table events (broadcast only — feed is ephemeral by
+// design; the DM's Book stores nothing from these) ----
+
+export interface RollEvent {
+  playerName: string
+  characterName: string
+  label: string
+  total: number
+  kept: number
+  modifier: number
+  mode: string
+  isNat20: boolean
+  isNat1: boolean
+  at: string
+}
+
+export interface ConditionEvent {
+  targetPlayer: string
+  condition: string
+  active: boolean
+}
+
+export interface RaceEvent {
+  raceId: string
+  phase: 'start' | 'progress' | 'finish' | 'end'
+  playerName?: string
+  progress?: number
+  /** Finish order by player name, sent with phase 'end'. */
+  results?: string[]
 }
 
 export interface SessionNote {

@@ -2,15 +2,16 @@
 // optimized for iPad. Six sections: Roster · Vault · Lost Things · Notes ·
 // NPCs · Clues. All components live at module level.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { QUIZ } from '../data/quiz'
-import { fmt, mod } from '../data/rules'
+import { CONDITIONS, fmt, mod } from '../data/rules'
 import { computeSheet, skillMod } from '../lib/compute'
+import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { TableSection } from './TableSection'
-import { Btn, C, H, Section, TextArea, TextInput, body, display } from './ui'
+import { Btn, C, CalmToggle, H, Section, TextArea, TextInput, body, display } from './ui'
 
 type DmSection = 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
@@ -73,14 +74,17 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
           <h1 style={{ ...display, fontSize: 28, fontWeight: 700, color: C.gold }}>
             ✦ The Lantern-Keeper's Book
           </h1>
-          <button
-            type="button"
-            onClick={handleLeave}
-            className="text-xs"
-            style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
-          >
-            leave
-          </button>
+          <span className="flex items-center gap-3">
+            <CalmToggle />
+            <button
+              type="button"
+              onClick={handleLeave}
+              className="text-xs"
+              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            >
+              leave
+            </button>
+          </span>
         </div>
         <p className="text-xs mb-4" style={{ color: C.faint }}>
           Dungeon Master view · {store.shared ? 'campaign-wide' : 'offline — showing this device only'}
@@ -90,7 +94,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
           <p style={{ color: C.faint }}>The book is opening…</p>
         ) : (
           <>
-            {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} />}
+            {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
             {section === 'vault' && <VaultSection roster={roster} />}
             {section === 'lost' && <LostSection store={store} roster={roster} />}
             {section === 'notes' && <NotesSection store={store} />}
@@ -133,7 +137,38 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
 
 // ------------------------------------------------------------------ Roster
 
-function RosterSection({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh: () => void }) {
+function RosterSection({
+  roster,
+  onRefresh,
+  store,
+}: {
+  roster: RosterEntry[]
+  onRefresh: () => void
+  store: Store
+}) {
+  const channelRef = useRef<TableChannel | null>(null)
+  const [pickerFor, setPickerFor] = useState<string | null>(null)
+  const [sentNote, setSentNote] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const id = await store.getChannelId()
+      if (!cancelled) channelRef.current = joinTableChannel(id, {})
+    })()
+    return () => {
+      cancelled = true
+      channelRef.current?.close()
+    }
+  }, [store])
+
+  const sendCondition = (targetPlayer: string, condition: string, active: boolean) => {
+    channelRef.current?.sendCondition({ targetPlayer, condition, active })
+    setSentNote(`${condition} ${active ? 'laid upon' : 'lifted from'} ${targetPlayer} ✦`)
+    setTimeout(() => setSentNote(null), 2500)
+    setPickerFor(null)
+  }
+
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <div className="flex items-center justify-between">
@@ -147,6 +182,11 @@ function RosterSection({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh
           refresh
         </button>
       </div>
+      {sentNote && (
+        <p role="status" className="text-xs mt-1" style={{ color: C.sea }}>
+          {sentNote} — their sheet explains it in plain words.
+        </p>
+      )}
       {roster.length === 0 && (
         <p className="mt-2" style={{ color: C.faint }}>
           No travelers yet. Text your players the link and the join code.
@@ -203,10 +243,44 @@ function RosterSection({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh
                       </span>
                     )}
                   </div>
-                  {r.character.state.conditions.length > 0 && (
-                    <p className="text-xs mt-2" style={{ color: C.gold }}>
-                      {r.character.state.conditions.join(' · ')}
-                    </p>
+                  <div className="flex flex-wrap items-center gap-1 mt-2">
+                    {r.character.state.conditions.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => sendCondition(r.playerName, c, false)}
+                        className="text-xs rounded-md px-2 py-1"
+                        style={{ background: C.night, color: C.gold, border: `1px solid ${C.gold}`, minHeight: 32, cursor: 'pointer' }}
+                        title={`Lift ${c}`}
+                      >
+                        {c} ✕
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setPickerFor(pickerFor === r.playerId ? null : r.playerId)}
+                      className="text-xs underline"
+                      style={{ background: 'none', border: 'none', color: C.sea, minHeight: 32, cursor: 'pointer' }}
+                    >
+                      + condition
+                    </button>
+                  </div>
+                  {pickerFor === r.playerId && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {Object.keys(CONDITIONS)
+                        .filter((c) => !r.character!.state.conditions.includes(c))
+                        .map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => sendCondition(r.playerName, c, true)}
+                            className="text-xs rounded-md px-2 py-1"
+                            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 32, cursor: 'pointer' }}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                    </div>
                   )}
                   {r.character.notes.lost && (
                     <p className="text-xs mt-2" style={{ color: C.faint }}>

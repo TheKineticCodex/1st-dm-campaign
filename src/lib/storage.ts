@@ -53,3 +53,19 @@ export function readCache<T>(name: string): T | null {
 export function writeCache<T>(name: string, value: T): void {
   localStorage.setItem(key(name), JSON.stringify(value))
 }
+
+// ---- "calm the lanterns": the in-app motion toggle ----
+
+export function isCalm(): boolean {
+  return readCache<boolean>('calm') === true
+}
+
+export function applyCalm(calm: boolean): void {
+  writeCache('calm', calm)
+  document.documentElement.classList.toggle('calm', calm)
+}
+
+/** Call once at startup so the stored preference takes effect. */
+export function initCalm(): void {
+  document.documentElement.classList.toggle('calm', isCalm())
+}

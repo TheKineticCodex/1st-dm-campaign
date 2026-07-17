@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { DmDashboard } from './components/DmDashboard'
 import { JoinScreen } from './components/JoinScreen'
 import { TabShell } from './components/TabShell'
-import { getDeviceSession, type DeviceSession } from './lib/storage'
+import { getDeviceSession, initCalm, type DeviceSession } from './lib/storage'
+
+initCalm()
 
 function App() {
   const [session, setSession] = useState<DeviceSession | null>(() => getDeviceSession())

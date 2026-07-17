@@ -8,7 +8,7 @@ import { FortuneTab } from './FortuneTab'
 import { GuideTab } from './GuideTab'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
-import { C, body } from './ui'
+import { C, CalmToggle, body } from './ui'
 
 export type TabId = 'fortune' | 'build' | 'sheet' | 'guide'
 
@@ -98,21 +98,42 @@ export function TabShell({ session, onLeave }: TabShellProps) {
       }}
       className="flex flex-col items-center px-4 pt-4 pb-24"
     >
-      <PlayerLive store={store} playerName={session.playerName} />
+      <PlayerLive
+        store={store}
+        playerName={session.playerName}
+        onCondition={(condition, active) => {
+          if (!character) return
+          const has = character.state.conditions.includes(condition)
+          if (active === has) return
+          persistCharacter({
+            ...character,
+            state: {
+              ...character.state,
+              conditions: active
+                ? [...character.state.conditions, condition]
+                : character.state.conditions.filter((c) => c !== condition),
+            },
+            updatedAt: new Date().toISOString(),
+          })
+        }}
+      />
       <div className="w-full" style={{ maxWidth: 560 }}>
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: C.faint }}>
             ✦ {session.playerName} · {session.campaignCode}
             {!store.shared && ' · offline'}
           </p>
-          <button
-            type="button"
-            onClick={handleLeave}
-            className="text-xs"
-            style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
-          >
-            leave
-          </button>
+          <span className="flex items-center gap-3">
+            <CalmToggle />
+            <button
+              type="button"
+              onClick={handleLeave}
+              className="text-xs"
+              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            >
+              leave
+            </button>
+          </span>
         </div>
 
         {!loaded ? (
@@ -155,6 +176,8 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                   setTab('build')
                 }}
                 onGoFortune={() => setTab('fortune')}
+                store={store}
+                playerName={session.playerName}
               />
             )}
             {tab === 'guide' && <GuideTab />}

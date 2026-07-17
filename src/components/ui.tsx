@@ -3,7 +3,9 @@
 // prototype version did, and every keystroke remounted the tree and killed
 // input focus on mobile).
 
+import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
+import { applyCalm, isCalm } from '../lib/storage'
 
 export const C = {
   night: '#181030',
@@ -116,6 +118,26 @@ export function TextInput(props: {
       className="w-full rounded-lg px-4 py-3 outline-none"
       style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44 }}
     />
+  )
+}
+
+/** In-app motion toggle — accessibility amendment 8.5. */
+export function CalmToggle() {
+  const [calm, setCalm] = useState(isCalm())
+  return (
+    <button
+      type="button"
+      aria-pressed={calm}
+      onClick={() => {
+        applyCalm(!calm)
+        setCalm(!calm)
+      }}
+      className="text-xs"
+      style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+      title="Toggle animations"
+    >
+      {calm ? 'wake the lanterns' : 'calm the lanterns'}
+    </button>
   )
 }
 

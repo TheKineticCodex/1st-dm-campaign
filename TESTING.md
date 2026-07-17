@@ -104,3 +104,27 @@ up (the section tells you which mode you're in).
 
 **The mock-session test (the real one)**
 - [ ] Run one combat and deliver one secret handout with zero player confusion.
+
+## Phase NEXT-1 — First Night Kit (Snail Derby · Condition Co-pilot · Roll Feed)
+
+Needs two devices for the live parts: your iPad (DM) and a phone (player,
+private tab is fine). This doubles as the **witness protocol** — do the
+whole list before Session 1.
+
+**The Great Snail Derby 🐌**
+- [ ] iPad → Table ⚔ → **Start the Snail Derby**. Every joined player's phone is taken over by the race screen with a giant TAP! button.
+- [ ] Mash the button on the phone — the snail 🐌 crawls along that player's lane on the iPad in near-real-time.
+- [ ] First phone to 40 taps gets 🥇 on its lane. Tap **Call the race** — every phone shows its medal and placement, then returns to normal by itself.
+- [ ] Run it twice in a row — the second race starts clean.
+
+**Condition co-pilot**
+- [ ] iPad → Roster → on a character's card tap **+ condition** → pick one (say, Frightened).
+- [ ] Within a second or two, the player's Sheet shows the condition with its plain-language explanation. Tap the chip on the iPad (✕) to lift it — it vanishes from the phone.
+- [ ] On the phone: in the Spellcasting panel, tap **"Tap when you cast a concentration spell"**. Then take 1 damage (− button). A gold **"The spell wavers"** panel appears — tap to roll. 10+ says "The spell holds"; less says it slips and the toggle clears itself.
+
+**The table's dice — live**
+- [ ] With the iPad on Table ⚔, roll anything on the phone (a skill, a save, the attack). It appears at the top of the iPad's dice feed within a moment, name and all.
+- [ ] Roll until someone hits a natural 20 (or 1) — the feed row burns gold (or shows a tiny trombone 🎺).
+
+**Calm the lanterns**
+- [ ] Tap **calm the lanterns** in the header (player or DM view) — drifting motes, shimmer, and twinkles stop; content stays. **wake the lanterns** brings them back. The choice survives a reload.

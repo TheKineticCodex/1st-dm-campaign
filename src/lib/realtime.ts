@@ -4,16 +4,22 @@
 
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from './supabase'
-import type { Encounter, Handout } from '../types'
+import type { ConditionEvent, Encounter, Handout, RaceEvent, RollEvent } from '../types'
 
 export interface TableEvents {
   encounter: (e: Encounter) => void
   handout: (h: Handout) => void
+  roll: (r: RollEvent) => void
+  condition: (c: ConditionEvent) => void
+  race: (r: RaceEvent) => void
 }
 
 export interface TableChannel {
   sendEncounter(e: Encounter): void
   sendHandout(h: Handout): void
+  sendRoll(r: RollEvent): void
+  sendCondition(c: ConditionEvent): void
+  sendRace(r: RaceEvent): void
   close(): void
 }
 
@@ -26,7 +32,14 @@ export function joinTableChannel(
   on: Partial<TableEvents>,
 ): TableChannel {
   if (!supabase || !campaignId) {
-    return { sendEncounter: () => {}, sendHandout: () => {}, close: () => {} }
+    return {
+      sendEncounter: () => {},
+      sendHandout: () => {},
+      sendRoll: () => {},
+      sendCondition: () => {},
+      sendRace: () => {},
+      close: () => {},
+    }
   }
 
   const channel: RealtimeChannel = supabase.channel(`table:${campaignId}`, {
@@ -39,15 +52,26 @@ export function joinTableChannel(
   if (on.handout) {
     channel.on('broadcast', { event: 'handout' }, (msg) => on.handout!(msg.payload as Handout))
   }
+  if (on.roll) {
+    channel.on('broadcast', { event: 'roll' }, (msg) => on.roll!(msg.payload as RollEvent))
+  }
+  if (on.condition) {
+    channel.on('broadcast', { event: 'condition' }, (msg) => on.condition!(msg.payload as ConditionEvent))
+  }
+  if (on.race) {
+    channel.on('broadcast', { event: 'race' }, (msg) => on.race!(msg.payload as RaceEvent))
+  }
   channel.subscribe()
 
+  const send = (event: string, payload: unknown) =>
+    void channel.send({ type: 'broadcast', event, payload })
+
   return {
-    sendEncounter(e) {
-      void channel.send({ type: 'broadcast', event: 'encounter', payload: e })
-    },
-    sendHandout(h) {
-      void channel.send({ type: 'broadcast', event: 'handout', payload: h })
-    },
+    sendEncounter: (e) => send('encounter', e),
+    sendHandout: (h) => send('handout', h),
+    sendRoll: (r) => send('roll', r),
+    sendCondition: (c) => send('condition', c),
+    sendRace: (r) => send('race', r),
     close() {
       void supabase!.removeChannel(channel)
     },

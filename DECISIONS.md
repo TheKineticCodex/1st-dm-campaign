@@ -80,7 +80,20 @@ Choices made where the spec left room. Newest at the bottom.
     failure allows retry; "forge without a portrait" always remains.
     All generation logic isolated in src/lib/portrait.ts for easy swap.
 
-16. **Component files, not nested components.** Every component lives at
+16. **The roll feed and race are deliberately ephemeral.** Amendment 8.3
+    says durable things go to Postgres — but the live dice feed and derby
+    are theater, not records: nothing needs to survive a refresh, so they
+    ride broadcast only. If dice *history* ever becomes a feature, that's
+    when it gets a table.
+
+17. **Conditions travel DM → player as a command, not a write.** The DM
+    broadcasts apply/lift; the player's device (the authority on its own
+    character) updates and persists its own state through the existing
+    save path. No new RPC, no second writer to the character row. Cost:
+    a player whose phone is asleep misses the command — the DM just
+    re-taps, matching how a real table repeats itself.
+
+18. **Component files, not nested components.** Every component lives at
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.
