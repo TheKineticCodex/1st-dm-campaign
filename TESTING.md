@@ -42,3 +42,37 @@ the printed URL.)
 
 **The 15-minute test (the real one)**
 - [ ] Hand your phone to someone who has never seen this. Link → quiz → built character → rolling dice, under 15 minutes, no help from you.
+
+## Phase 2 — DM Dashboard
+
+Best on the iPad, works on the phone. If you were signed in as a player on
+this device, tap **leave** first.
+
+**Getting in**
+- [ ] At the gate, enter code `LANTERNKEEPER` and your name — you land in **The Lantern-Keeper's Book**, not the player app.
+- [ ] Note the line under the title: before Supabase is set up it says "offline — showing this device only"; after, "campaign-wide".
+
+**Roster**
+- [ ] With no players joined it says "No travelers yet."
+- [ ] (After Supabase setup) Have a player build a character on their phone, then tap **refresh** — their card appears with HP, AC, Passive Perception, Initiative, and Spell DC if they're a caster.
+- [ ] If they wrote something in "What I lost", it shows on their card marked 🔒.
+
+**Vault**
+- [ ] Each player who took the quiz has a card with every answer; the two Lost-Thing questions ("risk everything to get back" / "afraid of losing") burn gold with a ✦.
+
+**Lost Things**
+- [ ] Each forged character has three boxes: What was taken / What they believe / What actually happened. Type in each, tap elsewhere, switch sections and come back — still there.
+- [ ] Verify on a player's phone that none of this is visible anywhere.
+
+**Notes**
+- [ ] **+ New session note** opens the template (What happened / Clues found / Clues missed / NPCs met / Threads open). Save it; it appears in the list as "Session 1".
+
+**NPCs**
+- [ ] **Quick-add NPC**, fill in name + a trait, save. The card shows.
+- [ ] Search for a word from the trait — the card is found. Search nonsense — "No match in the book."
+
+**Clues**
+- [ ] **+ New conclusion**, type a conclusion and three clues, tick one as found, tap **save changes**. Reload the page — everything is still there, tick included.
+
+**The prep test (the real one)**
+- [ ] Sit with the iPad and prep Session 1 — NPCs, clue paths, each character's Lost Thing — without touching paper.

@@ -18,6 +18,8 @@ import type {
 export interface RosterEntry {
   playerId: string
   playerName: string
+  /** Server row id for DM-only records (lost_things); null until a character exists. */
+  characterId: string | null
   character: SavedCharacter | null
   quiz: QuizResult | null
 }
@@ -88,6 +90,7 @@ class LocalStore implements Store {
       {
         playerId: 'this-device',
         playerName: quiz?.playerName || character?.build.name || this.session.playerName,
+        characterId: character ? 'this-device' : null,
         character,
         quiz,
       },

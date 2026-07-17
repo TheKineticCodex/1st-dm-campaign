@@ -29,7 +29,25 @@ Choices made where the spec left room. Newest at the bottom.
 6. **Seed codes.** `SEAFORGOT` (players) and `LANTERNKEEPER` (DM) are
    seeded by `supabase/schema.sql`; the owner can edit before running.
 
-7. **Component files, not nested components.** Every component lives at
+7. **Tailwind v4 added during the Phase 1 port.** The prototypes use
+   Tailwind utility classes throughout; installing Tailwind (one plugin,
+   one import) let the port keep the prototype markup verbatim instead of
+   hand-translating every class to CSS.
+
+8. **HP stored as damage-taken, not current-HP.** Max HP is derived from
+   the build, so if the build changes (level up, CON bump) current HP can
+   never desync or exceed the new max.
+
+9. **Level-2 rules data added with `// VERIFY` flags.** The prototype only
+   covers level 1 (verified). Level 2 features/slots for all twelve
+   classes were added from the 2024 PHB per spec §4.5, but each entry is
+   flagged for the owner to check before the party reaches level 2.
+
+10. **Persistence via SECURITY DEFINER RPCs.** Anon-key clients can only
+    call functions; every function demands a device token (players) or
+    the dm_code (DM). Tables stay fully RLS-locked with zero policies.
+
+11. **Component files, not nested components.** Every component lives at
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.

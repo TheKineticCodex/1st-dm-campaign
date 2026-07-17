@@ -6,11 +6,16 @@ code, the DM has a separate code.
 
 ## Status
 
-- **Phase 1 — Player Companion:** in progress. App shell, join flow, design
-  system, and database schema are in place. The Fortune quiz, character
-  Build forge, Sheet, and Guide tabs are being ported from the prototypes.
-- **Phase 2 — DM Dashboard:** not started.
+- **Phase 1 — Player Companion:** ✅ complete. Fortune quiz, character
+  forge, live sheet (tappable dice, HP/death saves, spell slots, rests,
+  conditions, private notes), beginner guide.
+- **Phase 2 — DM Dashboard:** ✅ complete. Roster, quiz vault, Lost Things,
+  session notes, NPC cards, three-clue ledger. Sign in with the DM code.
 - **Phase 3 — Table Mode:** not started.
+
+The app works fully **without any setup** (offline mode — everything saves
+to the device). Supabase connects the devices; Vercel puts it on the
+internet. Both below.
 
 ## Run it locally
 
@@ -19,28 +24,44 @@ npm install
 npm run dev
 ```
 
-Open the printed URL. Without Supabase configured the app runs in offline
-mode (everything saves to the device only).
+## Owner setup (10 minutes)
 
-## Wire up Supabase (one-time, ~5 minutes)
+Do this once, in order. No coding involved.
 
-1. Create a project at [supabase.com](https://supabase.com) (free tier).
-2. In the dashboard, open **SQL Editor → New query**, paste the contents of
-   [`supabase/schema.sql`](supabase/schema.sql), and run it. This creates
-   every table plus the campaign itself (join code `SEAFORGOT`, DM code
-   `LANTERNKEEPER` — edit the last lines of the file first if you want
-   different codes).
-3. Open **Project Settings → API** and copy the Project URL and the `anon`
-   key into a `.env.local` file (see [`.env.example`](.env.example)).
-4. For the deployed site, add the same two values as environment variables
-   in Vercel/Netlify.
+**Part 1 — Supabase (the shared memory), ~6 minutes**
 
-## Deploy (Vercel free tier)
+1. Go to [supabase.com](https://supabase.com), sign in, and click
+   **New project**. Name it anything (e.g. `sea-forgot`), pick the free
+   plan, choose a password (you won't need it again), wait ~1 minute for
+   it to provision.
+2. In the left sidebar click **SQL Editor**, then **New query**.
+3. On GitHub, open [`supabase/schema.sql`](supabase/schema.sql), copy ALL
+   of it, paste into the query box, click **Run**. You should see
+   "Success. No rows returned."
+   - Want different codes than `SEAFORGOT` / `LANTERNKEEPER`? Edit the
+     very last lines before running.
+4. Repeat with [`supabase/rpcs.sql`](supabase/rpcs.sql): new query, paste
+   all of it, **Run**.
+5. In the left sidebar click **Project Settings → API**. Keep this page
+   open — you need two values from it: **Project URL** and the **anon
+   public** key. (The anon key is safe to expose; the SQL you just ran is
+   what protects the data.)
 
-1. Go to [vercel.com/new](https://vercel.com/new) and import this GitHub
-   repository. Vercel auto-detects Vite; the defaults are correct.
-2. Add the two `VITE_SUPABASE_*` environment variables.
-3. Deploy. Text the resulting URL to your players.
+**Part 2 — Vercel (the live link), ~4 minutes**
+
+1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
+2. Import this repository (`1st-dm-campaign`). Vercel detects Vite —
+   don't change any build settings.
+3. Before clicking Deploy, expand **Environment Variables** and add both:
+   - `VITE_SUPABASE_URL` = the Project URL from Supabase
+   - `VITE_SUPABASE_ANON_KEY` = the anon public key from Supabase
+4. Click **Deploy**. In ~1 minute you get a URL like
+   `1st-dm-campaign.vercel.app`.
+5. Text that URL + the join code to your players. Keep the DM code for
+   yourself — entering it at the gate opens the Lantern-Keeper's Book.
+
+To test locally against Supabase, copy `.env.example` to `.env.local` and
+fill in the same two values.
 
 ## Project layout
 
