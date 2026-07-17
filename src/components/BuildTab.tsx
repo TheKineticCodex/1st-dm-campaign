@@ -13,21 +13,29 @@ import {
   SPECIES,
 } from '../data/rules'
 import type { CharacterBuild } from '../types'
+import { mintPortraitUrl, portraitPrompt } from '../lib/portrait'
 import { CharacterCard } from './CharacterCard'
 import { AURAS, CLASS_SIGILS, DEFAULT_AURA, SPECIES_GLYPHS } from './glyphs'
-import { Btn, C, Eyebrow, H, Pick, Section, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, H, Pick, Section, TextArea, TextInput, display } from './ui'
 
 const STEPS = ['Name', 'Species', 'Class', 'Background', 'Scores', 'Skills', 'Done']
+
+type MirrorStage = 'idle' | 'gazing' | 'seen' | 'failed'
 
 interface BuildTabProps {
   build: CharacterBuild
   onChange: (b: CharacterBuild) => void
-  onForged: () => void
+  /** Receives the appearance text so it lands in the sheet's notes. */
+  onForged: (appearance: string) => void
+  /** The quiz's "what does your character look like" answer, as a seed. */
+  quizLook?: string
 }
 
-export function BuildTab({ build: ch, onChange, onForged }: BuildTabProps) {
+export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabProps) {
   const [step, setStep] = useState(0)
   const [speciesDetail, setSpeciesDetail] = useState<string | null>(null)
+  const [appearance, setAppearance] = useState(quizLook ?? '')
+  const [mirror, setMirror] = useState<MirrorStage>(ch.portraitUrl ? 'seen' : 'idle')
 
   const setCh = onChange
 
@@ -378,13 +386,103 @@ export function BuildTab({ build: ch, onChange, onForged }: BuildTabProps) {
           <p className="text-xs text-center mb-3 italic" style={{ color: AURAS[ch.aura ?? DEFAULT_AURA].color }}>
             {AURAS[ch.aura ?? DEFAULT_AURA].name} — {AURAS[ch.aura ?? DEFAULT_AURA].word}
           </p>
+
+          {/* The Mirror — one look, and it's final */}
+          <Section style={{ border: `1px solid ${C.gold}55` }}>
+            <Eyebrow>The mirror waits</Eyebrow>
+            {mirror !== 'seen' && (
+              <>
+                <p className="text-sm mb-2" style={{ color: C.parchment }}>
+                  Describe yourself — truly. The mirror paints from your words: hair, eyes,
+                  clothes, the thing you always carry, the look on your face when no one's
+                  watching.
+                </p>
+                <TextArea
+                  rows={3}
+                  value={appearance}
+                  onChange={setAppearance}
+                  placeholder="e.g. Silver braids threaded with tiny bells, patched sailor's coat, one eye green and one gold, always clutching a cracked seashell…"
+                />
+                <p className="text-xs mt-2 italic" style={{ color: C.gold }}>
+                  ⚠ The mirror shows you once, and does not repent. When you look, that is who
+                  you are.
+                </p>
+              </>
+            )}
+
+            {mirror === 'gazing' && ch.portraitUrl && (
+              <div className="text-center mt-3">
+                <p className="text-sm spark" style={{ color: C.gold }}>
+                  ✦ The mirror gathers its silver…
+                </p>
+                <img
+                  src={ch.portraitUrl}
+                  alt=""
+                  style={{ width: 1, height: 1, opacity: 0 }}
+                  onLoad={() => setMirror('seen')}
+                  onError={() => {
+                    setCh({ ...ch, portraitUrl: undefined })
+                    setMirror('failed')
+                  }}
+                />
+              </div>
+            )}
+
+            {mirror === 'failed' && (
+              <p className="text-sm mt-2" style={{ color: '#C96A6A' }}>
+                The mirror clouded over — the fault is the mist's, not yours. Try again, or forge
+                without a portrait.
+              </p>
+            )}
+
+            {mirror === 'seen' && ch.portraitUrl && (
+              <div className="text-center mt-2" style={{ animation: 'cardRise .5s ease-out' }}>
+                <img
+                  src={ch.portraitUrl}
+                  alt={`The mirror's portrait of ${ch.name}`}
+                  className="rounded-xl mx-auto"
+                  style={{
+                    width: '100%',
+                    maxWidth: 320,
+                    border: `2px solid ${AURAS[ch.aura ?? DEFAULT_AURA].color}`,
+                    boxShadow: `0 0 28px ${AURAS[ch.aura ?? DEFAULT_AURA].color}55`,
+                  }}
+                />
+                <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
+                  The mirror has seen you. This is who steps through the gate.
+                </p>
+              </div>
+            )}
+
+            {(mirror === 'idle' || mirror === 'failed') && (
+              <Btn
+                shimmer
+                onClick={() => {
+                  const url = mintPortraitUrl(portraitPrompt(ch, appearance))
+                  setCh({ ...ch, portraitUrl: url })
+                  setMirror('gazing')
+                }}
+              >
+                Let the mirror see me ✦
+              </Btn>
+            )}
+          </Section>
+
           <Section>
             <p className="text-sm" style={{ color: C.faint }}>
               Everything else — HP, AC, attacks, spells — is calculated on your sheet the moment
               the forge seals.
             </p>
           </Section>
-          <Btn onClick={onForged}>Forge my character sheet ✦</Btn>
+          {mirror === 'seen' ? (
+            <Btn shimmer onClick={() => onForged(appearance)}>
+              This is who I am — seal the forge ✦
+            </Btn>
+          ) : (
+            <Btn secondary onClick={() => onForged(appearance)} disabled={mirror === 'gazing'}>
+              Forge without a portrait
+            </Btn>
+          )}
           <Btn secondary onClick={() => setStep(0)}>
             Start over
           </Btn>

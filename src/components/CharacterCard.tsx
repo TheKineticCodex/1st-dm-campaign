@@ -41,7 +41,7 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
             animation: 'glow-pulse 3.2s ease-in-out infinite',
           }}
         />
-        {/* medallion ring */}
+        {/* medallion ring — the mirror's portrait once seen, sigil before */}
         <div
           style={{
             position: 'absolute',
@@ -52,14 +52,23 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
             boxShadow: `0 0 ${compact ? 10 : 24}px ${aura.color}44, inset 0 0 ${compact ? 8 : 18}px ${aura.color}22`,
             display: 'grid',
             placeItems: 'center',
-            padding: compact ? 12 : 26,
+            padding: build.portraitUrl ? 0 : compact ? 12 : 26,
             color: aura.color,
+            overflow: 'hidden',
           }}
         >
-          {speciesGlyph ?? (
-            <span aria-hidden="true" style={{ fontSize: compact ? 18 : 36, opacity: 0.5 }}>
-              ?
-            </span>
+          {build.portraitUrl ? (
+            <img
+              src={build.portraitUrl}
+              alt={`Portrait of ${build.name || 'the character'}`}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+            />
+          ) : (
+            speciesGlyph ?? (
+              <span aria-hidden="true" style={{ fontSize: compact ? 18 : 36, opacity: 0.5 }}>
+                ?
+              </span>
+            )
           )}
         </div>
         {/* class badge */}

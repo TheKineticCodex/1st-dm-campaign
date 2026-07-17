@@ -69,7 +69,18 @@ Choices made where the spec left room. Newest at the bottom.
     and it upgrades the same component that plain handouts use — one
     envelope for both. Ephemeral mode is opt-in per handout (60s).
 
-15. **Component files, not nested components.** Every component lives at
+15. **The Mirror (AI portraits) — owner-approved exception to §9's "no AI
+    in v1".** Requested by the owner mid-build. Uses pollinations.ai:
+    free, keyless, no account — so it honors §2's "no paid services".
+    The prompt is assembled from the character's choices (species, class,
+    background, aura) plus the player's own appearance text; the random
+    seed is baked into the stored URL so a portrait, once seen, never
+    changes. One look is final by design — the fiction ("the mirror does
+    not repent") is the nudge to describe yourself well first. Network
+    failure allows retry; "forge without a portrait" always remains.
+    All generation logic isolated in src/lib/portrait.ts for easy swap.
+
+16. **Component files, not nested components.** Every component lives at
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.

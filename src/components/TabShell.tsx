@@ -59,11 +59,12 @@ export function TabShell({ session, onLeave }: TabShellProps) {
 
   const [sealing, setSealing] = useState(false)
 
-  const forgeCharacter = () => {
+  const forgeCharacter = (appearance: string) => {
+    const baseNotes = character?.notes ?? EMPTY_NOTES
     const c: SavedCharacter = {
       build: draftBuild,
       state: character?.state ?? EMPTY_STATE,
-      notes: character?.notes ?? EMPTY_NOTES,
+      notes: { ...baseNotes, appearance: appearance.trim() || baseNotes.appearance },
       updatedAt: new Date().toISOString(),
     }
     setCharacter(c)
@@ -137,7 +138,14 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 }}
               />
             )}
-            {tab === 'build' && <BuildTab build={draftBuild} onChange={setDraftBuild} onForged={forgeCharacter} />}
+            {tab === 'build' && (
+              <BuildTab
+                build={draftBuild}
+                onChange={setDraftBuild}
+                onForged={forgeCharacter}
+                quizLook={quiz?.answers.look}
+              />
+            )}
             {tab === 'sheet' && (
               <SheetTab
                 character={character}

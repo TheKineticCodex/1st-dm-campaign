@@ -15,6 +15,8 @@ export interface CharacterBuild {
   level: number
   /** Aura key (see glyphs.tsx AURAS) — the light the lanterns see in you. */
   aura?: string
+  /** The mirror's portrait — seed baked into the URL; once seen, final. */
+  portraitUrl?: string
 }
 
 /** Volatile play state, tracked separately from the build. */

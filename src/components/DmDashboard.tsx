@@ -167,7 +167,16 @@ function RosterSection({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh
                 </p>
               ) : (
                 <>
-                  <p style={{ ...display, fontSize: 22, fontWeight: 700 }}>{r.character.build.name}</p>
+                  <div className="flex items-center gap-2">
+                    {r.character.build.portraitUrl && (
+                      <img
+                        src={r.character.build.portraitUrl}
+                        alt=""
+                        style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
+                      />
+                    )}
+                    <p style={{ ...display, fontSize: 22, fontWeight: 700 }}>{r.character.build.name}</p>
+                  </div>
                   <p className="text-xs mb-2" style={{ color: C.faint }}>
                     Level {sheet.level} {r.character.build.species} {r.character.build.klass} ·{' '}
                     {r.character.build.bg}
