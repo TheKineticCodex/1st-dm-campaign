@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import {
-  mintDeviceToken,
-  saveDeviceSession,
-  type DeviceSession,
-} from '../lib/storage'
+import { mintDeviceToken, saveDeviceSession, type DeviceSession } from '../lib/storage'
+import { getStore } from '../lib/store'
+import { Btn, C, TextInput, body, display } from './ui'
 
 interface JoinScreenProps {
   onJoined: (session: DeviceSession) => void
@@ -13,8 +11,9 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  function handleJoin() {
+  async function handleJoin() {
     const trimmedCode = code.trim().toUpperCase()
     const trimmedName = name.trim()
     if (!trimmedCode) {
@@ -25,14 +24,20 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
       setError('Every traveler owes the carnival a name — even a borrowed one.')
       return
     }
-    // Campaign code validation against the server happens once Supabase is
-    // configured; until then any code opens the door (offline mode).
-    const session: DeviceSession = {
+    setBusy(true)
+    const provisional: DeviceSession = {
       campaignCode: trimmedCode,
       playerName: trimmedName,
       deviceToken: mintDeviceToken(),
       role: 'player',
     }
+    const role = await getStore(provisional).joinCampaign(trimmedCode, trimmedName, provisional.deviceToken)
+    setBusy(false)
+    if (role === 'invalid') {
+      setError('The lanterns do not recognize that word. Check the code your Dungeon Master sent you.')
+      return
+    }
+    const session: DeviceSession = { ...provisional, role }
     saveDeviceSession(session)
     onJoined(session)
   }
@@ -41,64 +46,71 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
     <main
       style={{
         minHeight: '100dvh',
+        background: `radial-gradient(1200px 600px at 50% -10%, #2B1E55 0%, ${C.night} 55%)`,
+        ...body,
+        color: C.parchment,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '24px',
-        maxWidth: 480,
-        margin: '0 auto',
+        padding: 24,
       }}
     >
-      <div className="rise" style={{ textAlign: 'center', marginBottom: 28 }}>
-        <div className="spark" style={{ fontSize: 28 }} aria-hidden="true">
-          ✦
-        </div>
-        <h1 style={{ fontSize: 34, marginTop: 8 }}>The Song the Sea Forgot</h1>
-        <p className="faint" style={{ marginTop: 10, fontStyle: 'italic' }}>
-          The carnival never charges coin. What it does charge is another
-          matter.
-        </p>
-      </div>
-
-      <div className="panel rise" style={{ display: 'grid', gap: 14 }}>
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span className="accent" style={{ fontSize: 15 }}>
-            Invitation code
-          </span>
-          <input
-            className="field"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="SEAFORGOT"
-            autoCapitalize="characters"
-            autoCorrect="off"
-            spellCheck={false}
-            style={{ letterSpacing: '0.12em', textTransform: 'uppercase' }}
-          />
-        </label>
-
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span className="accent" style={{ fontSize: 15 }}>
-            Your name
-          </span>
-          <input
-            className="field"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="What shall the lanterns call you?"
-            autoComplete="given-name"
-          />
-        </label>
-
-        {error && (
-          <p role="alert" style={{ color: 'var(--gold)', fontSize: 15 }}>
-            {error}
+      <div className="w-full mx-auto" style={{ maxWidth: 480 }}>
+        <div className="text-center mb-7" style={{ animation: 'cardRise .45s ease-out' }}>
+          <div className="spark" style={{ fontSize: 28 }} aria-hidden="true">
+            ✦
+          </div>
+          <h1 style={{ ...display, fontSize: 36, fontWeight: 700, color: C.gold, marginTop: 8 }}>
+            The Song the Sea Forgot
+          </h1>
+          <p className="mt-3 italic" style={{ color: C.faint }}>
+            The carnival never charges coin. What it does charge is another matter.
           </p>
-        )}
+        </div>
 
-        <button type="button" className="btn btn-gold" onClick={handleJoin}>
-          Step through the gate ✦
-        </button>
+        <div
+          className="rounded-xl p-5 grid gap-4"
+          style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, animation: 'cardRise .55s ease-out' }}
+        >
+          <label className="grid gap-1">
+            <span className="text-sm" style={{ color: C.sea }}>
+              Invitation code
+            </span>
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="SEAFORGOT"
+              autoCapitalize="characters"
+              autoCorrect="off"
+              spellCheck={false}
+              className="w-full rounded-lg px-4 py-3 outline-none uppercase"
+              style={{
+                background: C.night,
+                border: `1px solid ${C.panelEdge}`,
+                color: C.parchment,
+                letterSpacing: '0.12em',
+                minHeight: 44,
+              }}
+            />
+          </label>
+
+          <label className="grid gap-1">
+            <span className="text-sm" style={{ color: C.sea }}>
+              Your name
+            </span>
+            <TextInput value={name} onChange={setName} placeholder="What shall the lanterns call you?" />
+          </label>
+
+          {error && (
+            <p role="alert" className="text-sm" style={{ color: C.gold }}>
+              {error}
+            </p>
+          )}
+
+          <Btn onClick={handleJoin} disabled={busy}>
+            {busy ? 'The gate is listening…' : 'Step through the gate ✦'}
+          </Btn>
+        </div>
       </div>
     </main>
   )

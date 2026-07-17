@@ -1,4 +1,5 @@
 /* ✦ The Song the Sea Forgot — design tokens (from the witchlight prototypes) */
+@import 'tailwindcss';
 
 :root {
   --night: #181030;

@@ -1,38 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
+import { getStore } from '../lib/store'
+import { EMPTY_BUILD, EMPTY_NOTES, EMPTY_STATE, type CharacterBuild, type QuizResult, type SavedCharacter } from '../types'
+import { BuildTab } from './BuildTab'
+import { FortuneTab } from './FortuneTab'
+import { GuideTab } from './GuideTab'
+import { SheetTab } from './SheetTab'
+import { C, body } from './ui'
 
 export type TabId = 'fortune' | 'build' | 'sheet' | 'guide'
 
-const TABS: { id: TabId; label: string; glyph: string }[] = [
-  { id: 'fortune', label: 'Fortune', glyph: '☾' },
-  { id: 'build', label: 'Build', glyph: '⚒' },
-  { id: 'sheet', label: 'Sheet', glyph: '✎' },
-  { id: 'guide', label: 'Guide', glyph: '❧' },
+const TABS: [TabId, string, string][] = [
+  ['fortune', '✦', 'Fortune'],
+  ['build', '⚒', 'Build'],
+  ['sheet', '❖', 'Sheet'],
+  ['guide', '✧', 'Guide'],
 ]
-
-/**
- * Placeholder copy until the witchlight-quiz / players-companion prototypes
- * are ported into each tab. Each placeholder is replaced by a real screen
- * in Phase 1.
- */
-const PLACEHOLDERS: Record<TabId, { title: string; body: string }> = {
-  fortune: {
-    title: 'The Fortune Teller is still unpacking her wagon',
-    body: 'Soon she will read what the sea took from you. The divination quiz arrives here.',
-  },
-  build: {
-    title: 'The Character Forge is being stoked',
-    body: 'Species, class, background — the makings of a traveler. The builder arrives here.',
-  },
-  sheet: {
-    title: 'Your page in the ledger is still blank',
-    body: 'When your character is forged, their sheet lives here — dice, hit points, spells and all.',
-  },
-  guide: {
-    title: 'The Rules of the Road are being lettered',
-    body: 'A gentle guide for first-time travelers of the Feywild. It arrives here.',
-  },
-}
 
 interface TabShellProps {
   session: DeviceSession
@@ -40,11 +23,52 @@ interface TabShellProps {
 }
 
 export function TabShell({ session, onLeave }: TabShellProps) {
+  const store = useMemo(() => getStore(session), [session])
   const [tab, setTab] = useState<TabId>('fortune')
-  const placeholder = PLACEHOLDERS[tab]
+  const [loaded, setLoaded] = useState(false)
+  const [character, setCharacter] = useState<SavedCharacter | null>(null)
+  const [draftBuild, setDraftBuild] = useState<CharacterBuild>(EMPTY_BUILD)
+  const [quiz, setQuiz] = useState<QuizResult | null>(null)
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  function handleLeave() {
-    if (window.confirm('Leave the carnival? Your things stay saved on this device.')) {
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [c, q] = await Promise.all([store.getCharacter(), store.getQuizResult()])
+      if (cancelled) return
+      if (c) {
+        setCharacter(c)
+        setDraftBuild(c.build)
+        setTab('sheet')
+      }
+      if (q) setQuiz(q)
+      setLoaded(true)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [store])
+
+  const persistCharacter = (c: SavedCharacter) => {
+    setCharacter(c)
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => void store.saveCharacter(c), 600)
+  }
+
+  const forgeCharacter = () => {
+    const c: SavedCharacter = {
+      build: draftBuild,
+      state: character?.state ?? EMPTY_STATE,
+      notes: character?.notes ?? EMPTY_NOTES,
+      updatedAt: new Date().toISOString(),
+    }
+    setCharacter(c)
+    void store.saveCharacter(c)
+    setTab('sheet')
+  }
+
+  const handleLeave = () => {
+    if (window.confirm('Leave the carnival? Your things stay saved.')) {
       clearDeviceSession()
       onLeave()
     }
@@ -54,95 +78,91 @@ export function TabShell({ session, onLeave }: TabShellProps) {
     <div
       style={{
         minHeight: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        maxWidth: 720,
-        margin: '0 auto',
+        background: `radial-gradient(1200px 600px at 50% -10%, #2B1E55 0%, ${C.night} 55%)`,
+        ...body,
+        color: C.parchment,
       }}
+      className="flex flex-col items-center px-4 pt-4 pb-24"
     >
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          padding: '18px 20px 6px',
-        }}
-      >
-        <h1 style={{ fontSize: 22 }}>
-          <span className="spark" aria-hidden="true">
-            ✦
-          </span>{' '}
-          The Song the Sea Forgot
-        </h1>
-        <button
-          type="button"
-          onClick={handleLeave}
-          className="faint"
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: 14,
-            minHeight: 'var(--tap-target)',
-            cursor: 'pointer',
-          }}
-        >
-          {session.playerName} · leave
-        </button>
-      </header>
-
-      <main style={{ flex: 1, padding: '12px 20px 20px' }}>
-        <section key={tab} className="panel rise" aria-live="polite">
-          <h2 style={{ fontSize: 24 }}>{placeholder.title}</h2>
-          <p className="faint" style={{ marginTop: 10 }}>
-            {placeholder.body}
+      <div className="w-full" style={{ maxWidth: 560 }}>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-xs" style={{ color: C.faint }}>
+            ✦ {session.playerName} · {session.campaignCode}
+            {!store.shared && ' · offline'}
           </p>
-        </section>
-      </main>
+          <button
+            type="button"
+            onClick={handleLeave}
+            className="text-xs"
+            style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+          >
+            leave
+          </button>
+        </div>
+
+        {!loaded ? (
+          <p className="text-center mt-10" style={{ color: C.faint }}>
+            The lanterns are lighting…
+          </p>
+        ) : (
+          <>
+            {tab === 'fortune' && (
+              <FortuneTab
+                store={store}
+                playerName={session.playerName}
+                savedResult={quiz}
+                onSaved={setQuiz}
+                onBuildFromQuiz={(name, klass) => {
+                  setDraftBuild({ ...draftBuild, name: draftBuild.name || name, klass: klass ?? draftBuild.klass })
+                  setTab('build')
+                }}
+              />
+            )}
+            {tab === 'build' && <BuildTab build={draftBuild} onChange={setDraftBuild} onForged={forgeCharacter} />}
+            {tab === 'sheet' && (
+              <SheetTab
+                character={character}
+                onUpdate={persistCharacter}
+                onEdit={() => {
+                  if (character) setDraftBuild(character.build)
+                  setTab('build')
+                }}
+                onGoFortune={() => setTab('fortune')}
+              />
+            )}
+            {tab === 'guide' && <GuideTab />}
+          </>
+        )}
+      </div>
 
       <nav
-        aria-label="Sections"
+        className="fixed bottom-0 left-0 right-0 flex justify-center"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 6,
-          padding: '8px 12px calc(10px + env(safe-area-inset-bottom))',
-          background: 'var(--panel)',
-          borderTop: '1px solid var(--panel-edge)',
-          position: 'sticky',
-          bottom: 0,
+          background: `${C.night}F2`,
+          borderTop: `1px solid ${C.panelEdge}`,
+          backdropFilter: 'blur(8px)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          zIndex: 50,
         }}
+        aria-label="Sections"
       >
-        {TABS.map((t) => {
-          const active = t.id === tab
-          return (
+        <div className="flex w-full" style={{ maxWidth: 560 }}>
+          {TABS.map(([id, icon, label]) => (
             <button
-              key={t.id}
+              key={id}
               type="button"
-              onClick={() => setTab(t.id)}
-              aria-current={active ? 'page' : undefined}
-              style={{
-                minHeight: 'var(--tap-target)',
-                border: 'none',
-                borderRadius: 'var(--radius-sm)',
-                background: active ? 'var(--night)' : 'transparent',
-                color: active ? 'var(--gold)' : 'var(--faint)',
-                fontFamily: 'var(--font-display)',
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'grid',
-                gap: 2,
-                placeItems: 'center',
-                padding: '6px 0',
-              }}
+              onClick={() => setTab(id)}
+              className="flex-1 py-3 text-center"
+              style={{ color: tab === id ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              aria-current={tab === id ? 'page' : undefined}
             >
-              <span aria-hidden="true" style={{ fontSize: 15 }}>
-                {t.glyph}
+              <span className="block text-lg" aria-hidden="true">
+                {icon}
               </span>
-              {t.label}
+              <span className="text-xs">{label}</span>
             </button>
-          )
-        })}
+          ))}
+        </div>
       </nav>
     </div>
   )
