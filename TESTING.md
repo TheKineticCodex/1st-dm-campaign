@@ -126,5 +126,23 @@ whole list before Session 1.
 - [ ] With the iPad on Table ⚔, roll anything on the phone (a skill, a save, the attack). It appears at the top of the iPad's dice feed within a moment, name and all.
 - [ ] Roll until someone hits a natural 20 (or 1) — the feed row burns gold (or shows a tiny trombone 🎺).
 
+## Phase NEXT-2 — The Bargain Ledger ⚖
+
+Works fully offline on one device (DM sends → leave → rejoin as the
+player). Live, it crosses devices like whispers do.
+
+**Striking a bargain (DM)**
+- [ ] Table ⚔ → **Strike a bargain**: pick who signs, give it a title, who it's struck with, what they receive, and what is owed. Tap **Let the quill write the legalese ✒** — the terms compose themselves (edit freely). Offer it.
+
+**Signing (player)**
+- [ ] The contract arrives as an illuminated page: double gold border, wax seal, the debt boxed in gold.
+- [ ] **Seal the bargain** stays gray until you actually sign — draw your signature with a finger on the line. **Blot the ink** clears a bad one; **I must think on it** tucks the offer into the Ledger unsigned.
+- [ ] After sealing: the **Ledger** tab lists it under "the debt stands," with what's owed in gold letters. Open it — your real signature is on the page.
+- [ ] Close the app right after signing, reopen — still sealed (signatures save instantly, no grace period).
+
+**Fulfilling and breaking (DM)**
+- [ ] Roster → the character's card now shows **⚖ Bargains** with the deal. Tap **fulfill** (confirm) — live, the player's phone erupts in the gold-burn ceremony; their ledger moves it to "the settled pages," struck through.
+- [ ] Strike another and tap **break** — the crack ceremony, 💔, and the contract stays in their ledger, scarred, marked "the Feywild remembers."
+
 **Calm the lanterns**
 - [ ] Tap **calm the lanterns** in the header (player or DM view) — drifting motes, shimmer, and twinkles stop; content stays. **wake the lanterns** brings them back. The choice survives a reload.

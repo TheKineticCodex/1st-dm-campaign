@@ -93,7 +93,15 @@ Choices made where the spec left room. Newest at the bottom.
     a player whose phone is asleep misses the command — the DM just
     re-taps, matching how a real table repeats itself.
 
-18. **Component files, not nested components.** Every component lives at
+18. **Bargains live inside the character record.** Same authority pattern
+    as conditions (#17): offers travel as durable handouts (so late
+    joiners still receive them), the player's device seals and persists
+    its own copy, resolutions broadcast as commands, and the DM reads
+    every bargain's state back through the roster. Zero schema changes.
+    Bargain writes skip the save debounce — a signature must survive the
+    phone locking the moment the wax sets.
+
+19. **Component files, not nested components.** Every component lives at
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.

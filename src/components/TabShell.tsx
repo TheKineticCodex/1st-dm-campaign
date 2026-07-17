@@ -1,21 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
-import { EMPTY_BUILD, EMPTY_NOTES, EMPTY_STATE, type CharacterBuild, type QuizResult, type SavedCharacter } from '../types'
+import {
+  EMPTY_BUILD,
+  EMPTY_NOTES,
+  EMPTY_STATE,
+  type Bargain,
+  type CharacterBuild,
+  type QuizResult,
+  type SavedCharacter,
+} from '../types'
 import { BuildTab } from './BuildTab'
 import { CharacterCard } from './CharacterCard'
 import { FortuneTab } from './FortuneTab'
 import { GuideTab } from './GuideTab'
+import { LedgerTab } from './LedgerTab'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
 import { C, CalmToggle, body } from './ui'
 
-export type TabId = 'fortune' | 'build' | 'sheet' | 'guide'
+export type TabId = 'fortune' | 'build' | 'sheet' | 'ledger' | 'guide'
 
 const TABS: [TabId, string, string][] = [
   ['fortune', '✦', 'Fortune'],
   ['build', '⚒', 'Build'],
   ['sheet', '❖', 'Sheet'],
+  ['ledger', '⚖', 'Ledger'],
   ['guide', '✧', 'Guide'],
 ]
 
@@ -81,6 +91,44 @@ export function TabShell({ session, onLeave }: TabShellProps) {
     }, 2100)
   }
 
+  // A1 — the player's device is the authority on its own bargains.
+  // Bargain changes persist IMMEDIATELY (no debounce): a signature must
+  // survive the player locking their phone the moment the wax sets.
+  const mutateBargains = (fn: (list: Bargain[]) => Bargain[]) => {
+    setCharacter((cur) => {
+      if (!cur) return cur
+      const next: SavedCharacter = {
+        ...cur,
+        notes: { ...cur.notes, bargains: fn(cur.notes.bargains ?? []) },
+        updatedAt: new Date().toISOString(),
+      }
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      void store.saveCharacter(next)
+      return next
+    })
+  }
+
+  const offerBargain = (b: Bargain) =>
+    mutateBargains((list) => (list.some((x) => x.id === b.id) ? list : [...list, b]))
+
+  const signBargain = (id: string, signatureDataUrl: string) =>
+    mutateBargains((list) =>
+      list.map((x) =>
+        x.id === id && x.status === 'offered'
+          ? { ...x, status: 'sealed' as const, signatureDataUrl, sealedAt: new Date().toISOString() }
+          : x,
+      ),
+    )
+
+  const resolveBargain = (id: string, outcome: 'fulfilled' | 'broken') =>
+    mutateBargains((list) =>
+      list.map((x) =>
+        x.id === id && x.status === 'sealed'
+          ? { ...x, status: outcome, resolvedAt: new Date().toISOString() }
+          : x,
+      ),
+    )
+
   const handleLeave = () => {
     if (window.confirm('Leave the carnival? Your things stay saved.')) {
       clearDeviceSession()
@@ -116,6 +164,9 @@ export function TabShell({ session, onLeave }: TabShellProps) {
             updatedAt: new Date().toISOString(),
           })
         }}
+        onBargainOffer={offerBargain}
+        onBargainSign={signBargain}
+        onBargainResolve={resolveBargain}
       />
       <div className="w-full" style={{ maxWidth: 560 }}>
         <div className="flex items-center justify-between mb-4">
@@ -179,6 +230,9 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 store={store}
                 playerName={session.playerName}
               />
+            )}
+            {tab === 'ledger' && (
+              <LedgerTab bargains={character?.notes.bargains ?? []} onSign={signBargain} />
             )}
             {tab === 'guide' && <GuideTab />}
           </>

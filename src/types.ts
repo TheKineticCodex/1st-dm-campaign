@@ -36,6 +36,38 @@ export interface CharacterNotes {
   personality: string
   lost: string
   notes: string
+  /** A1 Bargain Ledger — the player's device is the authority (DECISIONS 17/19). */
+  bargains?: Bargain[]
+}
+
+// ---- A1: the Bargain Ledger ----
+
+export type BargainStatus = 'offered' | 'sealed' | 'fulfilled' | 'broken'
+
+export interface Bargain {
+  id: string
+  title: string
+  /** Who the deal is with: a hag, a pixie, the carnival itself. */
+  counterparty: string
+  /** What the Undersigned receives. */
+  boon: string
+  /** What remains owed — the gold-lettered heart of the ledger. */
+  price: string
+  /** The terms, in fairy-tale legalese. */
+  terms: string
+  status: BargainStatus
+  signatureDataUrl?: string
+  sealedAt?: string
+  resolvedAt?: string
+}
+
+export interface BargainEvent {
+  kind: 'resolve'
+  targetPlayer: string
+  bargainId: string
+  outcome: 'fulfilled' | 'broken'
+  /** Carried so the ceremony can name the bargain without a lookup. */
+  title?: string
 }
 
 export interface SavedCharacter {
@@ -134,6 +166,8 @@ export interface Handout {
   imageDataUrl?: string
   /** A2 Sealed Whispers: the message fades 60s after the seal breaks. */
   ephemeral?: boolean
+  /** A1: when present, this handout is a contract offer, not a whisper. */
+  bargain?: Bargain
   sentAt: string
 }
 

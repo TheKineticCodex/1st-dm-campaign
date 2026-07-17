@@ -169,6 +169,34 @@ function RosterSection({
     setPickerFor(null)
   }
 
+  const resolveBargain = async (
+    targetPlayer: string,
+    bargain: { id: string; title: string },
+    outcome: 'fulfilled' | 'broken',
+  ) => {
+    if (!window.confirm(outcome === 'fulfilled' ? `Burn "${bargain.title}" gold — fulfilled?` : `Crack the seal on "${bargain.title}" — broken?`)) return
+    channelRef.current?.sendBargain({ kind: 'resolve', targetPlayer, bargainId: bargain.id, outcome, title: bargain.title })
+    // Offline rehearsal: same-device character is ours to update directly.
+    if (!store.shared) {
+      const c = await store.getCharacter()
+      if (c?.notes.bargains) {
+        await store.saveCharacter({
+          ...c,
+          notes: {
+            ...c.notes,
+            bargains: c.notes.bargains.map((b) =>
+              b.id === bargain.id ? { ...b, status: outcome, resolvedAt: new Date().toISOString() } : b,
+            ),
+          },
+          updatedAt: new Date().toISOString(),
+        })
+      }
+    }
+    setSentNote(`"${bargain.title}" — ${outcome === 'fulfilled' ? 'burned gold' : 'the seal cracked'} ✦`)
+    setTimeout(() => setSentNote(null), 2500)
+    onRefresh()
+  }
+
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <div className="flex items-center justify-between">
@@ -280,6 +308,42 @@ function RosterSection({
                             {c}
                           </button>
                         ))}
+                    </div>
+                  )}
+                  {(r.character.notes.bargains ?? []).length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-xs uppercase tracking-widest" style={{ color: C.gold, letterSpacing: '0.15em' }}>
+                        ⚖ Bargains
+                      </p>
+                      {r.character.notes.bargains!.map((b) => (
+                        <div key={b.id} className="flex items-center justify-between text-xs mt-1">
+                          <span style={{ color: b.status === 'broken' ? '#C96A6A' : C.parchment }}>
+                            {b.status === 'fulfilled' ? '✦ ' : b.status === 'broken' ? '💔 ' : ''}
+                            {b.title}
+                            <span style={{ color: C.faint }}> · {b.status}</span>
+                          </span>
+                          {b.status === 'sealed' && (
+                            <span className="flex gap-1">
+                              <button
+                                type="button"
+                                onClick={() => void resolveBargain(r.playerName, b, 'fulfilled')}
+                                className="rounded px-2"
+                                style={{ background: C.gold, color: C.ink, border: 'none', minHeight: 30, cursor: 'pointer' }}
+                              >
+                                fulfill
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void resolveBargain(r.playerName, b, 'broken')}
+                                className="rounded px-2"
+                                style={{ background: '#3d2030', color: '#C96A6A', border: '1px solid #C96A6A', minHeight: 30, cursor: 'pointer' }}
+                              >
+                                break
+                              </button>
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                   {r.character.notes.lost && (

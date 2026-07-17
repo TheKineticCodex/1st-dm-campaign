@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
-import type { Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
+import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
 import { MapBoard } from './MapBoard'
 import { Btn, C, Eyebrow, H, Section, TextArea, TextInput, display } from './ui'
 
@@ -225,6 +225,10 @@ export function TableSection({ store, roster }: TableSectionProps) {
         <HandoutComposer store={store} roster={roster} channelRef={channelRef} />
       </Section>
 
+      <Section style={{ border: `1px solid ${C.gold}44` }}>
+        <BargainComposer store={store} roster={roster} channelRef={channelRef} />
+      </Section>
+
       <Section>
         <MapBoard pcNames={pcRows.map((r) => r.name)} />
       </Section>
@@ -374,6 +378,111 @@ function InitiativePanel({
       >
         Begin the encounter ⚔
       </Btn>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- bargains
+
+function legalese(name: string, counterparty: string, boon: string, price: string): string {
+  return (
+    `Let it be known to all lights of the twilight realm that ${name || 'the Undersigned'}, ` +
+    `of their own free and unclouded will, does hereby accept from ${counterparty || 'the carnival'}: ` +
+    `${boon || 'a gift yet unnamed'}.\n\n` +
+    `In consideration whereof, the Undersigned shall render unto ${counterparty || 'the carnival'}: ` +
+    `${price || 'a price yet unnamed'}, payable when and as the Feywild wills it, ` +
+    `without complaint, delay, or clever interpretation.\n\n` +
+    `The terms bind the name, and the name binds the bearer. Ink dries. Bargains do not.`
+  )
+}
+
+function BargainComposer({
+  store,
+  roster,
+  channelRef,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  channelRef: { current: TableChannel | null }
+}) {
+  const [target, setTarget] = useState('')
+  const [title, setTitle] = useState('')
+  const [counterparty, setCounterparty] = useState('')
+  const [boon, setBoon] = useState('')
+  const [price, setPrice] = useState('')
+  const [terms, setTerms] = useState('')
+  const [sent, setSent] = useState(false)
+
+  const targetEntry = roster.find((r) => r.playerName === target)
+  const characterName = targetEntry?.character?.build.name ?? target
+  const ready = target && title.trim() && price.trim()
+
+  const send = () => {
+    if (!ready) return
+    const bargain: Bargain = {
+      id: crypto.randomUUID(),
+      title: title.trim(),
+      counterparty: counterparty.trim() || 'the carnival itself',
+      boon: boon.trim() || 'a favor already granted',
+      price: price.trim(),
+      terms: terms.trim() || legalese(characterName, counterparty, boon, price),
+      status: 'offered',
+    }
+    const h: Handout = {
+      id: bargain.id,
+      target,
+      title: bargain.title,
+      body: '',
+      bargain,
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    setTitle('')
+    setBoon('')
+    setPrice('')
+    setTerms('')
+    setSent(true)
+    setTimeout(() => setSent(false), 2500)
+  }
+
+  return (
+    <div>
+      <Eyebrow>Strike a bargain — the illuminated contract ⚖</Eyebrow>
+      <div className="grid gap-2 mt-1">
+        <select
+          aria-label="Bargain target"
+          value={target}
+          onChange={(e) => setTarget(e.target.value)}
+          className="rounded-md px-3 py-2"
+          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+        >
+          <option value="">Who signs?</option>
+          {roster
+            .filter((r) => r.character)
+            .map((r) => (
+              <option key={r.playerId} value={r.playerName}>
+                {r.character!.build.name} ({r.playerName})
+              </option>
+            ))}
+        </select>
+        <TextInput value={title} onChange={setTitle} placeholder="Title (e.g. The Bargain of the Borrowed Voice)" />
+        <TextInput value={counterparty} onChange={setCounterparty} placeholder="Struck with… (a hag, a pixie, the carnival itself)" />
+        <TextInput value={boon} onChange={setBoon} placeholder="What they receive" />
+        <TextInput value={price} onChange={setPrice} placeholder="What is owed (this burns gold in their ledger)" />
+        <TextArea rows={4} value={terms} onChange={setTerms} placeholder="The terms — or let the quill write them…" />
+        <Btn secondary onClick={() => setTerms(legalese(characterName, counterparty, boon, price))}>
+          Let the quill write the legalese ✒
+        </Btn>
+        <Btn shimmer onClick={send} disabled={!ready}>
+          {sent ? 'The contract flies to their phone ✦' : target ? `Offer it to ${characterName}` : 'Offer the contract'}
+        </Btn>
+        {!store.shared && (
+          <p className="text-xs" style={{ color: C.faint }}>
+            (Offline: saved on this device — rehearse by rejoining as the player.)
+          </p>
+        )}
+      </div>
     </div>
   )
 }

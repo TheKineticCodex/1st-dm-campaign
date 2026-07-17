@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
-import type { Encounter, Handout, RaceEvent } from '../types'
+import type { Bargain, Encounter, Handout, RaceEvent } from '../types'
+import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
 import { C, display } from './ui'
 
@@ -17,6 +18,12 @@ interface PlayerLiveProps {
   playerName: string
   /** DM applied/cleared a condition on this player (co-pilot A4). */
   onCondition: (condition: string, active: boolean) => void
+  /** A1: a contract offer arrived — record it as 'offered'. */
+  onBargainOffer: (b: Bargain) => void
+  /** A1: the player signed — seal it with their hand. */
+  onBargainSign: (bargainId: string, signatureDataUrl: string) => void
+  /** A1: the DM resolved a bargain. */
+  onBargainResolve: (bargainId: string, outcome: 'fulfilled' | 'broken') => void
 }
 
 interface PlayerRace {
@@ -26,10 +33,19 @@ interface PlayerRace {
   place?: number
 }
 
-export function PlayerLive({ store, playerName, onCondition }: PlayerLiveProps) {
+export function PlayerLive({
+  store,
+  playerName,
+  onCondition,
+  onBargainOffer,
+  onBargainSign,
+  onBargainResolve,
+}: PlayerLiveProps) {
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [handout, setHandout] = useState<Handout | null>(null)
   const [race, setRace] = useState<PlayerRace | null>(null)
+  const [offer, setOffer] = useState<Bargain | null>(null)
+  const [ceremony, setCeremony] = useState<{ outcome: 'fulfilled' | 'broken'; title: string } | null>(null)
   const queue = useRef<Handout[]>([])
   const channelRef = useRef<TableChannel | null>(null)
   const progressRef = useRef(0)
@@ -37,6 +53,10 @@ export function PlayerLive({ store, playerName, onCondition }: PlayerLiveProps) 
   const finishedSent = useRef(false)
   const onConditionRef = useRef(onCondition)
   onConditionRef.current = onCondition
+  const onBargainOfferRef = useRef(onBargainOffer)
+  onBargainOfferRef.current = onBargainOffer
+  const onBargainResolveRef = useRef(onBargainResolve)
+  onBargainResolveRef.current = onBargainResolve
 
   useEffect(() => {
     let cancelled = false
@@ -49,6 +69,13 @@ export function PlayerLive({ store, playerName, onCondition }: PlayerLiveProps) 
       if (h.target && h.target !== playerName) return
       if (seen().has(h.id)) return
       markSeen(h.id)
+      // Contract offers take the illuminated-contract path, not the envelope.
+      if (h.bargain) {
+        const b: Bargain = { ...h.bargain, status: 'offered' }
+        onBargainOfferRef.current(b)
+        setOffer((cur) => cur ?? b)
+        return
+      }
       queue.current.push(h)
       setHandout((cur) => cur ?? queue.current.shift() ?? null)
     }
@@ -66,6 +93,11 @@ export function PlayerLive({ store, playerName, onCondition }: PlayerLiveProps) 
           handout: enqueue,
           condition: (c) => {
             if (c.targetPlayer === playerName) onConditionRef.current(c.condition, c.active)
+          },
+          bargain: (b) => {
+            if (b.targetPlayer !== playerName) return
+            onBargainResolveRef.current(b.bargainId, b.outcome)
+            setCeremony({ outcome: b.outcome, title: b.title ?? 'The bargain' })
           },
           race: (r: RaceEvent) => {
             if (r.phase === 'start') {
@@ -149,6 +181,21 @@ export function PlayerLive({ store, playerName, onCondition }: PlayerLiveProps) 
       )}
 
       {handout && <SealedEnvelope key={handout.id} handout={handout} onDismiss={dismissHandout} />}
+
+      {offer && (
+        <ContractView
+          bargain={offer}
+          onSign={(sig) => {
+            onBargainSign(offer.id, sig)
+            setOffer(null)
+          }}
+          onClose={() => setOffer(null)}
+        />
+      )}
+
+      {ceremony && (
+        <BargainCeremony outcome={ceremony.outcome} title={ceremony.title} onDone={() => setCeremony(null)} />
+      )}
 
       {race && (
         <div

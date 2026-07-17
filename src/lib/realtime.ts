@@ -4,7 +4,7 @@
 
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from './supabase'
-import type { ConditionEvent, Encounter, Handout, RaceEvent, RollEvent } from '../types'
+import type { BargainEvent, ConditionEvent, Encounter, Handout, RaceEvent, RollEvent } from '../types'
 
 export interface TableEvents {
   encounter: (e: Encounter) => void
@@ -12,6 +12,7 @@ export interface TableEvents {
   roll: (r: RollEvent) => void
   condition: (c: ConditionEvent) => void
   race: (r: RaceEvent) => void
+  bargain: (b: BargainEvent) => void
 }
 
 export interface TableChannel {
@@ -20,6 +21,7 @@ export interface TableChannel {
   sendRoll(r: RollEvent): void
   sendCondition(c: ConditionEvent): void
   sendRace(r: RaceEvent): void
+  sendBargain(b: BargainEvent): void
   close(): void
 }
 
@@ -38,6 +40,7 @@ export function joinTableChannel(
       sendRoll: () => {},
       sendCondition: () => {},
       sendRace: () => {},
+      sendBargain: () => {},
       close: () => {},
     }
   }
@@ -61,6 +64,9 @@ export function joinTableChannel(
   if (on.race) {
     channel.on('broadcast', { event: 'race' }, (msg) => on.race!(msg.payload as RaceEvent))
   }
+  if (on.bargain) {
+    channel.on('broadcast', { event: 'bargain' }, (msg) => on.bargain!(msg.payload as BargainEvent))
+  }
   channel.subscribe()
 
   const send = (event: string, payload: unknown) =>
@@ -72,6 +78,7 @@ export function joinTableChannel(
     sendRoll: (r) => send('roll', r),
     sendCondition: (c) => send('condition', c),
     sendRace: (r) => send('race', r),
+    sendBargain: (b) => send('bargain', b),
     close() {
       void supabase!.removeChannel(channel)
     },
