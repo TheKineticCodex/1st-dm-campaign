@@ -35,6 +35,10 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
   const [speciesScores, setSpeciesScores] = useState<Record<string, number>>({})
   const [draft, setDraft] = useState('')
   const [copied, setCopied] = useState(false)
+  // The verdict is tappable: players may take the lanterns' first word or
+  // tap any other card. null = the top recommendation.
+  const [pickClass, setPickClass] = useState<string | null>(null)
+  const [pickSpecies, setPickSpecies] = useState<string | null>(null)
 
   const q = QUIZ[idx]
   const freshRun = Object.keys(scores).length > 0
@@ -210,85 +214,120 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
 
   const top = topClasses()
   const species = topSpecies()
+  const chosenClass = pickClass ?? top[0] ?? null
+  const chosenSpecies = pickSpecies ?? species[0] ?? null
   const displayAnswers = Object.keys(answers).length > 0 ? answers : (savedResult?.answers ?? {})
 
   return (
     <div style={{ animation: 'cardRise .5s ease-out' }}>
       <Eyebrow>Your fortune, {name || 'stranger'}</Eyebrow>
       <H>The lanterns have spoken</H>
+      <p className="text-sm mt-1" style={{ color: C.sea }}>
+        Tap any card to choose it — the lanterns only suggest.
+      </p>
 
       {species.length > 0 && (
-        <div
-          className="rounded-xl p-4 mt-4 flex items-center gap-4"
-          style={{
-            background: `linear-gradient(135deg, #2B1E55, ${C.panel})`,
-            border: `1px solid ${C.sea}`,
-            boxShadow: `0 0 18px ${C.sea}33`,
-            animation: 'cardRise .5s ease-out .15s both',
-          }}
-        >
-          <span style={{ width: 64, height: 64, color: C.sea, flexShrink: 0 }} aria-hidden="true">
-            {SPECIES_GLYPHS[species[0]]}
-          </span>
-          <div>
-            <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.2em' }}>
-              The mirror shows
-            </p>
-            <h3 style={{ ...display, fontSize: 24, fontWeight: 700 }}>{species[0]}</h3>
-            <p className="text-xs" style={{ color: C.faint }}>
-              {SPECIES[species[0]]?.traits[0]}
-              {species[1] ? ` · or perhaps a ${species[1]}` : ''}
-            </p>
-          </div>
+        <div className="grid gap-2 mt-3" style={{ gridTemplateColumns: species.length > 1 ? '1fr 1fr' : '1fr' }}>
+          {species.map((sp, i) => {
+            const selected = chosenSpecies === sp
+            return (
+              <button
+                key={sp}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setPickSpecies(sp)}
+                className="rounded-xl p-3 text-center"
+                style={{
+                  background: `linear-gradient(135deg, #2B1E55, ${C.panel})`,
+                  border: `2px solid ${selected ? C.sea : C.panelEdge}`,
+                  boxShadow: selected ? `0 0 18px ${C.sea}66` : 'none',
+                  color: C.parchment,
+                  cursor: 'pointer',
+                  animation: `cardRise .5s ease-out ${0.15 + i * 0.12}s both`,
+                  transition: 'border-color .2s ease, box-shadow .2s ease',
+                }}
+              >
+                <span
+                  className="block mx-auto mb-1"
+                  style={{ width: 54, height: 54, color: selected ? C.sea : C.faint }}
+                  aria-hidden="true"
+                >
+                  {SPECIES_GLYPHS[sp]}
+                </span>
+                <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.18em' }}>
+                  {i === 0 ? 'the mirror shows' : 'or perhaps'}
+                </p>
+                <h3 style={{ ...display, fontSize: 20, fontWeight: 700 }}>
+                  {selected ? '✓ ' : ''}
+                  {sp}
+                </h3>
+                <p className="text-xs" style={{ color: C.faint }}>
+                  {SPECIES[sp]?.traits[0].split(':')[0]}
+                </p>
+              </button>
+            )
+          })}
         </div>
       )}
 
       <div className="mt-3 flex flex-col gap-3">
-        {top.map((n, i) => (
-          <div
-            key={n}
-            className="rounded-xl p-4 flex items-center gap-4"
-            style={{
-              background: i === 0 ? C.parchment : C.panel,
-              color: i === 0 ? C.ink : C.parchment,
-              border: `1px solid ${i === 0 ? C.gold : C.panelEdge}`,
-              boxShadow: i === 0 ? `0 0 22px ${C.gold}55` : 'none',
-              animation: `cardRise .5s ease-out ${0.3 + i * 0.18}s both`,
-            }}
-          >
-            <span
-              style={{ width: i === 0 ? 60 : 44, height: i === 0 ? 60 : 44, color: i === 0 ? C.goldDim : C.sea, flexShrink: 0 }}
-              aria-hidden="true"
+        {top.map((n, i) => {
+          const selected = chosenClass === n
+          return (
+            <button
+              key={n}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => setPickClass(n)}
+              className="rounded-xl p-4 flex items-center gap-4 text-left w-full"
+              style={{
+                background: selected ? C.parchment : C.panel,
+                color: selected ? C.ink : C.parchment,
+                border: `2px solid ${selected ? C.gold : C.panelEdge}`,
+                boxShadow: selected ? `0 0 22px ${C.gold}55` : 'none',
+                cursor: 'pointer',
+                animation: `cardRise .5s ease-out ${0.3 + i * 0.18}s both`,
+                transition: 'border-color .2s ease, box-shadow .2s ease',
+              }}
             >
-              {CLASS_SIGILS[n]}
-            </span>
-            <div>
-              <h3 style={{ ...display, fontSize: i === 0 ? 26 : 21, fontWeight: 700 }}>
-                {i === 0 ? '✦ ' : ''}
-                {n}
-              </h3>
-              <p className="text-sm" style={{ opacity: 0.9 }}>
-                {CLASSES[n].blurb} <em>({CLASSES[n].complexity})</em>
-              </p>
-            </div>
-          </div>
-        ))}
+              <span
+                style={{
+                  width: selected ? 60 : 44,
+                  height: selected ? 60 : 44,
+                  color: selected ? C.goldDim : C.sea,
+                  flexShrink: 0,
+                }}
+                aria-hidden="true"
+              >
+                {CLASS_SIGILS[n]}
+              </span>
+              <div>
+                <h3 style={{ ...display, fontSize: selected ? 26 : 21, fontWeight: 700 }}>
+                  {selected ? '✦ ' : ''}
+                  {n}
+                </h3>
+                <p className="text-sm" style={{ opacity: 0.9 }}>
+                  {CLASSES[n].blurb} <em>({CLASSES[n].complexity})</em>
+                </p>
+              </div>
+            </button>
+          )
+        })}
       </div>
 
       <p
         className="text-sm mt-4 text-center italic"
         style={{ color: C.faint, animation: 'cardRise .5s ease-out .9s both' }}
       >
-        The lanterns only suggest. The choice, as ever, is yours — every path stays open in the
-        forge.
+        Not seeing yourself here? Every species and every class stays open in the forge.
       </p>
       <p className="text-sm mt-2" style={{ color: C.sea }}>
         {store.shared
           ? '✦ Your fortune has already flown to the Dungeon Master on lantern-light.'
           : 'Saved on this device. Use the copy button to send it to your DM.'}
       </p>
-      <Btn shimmer onClick={() => onBuildFromQuiz(name, top[0] ?? null, species[0] ?? null)}>
-        Step into the forge as this hero ✦
+      <Btn shimmer onClick={() => onBuildFromQuiz(name, chosenClass, chosenSpecies)}>
+        Step into the forge as a {chosenSpecies ?? 'mystery'} {chosenClass ?? ''} ✦
       </Btn>
       <Btn secondary onClick={copy}>
         {copied ? 'Copied — send it to your DM' : 'Copy my fortune for the DM'}
