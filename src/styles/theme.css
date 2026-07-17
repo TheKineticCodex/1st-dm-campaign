@@ -172,6 +172,39 @@ select {
   animation: glow-pulse 2.8s ease-in-out infinite;
 }
 
+@keyframes lantern-drift {
+  0% {
+    transform: translateY(12px) translateX(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--lantern-max, 0.7);
+  }
+  55% {
+    transform: translateY(-46vh) translateX(var(--drift-x, 14px));
+    opacity: var(--lantern-max, 0.7);
+  }
+  100% {
+    transform: translateY(-92vh) translateX(calc(var(--drift-x, 14px) * -0.6));
+    opacity: 0;
+  }
+}
+
+.lantern {
+  position: absolute;
+  bottom: -20px;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(232, 184, 75, 0.8);
+  animation: lantern-drift linear infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lantern {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise {
     animation: none;

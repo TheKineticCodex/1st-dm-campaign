@@ -8,6 +8,7 @@ import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from 
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
 import type { SavedCharacter } from '../types'
+import { CharacterCard } from './CharacterCard'
 import { Btn, C, Eyebrow, H, Section, TextArea, display } from './ui'
 
 interface SheetTabProps {
@@ -110,15 +111,13 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune }: SheetTabP
 
   return (
     <div style={{ animation: 'cardRise .4s ease-out', paddingBottom: roll ? 120 : 0 }}>
-      <Eyebrow>
-        Level {sheet.level} · {build.species} {build.klass} · {build.bg}
-      </Eyebrow>
-      <h1 style={{ ...display, fontSize: 36, fontWeight: 700 }}>{build.name}</h1>
-      {build.subclass === null && (
-        <p className="text-xs" style={{ color: C.faint }}>
-          Subclass unlocks at level {sheet.K.subclassAt} 🔒
-        </p>
-      )}
+      <div className="mb-2">
+        <CharacterCard build={build} size="full" />
+      </div>
+      <p className="text-xs text-center" style={{ color: C.faint }}>
+        Level {sheet.level}
+        {build.subclass === null ? ` · subclass unlocks at level ${sheet.K.subclassAt} 🔒` : ` · ${build.subclass}`}
+      </p>
 
       {/* Advantage toggle */}
       <div className="flex gap-2 mt-3" role="group" aria-label="Roll mode">

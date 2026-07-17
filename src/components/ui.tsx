@@ -117,6 +117,38 @@ export function TextInput(props: {
   )
 }
 
+/** Drifting carnival lanterns for entry screens. Hidden under reduced motion. */
+export function Lanterns() {
+  const specks: { left: string; size: number; duration: number; delay: number; drift: number; max: number }[] = [
+    { left: '8%', size: 14, duration: 16, delay: 0, drift: 22, max: 0.55 },
+    { left: '22%', size: 9, duration: 21, delay: 5, drift: -16, max: 0.4 },
+    { left: '43%', size: 12, duration: 18, delay: 9, drift: 12, max: 0.5 },
+    { left: '61%', size: 8, duration: 23, delay: 3, drift: -20, max: 0.35 },
+    { left: '78%', size: 15, duration: 15, delay: 7, drift: 18, max: 0.6 },
+    { left: '90%', size: 10, duration: 20, delay: 12, drift: -12, max: 0.45 },
+  ]
+  return (
+    <div aria-hidden="true" style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+      {specks.map((s, i) => (
+        <span
+          key={i}
+          className="lantern"
+          style={{
+            left: s.left,
+            fontSize: s.size,
+            animationDuration: `${s.duration}s`,
+            animationDelay: `${s.delay}s`,
+            ['--drift-x' as string]: `${s.drift}px`,
+            ['--lantern-max' as string]: s.max,
+          }}
+        >
+          ✦
+        </span>
+      ))}
+    </div>
+  )
+}
+
 export function TextArea(props: {
   value: string
   onChange: (v: string) => void

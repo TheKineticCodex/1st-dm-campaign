@@ -13,6 +13,8 @@ export interface CharacterBuild {
   /** Locked until level 3 — stored now so level-up needs no migration. */
   subclass: string | null
   level: number
+  /** Aura key (see glyphs.tsx AURAS) — the light the lanterns see in you. */
+  aura?: string
 }
 
 /** Volatile play state, tracked separately from the build. */

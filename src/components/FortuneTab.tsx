@@ -7,7 +7,7 @@ import { QUIZ } from '../data/quiz'
 import { CLASSES } from '../data/rules'
 import type { Store } from '../lib/store'
 import type { QuizResult } from '../types'
-import { Btn, C, Eyebrow, H, Pick, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, H, Lanterns, Pick, TextInput, display } from './ui'
 
 type Stage = 'intro' | 'quiz' | 'results'
 
@@ -104,6 +104,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
   if (stage === 'intro') {
     return (
       <div className="text-center" style={{ animation: 'cardRise .4s ease-out' }}>
+        <Lanterns />
         <Eyebrow>Admit one · free of charge*</Eyebrow>
         <h1 style={{ ...display, fontSize: 40, lineHeight: 1.05, fontWeight: 700 }}>
           The Witchlight

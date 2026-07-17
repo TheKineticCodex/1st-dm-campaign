@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { mintDeviceToken, saveDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
-import { Btn, C, TextInput, body, display } from './ui'
+import { Btn, C, Lanterns, TextInput, body, display } from './ui'
 
 interface JoinScreenProps {
   onJoined: (session: DeviceSession) => void
@@ -55,6 +55,7 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
         padding: 24,
       }}
     >
+      <Lanterns />
       <div className="w-full mx-auto" style={{ maxWidth: 480 }}>
         <div className="text-center mb-7" style={{ animation: 'cardRise .45s ease-out' }}>
           <div className="spark" style={{ fontSize: 28 }} aria-hidden="true">
