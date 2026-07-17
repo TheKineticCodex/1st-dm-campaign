@@ -144,5 +144,12 @@ player). Live, it crosses devices like whispers do.
 - [ ] Roster → the character's card now shows **⚖ Bargains** with the deal. Tap **fulfill** (confirm) — live, the player's phone erupts in the gold-burn ceremony; their ledger moves it to "the settled pages," struck through.
 - [ ] Strike another and tap **break** — the crack ceremony, 💔, and the contract stays in their ledger, scarred, marked "the Feywild remembers."
 
+## The Lantern-Keeper's Book — portal upgrade
+
+- [ ] Signing in with the DM code now lands on **✦ Book** — a home page. Three chairs at the top (filled as your players join, empty chairs "waiting" until then), and tiles showing counts for Vault, Clues, NPCs, Sessions, Bargains, Table. Tapping a tile jumps to that section.
+- [ ] The roster refreshes itself every 30 seconds — leave the Book open and a newly joined player just appears.
+- [ ] **Lay the Witchlight threads ✦** (shown while your Clues are empty): one tap pre-loads three long-game clue paths and four NPC cards (Kettlesteam, Diana Cloppington, Northwind & Red, and a homebrew merchant slot). Everything is editable — it's your book.
+- [ ] **The callback engine:** in the Vault, every answer now has a ✉✦ button. Tap one — you land in the whisper composer with the title "The lanterns remember," the player pre-targeted, and their exact words already quoted. Add your twist and send.
+
 **Calm the lanterns**
 - [ ] Tap **calm the lanterns** in the header (player or DM view) — drifting motes, shimmer, and twinkles stop; content stays. **wake the lanterns** brings them back. The choice survives a reload.

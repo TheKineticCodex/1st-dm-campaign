@@ -11,19 +11,26 @@ import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { TableSection } from './TableSection'
-import { Btn, C, CalmToggle, H, Section, TextArea, TextInput, body, display } from './ui'
+import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display } from './ui'
 
-type DmSection = 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
+type DmSection = 'home' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
-const SECTIONS: [DmSection, string][] = [
-  ['roster', 'Roster'],
-  ['vault', 'Vault'],
-  ['lost', 'Lost Things'],
-  ['notes', 'Notes'],
-  ['npcs', 'NPCs'],
-  ['clues', 'Clues'],
-  ['table', 'Table ⚔'],
+const SECTIONS: [DmSection, string, string][] = [
+  ['home', '✦', 'Book'],
+  ['roster', '❖', 'Roster'],
+  ['vault', '☾', 'Vault'],
+  ['lost', '🔒', 'Lost'],
+  ['notes', '✎', 'Notes'],
+  ['npcs', '🎭', 'NPCs'],
+  ['clues', '🕯', 'Clues'],
+  ['table', '⚔', 'Table'],
 ]
+
+export interface WhisperPrefill {
+  target: string
+  title: string
+  body: string
+}
 
 interface DmDashboardProps {
   session: DeviceSession
@@ -32,25 +39,39 @@ interface DmDashboardProps {
 
 export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   const store = useMemo(() => getStore(session), [session])
-  const [section, setSection] = useState<DmSection>('roster')
+  const [section, setSection] = useState<DmSection>('home')
   const [roster, setRoster] = useState<RosterEntry[]>([])
   const [loaded, setLoaded] = useState(false)
+  const [whisperPrefill, setWhisperPrefill] = useState<WhisperPrefill | null>(null)
 
+  // Roster keeps itself fresh — no more tapping refresh to see a new player.
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
+    const load = async () => {
       const r = await store.listRoster()
       if (!cancelled) {
         setRoster(r)
         setLoaded(true)
       }
-    })()
+    }
+    void load()
+    const interval = setInterval(() => void load(), 30000)
     return () => {
       cancelled = true
+      clearInterval(interval)
     }
   }, [store])
 
   const refreshRoster = async () => setRoster(await store.listRoster())
+
+  const forgeWhisper = (target: string, quote: string) => {
+    setWhisperPrefill({
+      target,
+      title: 'The lanterns remember',
+      body: `You once told the lanterns: “${quote}”\n\n`,
+    })
+    setSection('table')
+  }
 
   const handleLeave = () => {
     if (window.confirm('Hang up the lantern-keeper’s coat? (You can sign back in with the DM code.)')) {
@@ -94,13 +115,18 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
           <p style={{ color: C.faint }}>The book is opening…</p>
         ) : (
           <>
+            {section === 'home' && (
+              <HomeSection store={store} roster={roster} onGo={setSection} onRefresh={refreshRoster} />
+            )}
             {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
-            {section === 'vault' && <VaultSection roster={roster} />}
+            {section === 'vault' && <VaultSection roster={roster} onForgeWhisper={forgeWhisper} />}
             {section === 'lost' && <LostSection store={store} roster={roster} />}
             {section === 'notes' && <NotesSection store={store} />}
             {section === 'npcs' && <NpcSection store={store} />}
             {section === 'clues' && <ClueSection store={store} />}
-            {section === 'table' && <TableSection store={store} roster={roster} />}
+            {section === 'table' && (
+              <TableSection store={store} roster={roster} whisperPrefill={whisperPrefill} />
+            )}
           </>
         )}
       </div>
@@ -116,21 +142,188 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
         }}
         aria-label="DM sections"
       >
-        <div className="flex w-full" style={{ maxWidth: 900 }}>
-          {SECTIONS.map(([id, label]) => (
+        <div className="flex w-full overflow-x-auto" style={{ maxWidth: 900 }}>
+          {SECTIONS.map(([id, glyph, label]) => (
             <button
               key={id}
               type="button"
               onClick={() => setSection(id)}
-              className="flex-1 py-3 text-center text-xs"
-              style={{ color: section === id ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              className="flex-1 py-2 text-center text-xs"
+              style={{
+                color: section === id ? C.gold : C.faint,
+                background: 'none',
+                border: 'none',
+                minHeight: 44,
+                minWidth: 64,
+                cursor: 'pointer',
+              }}
               aria-current={section === id ? 'page' : undefined}
             >
+              <span className="block" aria-hidden="true" style={{ fontSize: 15 }}>
+                {glyph}
+              </span>
               {label}
             </button>
           ))}
         </div>
       </nav>
+    </div>
+  )
+}
+
+// -------------------------------------------------------------------- Home
+
+function HomeSection({
+  store,
+  roster,
+  onGo,
+  onRefresh,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  onGo: (s: DmSection) => void
+  onRefresh: () => void
+}) {
+  const [counts, setCounts] = useState<{ clues: number; npcs: number; notes: number } | null>(null)
+  const [seeding, setSeeding] = useState(false)
+  const [seeded, setSeeded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [clues, npcs, notes] = await Promise.all([store.listClues(), store.listNpcs(), store.listSessionNotes()])
+      if (!cancelled) setCounts({ clues: clues.length, npcs: npcs.length, notes: notes.length })
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [store, seeded])
+
+  const activeBargains = roster.flatMap((r) => r.character?.notes.bargains ?? []).filter(
+    (b) => b.status === 'sealed' || b.status === 'offered',
+  ).length
+
+  const seedBook = async () => {
+    setSeeding(true)
+    const { SEED_CLUES, SEED_NPCS } = await import('../data/witchlightSeeds')
+    for (const c of SEED_CLUES) await store.saveClue({ ...c, id: crypto.randomUUID() })
+    for (const n of SEED_NPCS) await store.saveNpc({ ...n, id: crypto.randomUUID() })
+    setSeeding(false)
+    setSeeded(true)
+  }
+
+  // Three seats, always — the Three Protagonists rule made visible.
+  const seats = [0, 1, 2].map((i) => roster[i] ?? null)
+
+  return (
+    <div style={{ animation: 'cardRise .4s ease-out' }}>
+      <H>The Book opens</H>
+
+      <Section style={{ marginTop: 12 }}>
+        <div className="flex items-center justify-between">
+          <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+            The three chairs
+          </p>
+          <button
+            type="button"
+            onClick={onRefresh}
+            className="text-xs underline"
+            style={{ color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+          >
+            look again
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          {seats.map((r, i) => (
+            <div
+              key={r?.playerId ?? `empty-${i}`}
+              className="rounded-xl p-3 text-center"
+              style={{
+                background: C.night,
+                border: `1px dashed ${r ? C.gold : C.panelEdge}`,
+                borderStyle: r ? 'solid' : 'dashed',
+              }}
+            >
+              {r ? (
+                <>
+                  {r.character?.build.portraitUrl ? (
+                    <img
+                      src={r.character.build.portraitUrl}
+                      alt=""
+                      className="mx-auto"
+                      style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
+                    />
+                  ) : (
+                    <span className="block" style={{ fontSize: 26 }} aria-hidden="true">
+                      {r.character ? '❖' : '☾'}
+                    </span>
+                  )}
+                  <p className="text-sm mt-1" style={{ color: C.parchment, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {r.character?.build.name || r.playerName}
+                  </p>
+                  <p className="text-xs" style={{ color: C.faint }}>
+                    {r.character ? 'forged ✓' : r.quiz ? 'divined — not yet forged' : 'at the gate'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <span className="block" style={{ fontSize: 26, opacity: 0.4 }} aria-hidden="true">
+                    ✦
+                  </span>
+                  <p className="text-xs mt-1 italic" style={{ color: C.faint }}>
+                    an empty chair,
+                    <br />
+                    waiting
+                  </p>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+        {[
+          ['vault' as DmSection, '☾ Vault', `${roster.filter((r) => r.quiz).length} divinations kept`],
+          ['clues' as DmSection, '🕯 Clue paths', counts ? `${counts.clues} conclusions tracked` : '…'],
+          ['npcs' as DmSection, '🎭 NPCs', counts ? `${counts.npcs} souls in the book` : '…'],
+          ['notes' as DmSection, '✎ Sessions', counts ? `${counts.notes} nights recorded` : '…'],
+          ['roster' as DmSection, '⚖ Bargains', `${activeBargains} in force`],
+          ['table' as DmSection, '⚔ The Table', 'derby · dice · whispers · map'],
+        ].map(([id, label, detail]) => (
+          <button
+            key={label as string}
+            type="button"
+            onClick={() => onGo(id as DmSection)}
+            className="rounded-xl p-4 text-left"
+            style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 44 }}
+          >
+            <p style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>{label}</p>
+            <p className="text-xs mt-1" style={{ color: C.faint }}>
+              {detail}
+            </p>
+          </button>
+        ))}
+      </div>
+
+      {counts !== null && counts.clues === 0 && !seeded && (
+        <Section style={{ marginTop: 12, border: `1px solid ${C.sea}55` }}>
+          <Eyebrow>Before the first night</Eyebrow>
+          <p className="text-sm" style={{ color: C.parchment }}>
+            The book can pre-thread the Witchlight long game for you: three clue paths worth
+            tracking from Session 1 (the carnival's true power, the wording of wishes, who
+            collects Lost Things) and four NPC cards including your homebrew merchant slot.
+          </p>
+          <Btn onClick={() => void seedBook()} disabled={seeding}>
+            {seeding ? 'Threading the needle…' : 'Lay the Witchlight threads ✦'}
+          </Btn>
+        </Section>
+      )}
+      {seeded && (
+        <p role="status" className="text-sm mt-3" style={{ color: C.sea }}>
+          ✦ The threads are laid — see Clues and NPCs. Edit everything; it's your book.
+        </p>
+      )}
     </div>
   )
 }
@@ -365,13 +558,20 @@ function RosterSection({
 
 const KEY_QUESTIONS = new Set(['recover', 'fear'])
 
-function VaultSection({ roster }: { roster: RosterEntry[] }) {
+function VaultSection({
+  roster,
+  onForgeWhisper,
+}: {
+  roster: RosterEntry[]
+  onForgeWhisper: (target: string, quote: string) => void
+}) {
   const withQuiz = roster.filter((r) => r.quiz)
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <H>The quiz vault</H>
       <p className="text-sm mb-3" style={{ color: C.faint }}>
-        Raw material for each Lost Thing. The two questions that matter most burn gold.
+        Raw material for each Lost Thing — the gold ✦ questions most of all. The ✉ beside any
+        answer forges it into a sealed whisper, their own words returned to them.
       </p>
       {withQuiz.length === 0 && <p style={{ color: C.faint }}>No divinations recorded yet.</p>}
       {withQuiz.map((r) => (
@@ -394,9 +594,21 @@ function VaultSection({ roster }: { roster: RosterEntry[] }) {
                   {key ? '✦ ' : ''}
                   {q.prompt}
                 </p>
-                <p className="text-sm" style={{ color: C.parchment }}>
-                  → {a}
-                </p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm" style={{ color: C.parchment }}>
+                    → {a}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onForgeWhisper(r.playerName, a)}
+                    aria-label={`Forge this answer into a whisper for ${r.playerName}`}
+                    title="Forge into a sealed whisper"
+                    className="text-sm flex-shrink-0"
+                    style={{ background: 'none', border: 'none', color: C.sea, minWidth: 40, minHeight: 40, cursor: 'pointer' }}
+                  >
+                    ✉✦
+                  </button>
+                </div>
               </div>
             )
           })}

@@ -19,12 +19,20 @@ interface DmRace {
 
 const RACE_GOAL = 40
 
+export interface WhisperPrefill {
+  target: string
+  title: string
+  body: string
+}
+
 interface TableSectionProps {
   store: Store
   roster: RosterEntry[]
+  /** Callback engine: a Vault answer forged into a ready-to-send whisper. */
+  whisperPrefill?: WhisperPrefill | null
 }
 
-export function TableSection({ store, roster }: TableSectionProps) {
+export function TableSection({ store, roster, whisperPrefill }: TableSectionProps) {
   const channelRef = useRef<TableChannel | null>(null)
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -221,8 +229,14 @@ export function TableSection({ store, roster }: TableSectionProps) {
         )}
       </Section>
 
-      <Section>
-        <HandoutComposer store={store} roster={roster} channelRef={channelRef} />
+      <Section style={whisperPrefill ? { border: `1px solid ${C.sea}` } : undefined}>
+        <HandoutComposer
+          key={whisperPrefill ? `${whisperPrefill.target}-${whisperPrefill.body.slice(0, 24)}` : 'blank'}
+          store={store}
+          roster={roster}
+          channelRef={channelRef}
+          prefill={whisperPrefill ?? undefined}
+        />
       </Section>
 
       <Section style={{ border: `1px solid ${C.gold}44` }}>
@@ -493,14 +507,16 @@ function HandoutComposer({
   store,
   roster,
   channelRef,
+  prefill,
 }: {
   store: Store
   roster: RosterEntry[]
   channelRef: { current: TableChannel | null }
+  prefill?: WhisperPrefill
 }) {
-  const [title, setTitle] = useState('')
-  const [bodyText, setBodyText] = useState('')
-  const [target, setTarget] = useState<string>('') // '' = everyone
+  const [title, setTitle] = useState(prefill?.title ?? '')
+  const [bodyText, setBodyText] = useState(prefill?.body ?? '')
+  const [target, setTarget] = useState<string>(prefill?.target ?? '') // '' = everyone
   const [image, setImage] = useState<string | undefined>()
   const [ephemeral, setEphemeral] = useState(false)
   const [sent, setSent] = useState(false)
