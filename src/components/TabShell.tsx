@@ -143,7 +143,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 build={draftBuild}
                 onChange={setDraftBuild}
                 onForged={forgeCharacter}
-                quizLook={quiz?.answers.look}
+                quizLook={quiz?.answers.look === '(left to chance)' ? undefined : quiz?.answers.look}
               />
             )}
             {tab === 'sheet' && (

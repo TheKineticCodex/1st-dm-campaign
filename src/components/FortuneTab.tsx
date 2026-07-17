@@ -3,7 +3,7 @@
 // automatically in Supabase mode); copy button kept as fallback.
 
 import { useState } from 'react'
-import { QUIZ } from '../data/quiz'
+import { LEFT_TO_CHANCE, QUIZ } from '../data/quiz'
 import { CLASSES, SPECIES } from '../data/rules'
 import type { Store } from '../lib/store'
 import type { QuizResult } from '../types'
@@ -87,14 +87,22 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
     else finish(nextAnswers, nextScores, nextSpecies)
   }
 
-  const submitText = () => {
-    const v = draft.trim()
+  const submitText = (leaveToChance = false) => {
+    const v = leaveToChance ? LEFT_TO_CHANCE : draft.trim()
     if (!v) return
     const nextAnswers = { ...answers, [q.id]: v }
     setAnswers(nextAnswers)
     setDraft('')
     if (idx + 1 < QUIZ.length) setIdx(idx + 1)
     else finish(nextAnswers, scores, speciesScores)
+  }
+
+  // "I already know my path" jumps past the seven reading questions,
+  // straight to the ones the Dungeon Master keeps.
+  const firstKeeperQuestion = QUIZ.findIndex((x) => x.type === 'text')
+  const skipReading = () => {
+    setStage('quiz')
+    setIdx(firstKeeperQuestion)
   }
 
   const copy = async () => {
@@ -145,6 +153,12 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
         <Btn shimmer onClick={() => setStage('quiz')}>
           Step inside ✦
         </Btn>
+        <Btn secondary onClick={skipReading}>
+          I already know my path — skip the reading
+        </Btn>
+        <p className="mt-1 text-xs" style={{ color: C.faint }}>
+          (Even the certain answer four small questions — the carnival keeps its records.)
+        </p>
         <p className="mt-3 text-xs" style={{ color: C.faint }}>
           *The carnival never charges coin. What it does charge is another matter.
         </p>
@@ -184,6 +198,11 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
         <div key={idx} style={{ animation: 'cardRise .4s ease-out' }}>
           <Eyebrow>The lanterns ask —</Eyebrow>
           <H>{q.prompt}</H>
+          {q.hint && (
+            <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
+              ✦ {q.hint}
+            </p>
+          )}
           {q.type === 'choice' ? (
             <div className="mt-5 flex flex-col gap-3">
               {q.options!.map((o) => (
@@ -202,9 +221,14 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 className="w-full rounded-lg px-4 py-3 outline-none"
                 style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, resize: 'vertical' }}
               />
-              <Btn onClick={submitText} disabled={!draft.trim()}>
+              <Btn onClick={() => submitText()} disabled={!draft.trim()}>
                 Tell the lanterns
               </Btn>
+              {q.optional && (
+                <Btn secondary onClick={() => submitText(true)}>
+                  Leave it to chance ✦
+                </Btn>
+              )}
             </div>
           )}
         </div>
@@ -221,10 +245,16 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
   return (
     <div style={{ animation: 'cardRise .5s ease-out' }}>
       <Eyebrow>Your fortune, {name || 'stranger'}</Eyebrow>
-      <H>The lanterns have spoken</H>
-      <p className="text-sm mt-1" style={{ color: C.sea }}>
-        Tap any card to choose it — the lanterns only suggest.
-      </p>
+      <H>{top.length > 0 ? 'The lanterns have spoken' : 'You kept your own counsel'}</H>
+      {top.length > 0 ? (
+        <p className="text-sm mt-1" style={{ color: C.sea }}>
+          Tap any card to choose it — the lanterns only suggest.
+        </p>
+      ) : (
+        <p className="text-sm mt-1" style={{ color: C.sea }}>
+          The lanterns respect a made-up mind. Every door in the forge stands open.
+        </p>
+      )}
 
       {species.length > 0 && (
         <div className="grid gap-2 mt-3" style={{ gridTemplateColumns: species.length > 1 ? '1fr 1fr' : '1fr' }}>
@@ -327,7 +357,9 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
           : 'Saved on this device. Use the copy button to send it to your DM.'}
       </p>
       <Btn shimmer onClick={() => onBuildFromQuiz(name, chosenClass, chosenSpecies)}>
-        Step into the forge as a {chosenSpecies ?? 'mystery'} {chosenClass ?? ''} ✦
+        {chosenClass || chosenSpecies
+          ? `Step into the forge as a ${[chosenSpecies, chosenClass].filter(Boolean).join(' ')} ✦`
+          : 'Step into the forge ✦'}
       </Btn>
       <Btn secondary onClick={copy}>
         {copied ? 'Copied — send it to your DM' : 'Copy my fortune for the DM'}

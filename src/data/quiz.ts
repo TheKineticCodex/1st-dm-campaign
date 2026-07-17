@@ -15,7 +15,14 @@ export interface QuizQuestion {
   placeholder?: string
   /** Answer is recorded but never scores points (flavor capture). */
   captureOnly?: boolean
+  /** Shown under the prompt in the lanterns' voice. */
+  hint?: string
+  /** May be left unanswered — "leave it to chance". */
+  optional?: boolean
 }
+
+/** Recorded when an optional question is deliberately left unanswered. */
+export const LEFT_TO_CHANCE = '(left to chance)'
 
 export const QUIZ: QuizQuestion[] = [
   {
@@ -115,7 +122,10 @@ export const QUIZ: QuizQuestion[] = [
     id: 'look',
     prompt: "Close your eyes. What does your character look like? 'A rabbit in a waistcoat' is a legal answer here.",
     type: 'text',
-    placeholder: 'Describe the picture in your head…',
+    placeholder:
+      'Hair, eyes, clothes, scars, the thing you always carry, the look on your face when no one’s watching…',
+    hint: 'At the end of the forge, an enchanted mirror will paint your portrait from these very words. Give it every detail you want — or give it nothing, and leave your face to chance.',
+    optional: true,
   },
   {
     id: 'recover',
