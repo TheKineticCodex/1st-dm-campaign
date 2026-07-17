@@ -234,6 +234,7 @@ function VaultSection({ roster }: { roster: RosterEntry[] }) {
             <span className="text-sm font-normal" style={{ color: C.faint }}>
               {' '}
               · callings: {r.quiz!.topClasses.join(', ') || '—'}
+            {r.quiz!.topSpecies?.length ? ` · mirror: ${r.quiz!.topSpecies.join(' or ')}` : ''}
             </span>
           </p>
           {QUIZ.map((q) => {

@@ -3,6 +3,7 @@ import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
 import { EMPTY_BUILD, EMPTY_NOTES, EMPTY_STATE, type CharacterBuild, type QuizResult, type SavedCharacter } from '../types'
 import { BuildTab } from './BuildTab'
+import { CharacterCard } from './CharacterCard'
 import { FortuneTab } from './FortuneTab'
 import { GuideTab } from './GuideTab'
 import { PlayerLive } from './PlayerLive'
@@ -56,6 +57,8 @@ export function TabShell({ session, onLeave }: TabShellProps) {
     saveTimer.current = setTimeout(() => void store.saveCharacter(c), 600)
   }
 
+  const [sealing, setSealing] = useState(false)
+
   const forgeCharacter = () => {
     const c: SavedCharacter = {
       build: draftBuild,
@@ -65,7 +68,16 @@ export function TabShell({ session, onLeave }: TabShellProps) {
     }
     setCharacter(c)
     void store.saveCharacter(c)
-    setTab('sheet')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      setTab('sheet')
+      return
+    }
+    setSealing(true)
+    setTimeout(() => {
+      setSealing(false)
+      setTab('sheet')
+    }, 2100)
   }
 
   const handleLeave = () => {
@@ -114,8 +126,13 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 playerName={session.playerName}
                 savedResult={quiz}
                 onSaved={setQuiz}
-                onBuildFromQuiz={(name, klass) => {
-                  setDraftBuild({ ...draftBuild, name: draftBuild.name || name, klass: klass ?? draftBuild.klass })
+                onBuildFromQuiz={(name, klass, species) => {
+                  setDraftBuild({
+                    ...draftBuild,
+                    name: draftBuild.name || name,
+                    klass: klass ?? draftBuild.klass,
+                    species: species ?? draftBuild.species,
+                  })
                   setTab('build')
                 }}
               />
@@ -137,7 +154,46 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         )}
       </div>
 
-      <nav
+      {sealing && (
+        <div
+          role="status"
+          aria-label="The forge seals"
+          className="fixed inset-0 flex flex-col items-center justify-center"
+          style={{ background: `${C.night}F5`, zIndex: 80 }}
+        >
+          <div style={{ position: 'relative' }}>
+            {[0, 0.35, 0.7].map((delay) => (
+              <div
+                key={delay}
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: -20,
+                  borderRadius: '50%',
+                  border: `2px solid ${C.gold}`,
+                  animation: `ring-burst 1.6s ease-out ${delay}s both`,
+                }}
+              />
+            ))}
+            <CharacterCard build={draftBuild} size="full" />
+          </div>
+          <p
+            className="mt-6 text-center px-8"
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 24,
+              fontWeight: 600,
+              color: C.gold,
+              animation: 'ceremony-fade 2.1s ease-out both',
+            }}
+          >
+            The Feywild takes notice of you.
+          </p>
+        </div>
+      )}
+
+      {(quiz || character) && (
+        <nav
         className="fixed bottom-0 left-0 right-0 flex justify-center"
         style={{
           background: `${C.night}F2`,
@@ -166,6 +222,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
           ))}
         </div>
       </nav>
+      )}
     </div>
   )
 }

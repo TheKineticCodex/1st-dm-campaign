@@ -45,18 +45,20 @@ export function Btn({
   disabled,
   children,
   secondary,
+  shimmer,
 }: {
   onClick?: () => void
   disabled?: boolean
   children: ReactNode
   secondary?: boolean
+  shimmer?: boolean
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-lg py-3 text-base font-semibold mt-3"
+      className={`w-full rounded-lg py-3 text-base font-semibold mt-3${shimmer && !disabled && !secondary ? ' btn-shimmer' : ''}`}
       style={{
         ...display,
         fontSize: 18,

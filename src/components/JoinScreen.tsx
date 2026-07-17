@@ -61,7 +61,7 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
           <div className="spark" style={{ fontSize: 28 }} aria-hidden="true">
             ✦
           </div>
-          <h1 style={{ ...display, fontSize: 36, fontWeight: 700, color: C.gold, marginTop: 8 }}>
+          <h1 className="title-glow" style={{ ...display, fontSize: 36, fontWeight: 700, color: C.gold, marginTop: 8 }}>
             The Song the Sea Forgot
           </h1>
           <p className="mt-3 italic" style={{ color: C.faint }}>
@@ -70,7 +70,7 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
         </div>
 
         <div
-          className="rounded-xl p-5 grid gap-4"
+          className="rounded-xl p-5 grid gap-4 gate-card"
           style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, animation: 'cardRise .55s ease-out' }}
         >
           <label className="grid gap-1">
@@ -108,7 +108,7 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
             </p>
           )}
 
-          <Btn onClick={handleJoin} disabled={busy}>
+          <Btn shimmer onClick={handleJoin} disabled={busy}>
             {busy ? 'The gate is listening…' : 'Step through the gate ✦'}
           </Btn>
         </div>

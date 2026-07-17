@@ -45,6 +45,8 @@ export interface QuizResult {
   playerName: string
   answers: Record<string, string>
   topClasses: string[]
+  /** The mirror questions' species recommendation. */
+  topSpecies?: string[]
   updatedAt: string
 }
 

@@ -226,22 +226,26 @@ class SupabaseStore implements Store {
   async getQuizResult() {
     const remote = await this.rpc<QuizResult>('get_quiz', { p_device_token: this.token })
     if (remote) {
-      await this.local.saveQuizResult(remote)
-      return remote
+      const normalized = extractTopSpecies(remote)
+      await this.local.saveQuizResult(normalized)
+      return normalized
     }
     return this.local.getQuizResult()
   }
   async saveQuizResult(r: QuizResult) {
     await this.local.saveQuizResult(r)
+    // topSpecies rides inside the answers jsonb (no schema change needed);
+    // extractTopSpecies pulls it back out on every read path.
     await this.rpc('save_quiz', {
       p_device_token: this.token,
-      p_answers: r.answers,
+      p_answers: { ...r.answers, _topSpecies: r.topSpecies ?? [] },
       p_top_classes: r.topClasses,
     })
   }
 
   async listRoster() {
-    return (await this.rpc<RosterEntry[]>('dm_roster', { p_dm_code: this.dmCode })) ?? []
+    const roster = (await this.rpc<RosterEntry[]>('dm_roster', { p_dm_code: this.dmCode })) ?? []
+    return roster.map((r) => (r.quiz ? { ...r, quiz: extractTopSpecies(r.quiz) } : r))
   }
   async getLostThings(characterId: string) {
     return this.rpc<LostThing>('dm_get_lost_things', { p_dm_code: this.dmCode, p_character_id: characterId })
@@ -300,6 +304,15 @@ class SupabaseStore implements Store {
   async listMyHandouts() {
     return (await this.rpc<Handout[]>('list_my_handouts', { p_device_token: this.token })) ?? []
   }
+}
+
+/** Server rows carry topSpecies inside answers._topSpecies — lift it out. */
+function extractTopSpecies(q: QuizResult): QuizResult {
+  const raw = (q.answers as Record<string, unknown>)?._topSpecies
+  if (!Array.isArray(raw)) return q
+  const { _topSpecies, ...answers } = q.answers as Record<string, string> & { _topSpecies?: unknown }
+  void _topSpecies
+  return { ...q, answers, topSpecies: raw as string[] }
 }
 
 export function getStore(session: DeviceSession): Store {

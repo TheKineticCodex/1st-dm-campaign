@@ -3,6 +3,8 @@
 export interface QuizOption {
   label: string
   pts: Record<string, number>
+  /** Species affinity points — the mirror questions read your reflection. */
+  speciesPts?: Record<string, number>
 }
 
 export interface QuizQuestion {
@@ -75,6 +77,32 @@ export const QUIZ: QuizQuestion[] = [
       { label: 'Helping, healing, tipping the scales', pts: { Cleric: 3, Bard: 2, Druid: 1 } },
       { label: 'Everywhere at once', pts: { Monk: 3, Rogue: 1 } },
       { label: "I'd rather there be no fight at all", pts: { Bard: 2, Rogue: 1, Druid: 1 } },
+    ],
+  },
+  {
+    id: 'mirror',
+    prompt: 'The mirror-maze shows you truer than any glass. What looks back?',
+    type: 'choice',
+    options: [
+      { label: 'Something small, quick, and impossible to catch', pts: {}, speciesPts: { Halfling: 2, Gnome: 2, 'Fairy ✦': 1 } },
+      { label: 'Something with wings — or the ache where wings should be', pts: {}, speciesPts: { 'Fairy ✦': 3, Aasimar: 2 } },
+      { label: 'Long ears, listening to everything at once', pts: {}, speciesPts: { 'Harengon ✦': 3, Elf: 1 } },
+      { label: 'Something carved from stone and patience', pts: {}, speciesPts: { Dwarf: 2, Goliath: 2, Orc: 1 } },
+      { label: 'Old fire, banked but never out', pts: {}, speciesPts: { Tiefling: 2, Dragonborn: 2, Orc: 1 } },
+      { label: 'Just me — but braver, and glowing a little', pts: {}, speciesPts: { Human: 3, Aasimar: 1 } },
+    ],
+  },
+  {
+    id: 'home',
+    prompt: 'Where does your heart keep its home?',
+    type: 'choice',
+    options: [
+      { label: 'A snug den with a round door and good bread', pts: {}, speciesPts: { Halfling: 3, Gnome: 1, Dwarf: 1 } },
+      { label: 'The deep woods, where the old songs live', pts: {}, speciesPts: { Elf: 3, 'Fairy ✦': 1 } },
+      { label: 'Mountain halls, forge-light, the long memory', pts: {}, speciesPts: { Dwarf: 3, Goliath: 1 } },
+      { label: 'Wherever the road bends next', pts: {}, speciesPts: { Human: 2, 'Harengon ✦': 2 } },
+      { label: 'Somewhere I lost — and mean to find again', pts: {}, speciesPts: { Tiefling: 1, Aasimar: 1, Dragonborn: 1 } },
+      { label: 'The carnival. Obviously.', pts: {}, speciesPts: { 'Fairy ✦': 1, Gnome: 1, 'Harengon ✦': 1 } },
     ],
   },
   {
