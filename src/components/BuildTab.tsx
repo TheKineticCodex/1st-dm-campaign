@@ -451,6 +451,21 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                 <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
                   The mirror has seen you. This is who steps through the gate.
                 </p>
+                {/* Safety valve (research report rec. 2): never let a single
+                    AI output be unskippable at an emotional moment. The
+                    fiction blames the mist, not the mirror. */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = mintPortraitUrl(portraitPrompt(ch, appearance))
+                    setCh({ ...ch, portraitUrl: url })
+                    setMirror('gazing')
+                  }}
+                  className="text-xs underline mt-2"
+                  style={{ background: 'none', border: 'none', color: C.faint, minHeight: 44, cursor: 'pointer' }}
+                >
+                  The mist marred the glass — bid the mirror look once more
+                </button>
               </div>
             )}
 

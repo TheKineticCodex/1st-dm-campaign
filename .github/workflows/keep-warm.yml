@@ -1,0 +1,27 @@
+# Supabase pauses Free-plan projects after ~7 days of low activity, which
+# would silently kill a campaign played weeks apart (research report, Area 5).
+# This pings the database daily so the project never sleeps. The anon key is
+# public by design; the RPC returns null for an unknown code and costs nothing.
+# Retire this workflow if the project ever moves to Supabase Pro.
+
+name: Keep Supabase warm
+
+on:
+  schedule:
+    - cron: '23 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping database via RPC
+        run: |
+          ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxemJvZnJ2YWhpb3B0cnJnY2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyODUxODMsImV4cCI6MjA5OTg2MTE4M30.l3P3CdizfVJkHDUPnlc8nGSIyhx0aEWiGJjqZ3PCK8s"
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "https://dqzbofrvahioptrrgche.supabase.co/rest/v1/rpc/get_channel" \
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+            -H "Content-Type: application/json" \
+            -d '{"p_code":"KEEPWARM"}')
+          echo "Supabase responded $code"
+          test "$code" = "200"

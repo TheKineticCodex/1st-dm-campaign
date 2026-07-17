@@ -1,5 +1,14 @@
 # The Song the Sea Forgot ✦
 
+> *The Song the Sea Forgot* is unofficial Fan Content permitted under the
+> [Fan Content Policy](https://company.wizards.com/en/legal/fancontentpolicy).
+> Not approved/endorsed by Wizards. Portions of the materials used are
+> property of Wizards of the Coast. ©Wizards of the Coast LLC. This work
+> includes material from the System Reference Document 5.2 ("SRD 5.2") by
+> Wizards of the Coast LLC, available under the Creative Commons
+> Attribution 4.0 International License. This app is free, private, and
+> non-commercial, and must remain so.
+
 Campaign companion web app for a 3-player *Wild Beyond the Witchlight*
 campaign (D&D 2024 rules). Mobile-first, no accounts — players join with a
 code, the DM has a separate code.

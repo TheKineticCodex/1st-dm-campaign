@@ -92,7 +92,39 @@ The quiz answers are the campaign's seed vault. Build toward the DM being able t
 - Session cadence and Session 1 date → drives the witness protocol deadline and scheduled-whisper defaults.
 - Confirmation pass on all `// VERIFY` rules data before the party hits level 2.
 
-## 8. Definition of the best version
+## 8. Research amendments (binding — from the 2026-07-17 pressure-test report)
+
+The owner commissioned independent research on this directive. Its findings amend the above:
+
+**8.1 Operational (done or standing order):**
+- **Supabase pausing is the #1 operational risk** (Free plan pauses after ~7 idle days; a campaign played weeks apart would find its backend asleep). A daily keep-warm GitHub Action now pings the database. **Standing order: the moment Phase NEXT-4 (between-session features) ships, recommend Supabase Pro ($25/mo)** — scheduled delivery on a pausable free project is worthless, and Pro adds backups and 50 msg/s realtime.
+- **The local store is a disposable cache, never the source of truth.** iOS evicts script-writable storage after ~7 days of disuse. Every session must cold-start cleanly from the server; verify on a real iPhone after a long gap. Sync on `online`/foreground, never rely on Background Sync (unsupported on iOS).
+- **The Mirror got its safety valve:** a quiet "the mist marred the glass — look once more" regenerate now exists under the fiction, because a grotesque one-shot AI output at an emotionally loaded ceremony is a live risk (pollinations has no SLA and weak moderation). "Forge without a portrait" remains. Never make a single AI output unskippable.
+- **Legal notices shipped:** Fan Content Policy notice + SRD 5.2 CC-BY-4.0 attribution on the gate and in the README. The app must stay free, private, unlisted, non-commercial — Vercel Hobby is non-commercial-only anyway. Never use WotC logos or the ampersand trade dress. Never reproduce adventure text; owner-upload slots only.
+
+**8.2 Roadmap reorder (novelty-weighted):**
+- The research found the **dice feed is derivative** (D&D Beyond Shared Dice does it) while the **carnival minigames and the finger-drawn fey-contract signature appear genuinely novel** — no shipped product does either. Therefore, within NEXT-1: **minigames and condition co-pilot lead; the roll feed ships last** as table-stakes polish. **NEXT-2 (Bargain Ledger) is promoted** — the signature is one of only two novel wow-moments and technically cheap (use `signature_pad`; handle devicePixelRatio and set `touch-action: none` on the canvas).
+- Sealed whispers validated as a real unmet need — with one design law from the community: private content must **default sealed** (tap-to-reveal), because "texts on someone's phone are easy to see by accident." Already true; keep it true.
+- Reliquary audio: iOS blocks all autoplay — the melody plays only from an explicit tap, which is on-theme ("listen to the memory"). Don't cache audio in the PWA (~50MB origin cap).
+
+**8.3 Realtime engineering laws:**
+- Throttle high-frequency broadcasts (snail race positions) to **≤10Hz, batched** — free tier allows ~20 msg/s total. Prefer Broadcast over Presence.
+- **Broadcast is fire-and-forget (dropped after 72h). Anything durable — dice history, minigame results, whisper delivery — writes to Postgres.**
+- Move channels to **private channels with RLS** when Table Mode hardens (anon-key spam is a known vector).
+
+**8.4 The phones-at-the-table law (adoption-critical):**
+The community's default belief is that phones *destroy* in-person play. The objection is to *off-task* use — so every phone interaction must be **fast, glanceable, and diegetic**: seconds not menus, an artifact not a browser. The iPad is the shared focal point; phones are for secrets, dice, and ceremonies. Any feature that invites heads-down browsing at the table is wrong even if it's beautiful.
+
+**8.5 Motion:** before any new ceremony ships, add an **in-app motion toggle** ("calm the lanterns") alongside `prefers-reduced-motion` — replace motion with fades, don't just delete it.
+
+**8.6 Campaign-craft preloads for the DM's Book** (do during NEXT-4, they're content not code):
+- Seed the clue tracker with Witchlight's long-fuse callbacks: Kettlesteam, Diana Cloppington, Northwind & Red's wishes — clues planted in Chapter 1 that pay off in Chapter 4.
+- Add a homebrew merchant table slot (the module under-provides shops) and a sidekick slot (standard 3-player fix; also the natural diegetic home for a tether).
+- Frame the divination forge as the centerpiece of a real Session Zero; the app should gently encourage the owner to run one (tone, safety tools, inter-character connections, and the table's phone policy).
+
+**8.7 Housekeeping:** audit for dynamically constructed Tailwind class names (v4 purges them silently — inline styles are safe, string-built `bg-${x}` classes are not); plan the Supabase key migration (legacy anon keys deprecated end of 2026 — the publishable `sb_publishable_…` key already exists on the project).
+
+## 9. Definition of the best version
 
 It is NOT feature completeness. It is: **three specific humans, one year from now, unable to imagine having played this campaign without it** — because the app held their faces, their bargains, their recovered fragments, their table's laughter at a nat 1, and the words they typed the first night, and gave all of it back to them at exactly the right moments. Judge every pull request against that.
 

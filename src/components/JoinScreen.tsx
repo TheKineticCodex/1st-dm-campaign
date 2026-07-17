@@ -112,6 +112,13 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
             {busy ? 'The gate is listening…' : 'Step through the gate ✦'}
           </Btn>
         </div>
+
+        <p className="text-center mt-6" style={{ color: C.faint, fontSize: 11, lineHeight: 1.5 }}>
+          Unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by
+          Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards
+          of the Coast LLC. Includes content from the SRD 5.2, © Wizards of the Coast, licensed
+          under CC-BY-4.0.
+        </p>
       </div>
     </main>
   )
