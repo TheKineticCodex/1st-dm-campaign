@@ -11,7 +11,14 @@ code, the DM has a separate code.
   conditions, private notes), beginner guide.
 - **Phase 2 — DM Dashboard:** ✅ complete. Roster, quiz vault, Lost Things,
   session notes, NPC cards, three-clue ledger. Sign in with the DM code.
-- **Phase 3 — Table Mode:** not started.
+- **Phase 3 — Table Mode:** ✅ complete. Initiative tracker (broadcasts to
+  phones), handouts — to all or secretly to one player, arriving as a
+  sealed envelope with typewriter reveal and optional 60-second fade
+  (Sealed Whispers, A2) — and the iPad map with draggable tokens.
+  ⚠ The realtime paths are wired but need a live Supabase project to be
+  exercised — run the Phase 3 checklist in TESTING.md after setup.
+- **Phase 4 — Tier A magic:** A2 Sealed Whispers shipped early (above).
+  Bargain Ledger, Reliquary, condition co-pilot, roll feed: next.
 
 The app works fully **without any setup** (offline mode — everything saves
 to the device). Supabase connects the devices; Vercel puts it on the

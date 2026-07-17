@@ -5,6 +5,7 @@ import { EMPTY_BUILD, EMPTY_NOTES, EMPTY_STATE, type CharacterBuild, type QuizRe
 import { BuildTab } from './BuildTab'
 import { FortuneTab } from './FortuneTab'
 import { GuideTab } from './GuideTab'
+import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
 import { C, body } from './ui'
 
@@ -84,6 +85,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
       }}
       className="flex flex-col items-center px-4 pt-4 pb-24"
     >
+      <PlayerLive store={store} playerName={session.playerName} />
       <div className="w-full" style={{ maxWidth: 560 }}>
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: C.faint }}>

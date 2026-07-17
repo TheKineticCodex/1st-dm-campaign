@@ -47,7 +47,29 @@ Choices made where the spec left room. Newest at the bottom.
     call functions; every function demands a device token (players) or
     the dm_code (DM). Tables stay fully RLS-locked with zero policies.
 
-11. **Component files, not nested components.** Every component lives at
+11. **The map lives on the DM's iPad only.** Spec §6 says "the iPad
+    becomes the shared table; phones stay personal" — so the map is a
+    local surface on the DM device (image + draggable tokens, persisted
+    locally), not a synced view. No image ever leaves the device, which
+    also keeps the licensing guardrail airtight.
+
+12. **Handouts target players by name, realtime by broadcast.** Names are
+    unique per campaign (DB constraint) and are what the DM sees; the RPC
+    resolves name → player id for storage. Live delivery is a Supabase
+    channel broadcast keyed on the campaign id (either code resolves it
+    via get_channel); persisted handouts catch up late joiners.
+
+13. **Offline rehearsal mode.** Player-side live features (initiative
+    banner, envelopes) still run their catch-up fetch in offline mode, so
+    the owner can rehearse the full Table flow alone on one device by
+    switching between DM and player codes.
+
+14. **Sealed Whispers (A2) shipped with Phase 3.** The addendum's hard
+    rule names A2 as one of the two above-weight features for Session 1,
+    and it upgrades the same component that plain handouts use — one
+    envelope for both. Ephemeral mode is opt-in per handout (60s).
+
+15. **Component files, not nested components.** Every component lives at
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.

@@ -270,6 +270,77 @@ $$;
 -- uniqueness must not block editing an existing note's number
 alter table session_notes drop constraint if exists session_notes_campaign_id_session_number_key;
 
+-- ------------------------------------------------------ Phase 3: Table Mode
+
+-- Campaign id doubles as the realtime channel name. Either code works:
+-- players hold the join code, the DM holds the dm code.
+create or replace function get_channel(p_code text)
+returns text language sql security definer set search_path = public as $$
+  select id::text from campaigns where join_code = p_code or dm_code = p_code limit 1;
+$$;
+
+create or replace function dm_save_encounter(p_dm_code text, p_encounter jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  v_campaign uuid := _campaign_by_dm_code(p_dm_code);
+begin
+  if v_campaign is null then return; end if;
+  insert into encounters (id, campaign_id, initiative_order, active_index, ended_at)
+  values ((p_encounter->>'id')::uuid, v_campaign, p_encounter->'order',
+    coalesce((p_encounter->>'activeIndex')::int, 0),
+    case when coalesce((p_encounter->>'active')::boolean, false) then null else now() end)
+  on conflict (id) do update set
+    initiative_order = excluded.initiative_order,
+    active_index = excluded.active_index,
+    ended_at = excluded.ended_at;
+end;
+$$;
+
+create or replace function get_active_encounter(p_device_token text)
+returns jsonb language sql security definer set search_path = public as $$
+  select jsonb_build_object('id', e.id, 'order', e.initiative_order,
+    'activeIndex', e.active_index, 'active', true)
+  from encounters e
+  join players p on p.campaign_id = e.campaign_id
+  where p.device_token = p_device_token and e.ended_at is null
+  order by e.started_at desc
+  limit 1;
+$$;
+
+-- Handouts: target is stored as a player id; the app addresses by player
+-- name, so resolve on the way in and expose the name on the way out.
+create or replace function dm_send_handout(p_dm_code text, p_handout jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  v_campaign uuid := _campaign_by_dm_code(p_dm_code);
+  v_target uuid;
+begin
+  if v_campaign is null then return; end if;
+  if p_handout->>'target' is not null then
+    select id into v_target from players
+    where campaign_id = v_campaign and name = p_handout->>'target';
+    if v_target is null then return; end if; -- unknown target: refuse silently
+  end if;
+  insert into handouts (id, campaign_id, target, content)
+  values ((p_handout->>'id')::uuid, v_campaign, v_target,
+    p_handout - 'target')
+  on conflict (id) do nothing;
+end;
+$$;
+
+create or replace function list_my_handouts(p_device_token text)
+returns jsonb language sql security definer set search_path = public as $$
+  select coalesce(jsonb_agg(
+    (h.content || jsonb_build_object(
+      'target', tp.name,
+      'sentAt', h.sent_at)) order by h.sent_at), '[]'::jsonb)
+  from handouts h
+  join players me on me.device_token = p_device_token
+    and me.campaign_id = h.campaign_id
+  left join players tp on tp.id = h.target
+  where h.target is null or h.target = me.id;
+$$;
+
 -- --------------------------------------------------------------- execution
 -- Supabase grants EXECUTE to anon/authenticated by default on functions in
 -- the public schema; the token/dm_code checks inside are the real gate.

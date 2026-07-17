@@ -76,3 +76,31 @@ this device, tap **leave** first.
 
 **The prep test (the real one)**
 - [ ] Sit with the iPad and prep Session 1 — NPCs, clue paths, each character's Lost Thing — without touching paper.
+
+## Phase 3 — Table Mode (+ Sealed Whispers)
+
+The **Table ⚔** section of the DM view. Initiative and the map work
+before Supabase; anything reaching the players' phones needs Supabase set
+up (the section tells you which mode you're in).
+
+**Initiative (works offline, on the iPad)**
+- [ ] Open Table ⚔. Each forged character is already listed. Type an enemy name, tap **add**.
+- [ ] Give everyone an initiative number, tap **Begin the encounter** — the list sorts high-to-low with the top row lit gold.
+- [ ] **Next turn →** moves the gold marker and wraps around at the bottom.
+- [ ] (After Supabase) Players' phones show a banner: whose turn it is, "You're up next", and a gold "Your turn!" when it's them.
+- [ ] **End encounter** returns to setup, and player banners disappear.
+
+**Handouts**
+- [ ] Write a title and text, leave target on "Everyone", tap send. (After Supabase: every player's phone gets a sealed envelope.)
+- [ ] Pick "Only [name] 🤫" — just that player receives it. Confirm the others see nothing.
+- [ ] On the receiving phone: an envelope with a wax seal. Swipe across it (or tap the fallback) — the seal breaks, the text types itself out.
+- [ ] Send one with the "fades 60 seconds" box ticked — after the seal breaks, a countdown shows, and the whisper vanishes on its own.
+- [ ] Rehearsal without Supabase: send a handout as DM, tap leave, rejoin with the player code — the envelope arrives on this same device.
+
+**Map (iPad, offline is fine)**
+- [ ] Tap **Choose a map image**, pick a photo/scan of yours. Party tokens appear at the bottom edge.
+- [ ] Drag tokens with a finger — they move smoothly and stay put after a reload.
+- [ ] **+ Enemy token** adds a red token; **Clear map** (confirm) empties the board.
+
+**The mock-session test (the real one)**
+- [ ] Run one combat and deliver one secret handout with zero player confusion.

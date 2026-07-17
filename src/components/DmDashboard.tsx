@@ -9,9 +9,10 @@ import { computeSheet, skillMod } from '../lib/compute'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
+import { TableSection } from './TableSection'
 import { Btn, C, H, Section, TextArea, TextInput, body, display } from './ui'
 
-type DmSection = 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues'
+type DmSection = 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
 const SECTIONS: [DmSection, string][] = [
   ['roster', 'Roster'],
@@ -20,6 +21,7 @@ const SECTIONS: [DmSection, string][] = [
   ['notes', 'Notes'],
   ['npcs', 'NPCs'],
   ['clues', 'Clues'],
+  ['table', 'Table ⚔'],
 ]
 
 interface DmDashboardProps {
@@ -94,6 +96,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
             {section === 'notes' && <NotesSection store={store} />}
             {section === 'npcs' && <NpcSection store={store} />}
             {section === 'clues' && <ClueSection store={store} />}
+            {section === 'table' && <TableSection store={store} roster={roster} />}
           </>
         )}
       </div>

@@ -8,6 +8,8 @@ import { supabase } from './supabase'
 import { readCache, writeCache, type DeviceSession } from './storage'
 import type {
   Clue,
+  Encounter,
+  Handout,
   LostThing,
   Npc,
   QuizResult,
@@ -49,6 +51,18 @@ export interface Store {
   listSessionNotes(): Promise<SessionNote[]>
   saveSessionNote(n: SessionNote): Promise<void>
   deleteSessionNote(id: string): Promise<void>
+
+  // ---- Phase 3: Table Mode ----
+  /** Campaign id for the realtime channel; null in offline mode. */
+  getChannelId(): Promise<string | null>
+  /** DM: persist encounter state (also broadcast separately). */
+  saveEncounter(e: Encounter): Promise<void>
+  /** Player: current active encounter, for late joiners. */
+  getActiveEncounter(): Promise<Encounter | null>
+  /** DM: persist a handout so late joiners still receive it. */
+  sendHandout(h: Handout): Promise<void>
+  /** Player: handouts addressed to me (or everyone). */
+  listMyHandouts(): Promise<Handout[]>
 }
 
 // --------------------------------------------------------------- LocalStore
@@ -131,6 +145,26 @@ class LocalStore implements Store {
   }
   async deleteSessionNote(id: string) {
     writeCache('session-notes', (readCache<SessionNote[]>('session-notes') ?? []).filter((x) => x.id !== id))
+  }
+
+  // Table Mode offline: the DM can still run initiative on the iPad;
+  // nothing broadcasts, handouts stay on-device.
+  async getChannelId() {
+    return null
+  }
+  async saveEncounter(e: Encounter) {
+    writeCache('encounter', e)
+  }
+  async getActiveEncounter() {
+    const e = readCache<Encounter>('encounter')
+    return e?.active ? e : null
+  }
+  async sendHandout(h: Handout) {
+    writeCache('handouts', [...(readCache<Handout[]>('handouts') ?? []), h])
+  }
+  async listMyHandouts() {
+    const all = readCache<Handout[]>('handouts') ?? []
+    return all.filter((h) => !h.target || h.target === this.session.playerName)
   }
 }
 
@@ -247,6 +281,24 @@ class SupabaseStore implements Store {
   }
   async deleteSessionNote(id: string) {
     await this.rpc('dm_delete_session_note', { p_dm_code: this.dmCode, p_id: id })
+  }
+
+  async getChannelId() {
+    // Works with either code: players hold the join code, the DM the DM code.
+    return this.rpc<string>('get_channel', { p_code: this.session.campaignCode })
+  }
+  async saveEncounter(e: Encounter) {
+    await this.local.saveEncounter(e)
+    await this.rpc('dm_save_encounter', { p_dm_code: this.dmCode, p_encounter: e })
+  }
+  async getActiveEncounter() {
+    return this.rpc<Encounter>('get_active_encounter', { p_device_token: this.token })
+  }
+  async sendHandout(h: Handout) {
+    await this.rpc('dm_send_handout', { p_dm_code: this.dmCode, p_handout: h })
+  }
+  async listMyHandouts() {
+    return (await this.rpc<Handout[]>('list_my_handouts', { p_device_token: this.token })) ?? []
   }
 }
 

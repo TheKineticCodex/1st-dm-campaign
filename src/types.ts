@@ -98,6 +98,37 @@ export interface Clue {
   clues: { text: string; found: boolean }[]
 }
 
+// ---- Phase 3 (Table Mode) types ----
+
+export interface InitiativeRow {
+  id: string
+  name: string
+  init: number
+  isPc: boolean
+  /** Player name for "you're up" matching (PC rows only). */
+  playerName?: string
+}
+
+export interface Encounter {
+  id: string
+  order: InitiativeRow[]
+  activeIndex: number
+  active: boolean
+}
+
+export interface Handout {
+  id: string
+  /** null = everyone; otherwise the target player's name. */
+  target: string | null
+  title: string
+  body: string
+  /** Small image as data URL (owner-supplied asset). */
+  imageDataUrl?: string
+  /** A2 Sealed Whispers: the message fades 60s after the seal breaks. */
+  ephemeral?: boolean
+  sentAt: string
+}
+
 export interface SessionNote {
   id: string
   sessionNumber: number
