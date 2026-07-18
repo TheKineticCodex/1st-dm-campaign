@@ -8,7 +8,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
 import { MapBoard } from './MapBoard'
-import { Btn, C, Eyebrow, H, Section, TextArea, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
 
 interface DmRace {
   raceId: string
@@ -121,15 +121,18 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
           players' phones until Supabase is set up (see README).
         </p>
       )}
+      <div className="mt-2">
+        <HintOnce id="dm-table-folds">
+          Each panel below folds — tap its title. The Book remembers which you keep open.
+        </HintOnce>
+      </div>
 
-      <Section style={{ marginTop: 12 }}>
-        {loaded && (
-          <InitiativePanel encounter={encounter} pcRows={pcRows} onChange={update} />
-        )}
-      </Section>
+      <div className="mt-3" />
+      <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen>
+        {loaded && <InitiativePanel encounter={encounter} pcRows={pcRows} onChange={update} />}
+      </Fold>
 
-      <Section>
-        <Eyebrow>Carnival games — the Snail Derby 🐌</Eyebrow>
+      <Fold id="dm-games" title="🐌 Carnival games — the Snail Derby">
         {!race && (
           <>
             <p className="text-sm" style={{ color: C.faint }}>
@@ -195,10 +198,9 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
             )}
           </>
         )}
-      </Section>
+      </Fold>
 
-      <Section>
-        <Eyebrow>The table's dice — live</Eyebrow>
+      <Fold id="dm-dice" title="🎲 The table's dice — live" defaultOpen>
         {feed.length === 0 ? (
           <p className="text-sm" style={{ color: C.faint }}>
             The dice are quiet. Every roll from every phone lands here.
@@ -227,9 +229,9 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
             </div>
           ))
         )}
-      </Section>
+      </Fold>
 
-      <Section style={whisperPrefill ? { border: `1px solid ${C.sea}` } : undefined}>
+      <Fold id="dm-whispers" title="✉ Whispers & handouts" forceOpen={!!whisperPrefill}>
         <HandoutComposer
           key={whisperPrefill ? `${whisperPrefill.target}-${whisperPrefill.body.slice(0, 24)}` : 'blank'}
           store={store}
@@ -237,15 +239,15 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
           channelRef={channelRef}
           prefill={whisperPrefill ?? undefined}
         />
-      </Section>
+      </Fold>
 
-      <Section style={{ border: `1px solid ${C.gold}44` }}>
+      <Fold id="dm-bargains" title="⚖ Strike a bargain">
         <BargainComposer store={store} roster={roster} channelRef={channelRef} />
-      </Section>
+      </Fold>
 
-      <Section>
+      <Fold id="dm-map" title="🗺 The table map">
         <MapBoard pcNames={pcRows.map((r) => r.name)} />
-      </Section>
+      </Fold>
     </div>
   )
 }

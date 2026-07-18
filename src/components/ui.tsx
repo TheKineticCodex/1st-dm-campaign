@@ -5,7 +5,7 @@
 
 import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { applyCalm, isCalm } from '../lib/storage'
+import { applyCalm, isCalm, readCache, writeCache } from '../lib/storage'
 
 export const C = {
   night: '#181030',
@@ -118,6 +118,79 @@ export function TextInput(props: {
       className="w-full rounded-lg px-4 py-3 outline-none"
       style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44 }}
     />
+  )
+}
+
+/**
+ * Foldable panel (Quiet Interface law 5): dense surfaces open calm.
+ * Open/closed state is remembered per device under the given id.
+ */
+export function Fold({
+  id,
+  title,
+  defaultOpen = false,
+  forceOpen = false,
+  children,
+}: {
+  id: string
+  title: string
+  defaultOpen?: boolean
+  forceOpen?: boolean
+  children: ReactNode
+}) {
+  const [open, setOpen] = useState(() => forceOpen || (readCache<boolean>(`fold:${id}`) ?? defaultOpen))
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    writeCache(`fold:${id}`, next)
+  }
+  return (
+    <div className="rounded-xl mb-3 overflow-hidden" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        style={{ background: 'none', border: 'none', color: C.parchment, minHeight: 48, cursor: 'pointer' }}
+      >
+        <span style={{ ...display, fontSize: 18, fontWeight: 600, color: open ? C.gold : C.parchment }}>{title}</span>
+        <span aria-hidden="true" style={{ color: C.gold }}>
+          {open ? '−' : '+'}
+        </span>
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
+  )
+}
+
+/**
+ * One-time hint (Quiet Interface law 3): a gentle line in the lanterns'
+ * voice, shown until dismissed, then never again on this device.
+ */
+export function HintOnce({ id, children }: { id: string; children: ReactNode }) {
+  const [dismissed, setDismissed] = useState(() => readCache<boolean>(`hint:${id}`) === true)
+  if (dismissed) return null
+  return (
+    <div
+      className="flex items-start justify-between gap-2 rounded-lg px-3 py-2 mb-3"
+      style={{ background: `${C.sea}14`, border: `1px solid ${C.sea}55` }}
+      role="note"
+    >
+      <p className="text-sm" style={{ color: C.sea }}>
+        ✦ {children}
+      </p>
+      <button
+        type="button"
+        aria-label="Dismiss hint"
+        onClick={() => {
+          writeCache(`hint:${id}`, true)
+          setDismissed(true)
+        }}
+        style={{ background: 'none', border: 'none', color: C.faint, minWidth: 40, minHeight: 40, cursor: 'pointer', flexShrink: 0 }}
+      >
+        ✕
+      </button>
+    </div>
   )
 }
 

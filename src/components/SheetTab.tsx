@@ -11,7 +11,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
-import { Btn, C, Eyebrow, H, Section, TextArea, display } from './ui'
+import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display } from './ui'
 
 interface SheetTabProps {
   character: SavedCharacter | null
@@ -193,9 +193,11 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           </button>
         ))}
       </div>
-      <p className="text-xs mt-1" style={{ color: C.faint }}>
-        Tap any ability, skill, or attack to roll it.
-      </p>
+      <div className="mt-2">
+        <HintOnce id="sheet-tap-to-roll">
+          Your sheet rolls for you — tap any ability, skill, or the attack, and the dice answer.
+        </HintOnce>
+      </div>
 
       {/* Abilities (tap = save roll) */}
       <div className="grid grid-cols-3 gap-2 mt-3">

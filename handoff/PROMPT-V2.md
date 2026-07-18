@@ -124,7 +124,56 @@ The community's default belief is that phones *destroy* in-person play. The obje
 
 **8.7 Housekeeping:** audit for dynamically constructed Tailwind class names (v4 purges them silently — inline styles are safe, string-built `bg-${x}` classes are not); plan the Supabase key migration (legacy anon keys deprecated end of 2026 — the publishable `sb_publishable_…` key already exists on the project).
 
-## 9. Definition of the best version
+## 9. The Doctrine of the Quiet Interface (binding — owner directive)
+
+The owner wants EVERYTHING in — and a beginner never confused. These laws
+reconcile that, and every future feature must pass them:
+
+1. **On a player's phone, features are events, not menus.** Whispers,
+   contracts, races, ceremonies, hauntings, ballots, oaths: all arrive as
+   full-screen moments pushed by the DM, then vanish. The player tab bar
+   is capped at five, forever. If a feature needs a sixth tab, redesign
+   it as an event or a card inside an existing tab.
+2. **A new player sees only the path.** Gate → divination → forge →
+   sheet. Nothing else exists until it happens to them. The Ledger sits
+   quietly until the first contract flies.
+3. **First-time hints, said once.** When a surface is seen for the first
+   time, one gentle line in the lanterns' voice explains it; dismissed,
+   it never returns. No tutorials, no tooltips forests, no manuals.
+4. **Empty states teach.** Every empty screen says what will appear
+   there and how ("No bargains yet. The carnival will offer — it always
+   does.") — the empty state IS the documentation.
+5. **The DM's Book absorbs all complexity, folded.** Dense DM surfaces
+   (the Table) are collapsible panels with plain names; open panels are
+   remembered per device. The owner's screen can be busy-capable but
+   must open calm.
+6. **One action per moment.** Any screen a beginner faces mid-session
+   has exactly one obvious primary action (gold), everything else
+   secondary or folded. If two gold buttons ever share a screen, one is
+   wrong.
+7. **Permissions are ceremonies.** Any feature needing a device
+   permission (motion, mic, notifications) asks inside the fiction at
+   the moment of use, with a plain skip. Declining costs nothing and is
+   never asked twice in the same session.
+8. **Android is a gift, not a gap.** The web app runs identically on
+   Android Chrome; where Android allows more (vibration, install,
+   richer notifications), features enhance there and degrade silently
+   elsewhere — framed as the Feywild taking to each glass differently.
+
+## 10. Tier P — the phone-magic backlog (owner-approved, build under §9)
+
+In lean-in order: spoken oaths (mic level seals the biggest bargains) ·
+the haunted pulse (DM-triggered vibration patterns, Android; visual
+shiver elsewhere) · ears-only secrets (audio whispers to one player) ·
+secret ballots ("who do you trust least?" — private answers to the Book)
+· player sketching (finger-drawn mystery symbols to the DM) ·
+cracked-glass low-HP dread · phones-as-lanterns séance mode · tilt
+minigames (balance the pixie, pour the potion) · shake-the-fortune ·
+push-notification dreams (installed PWA) · the two-thumb pact. Every one
+ships as a DM-triggered event or an automatic moment — zero new player
+navigation.
+
+## 11. Definition of the best version
 
 It is NOT feature completeness. It is: **three specific humans, one year from now, unable to imagine having played this campaign without it** — because the app held their faces, their bargains, their recovered fragments, their table's laughter at a nat 1, and the words they typed the first night, and gave all of it back to them at exactly the right moments. Judge every pull request against that.
 

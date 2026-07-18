@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { Bargain } from '../types'
 import { ContractView } from './Contract'
-import { C, Eyebrow, H, display } from './ui'
+import { C, Eyebrow, H, HintOnce, display } from './ui'
 
 const STATUS_LABEL: Record<Bargain['status'], string> = {
   offered: 'awaiting your hand',
@@ -28,6 +28,12 @@ export function LedgerTab({ bargains, onSign }: LedgerTabProps) {
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <Eyebrow>The Bargain Ledger</Eyebrow>
       <H>What is owed, and to whom</H>
+      <div className="mt-2">
+        <HintOnce id="ledger-first">
+          Nothing to do here yet — contracts find you on their own. When one arrives, sign it (or
+          don't), and this ledger keeps the record.
+        </HintOnce>
+      </div>
 
       {bargains.length === 0 && (
         <p className="mt-3" style={{ color: C.faint }}>
