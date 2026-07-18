@@ -30,7 +30,7 @@ The owner has confirmed all three matter equally. Every phase must name which ax
 
 ## 3. The iron rules (unchanged, restated because they are load-bearing)
 
-1. **Three Protagonists.** No players exist yet — Session 0 hasn't happened. Therefore every personal-story system (Reliquary, tethers, lost things, callbacks) ships as **three equal empty slots** that populate from real play. The mermaid, if she appears, is merely the slot that fills first. Never build a feature for one character that isn't a system for three.
+1. **Equal Protagonists.** *(Amended 2026-07: the party grew from three to four — the owner's brother joined. `PARTY_SIZE` in `src/data/campaign.ts` is the single source of truth.)* No players exist yet — Session 0 hasn't happened. Every personal-story system (Reliquary, tethers, lost things, callbacks) ships as **PARTY_SIZE equal empty slots** that populate from real play. The mermaid, if she appears, is merely the slot that fills first. Never build a feature for one character that isn't a system for all of them. Note: 4 players also normalizes combat balance — the sidekick lever from research 8.6 becomes optional rather than recommended.
 2. **Never invent rules.** Prototype data is truth; additions get `// VERIFY` and a line in the summary.
 3. **Licensing guardrail.** No WotC art, maps, or text in the repo, ever. Original art, SRD 5.2 stats only, owner-upload slots for his own book's scans. When gray, leave a slot and flag it.
 4. **The focus bug class stays dead.** Components at module scope, always.
@@ -65,7 +65,7 @@ Each phase ships complete, live, tested at 390×844, with a TESTING.md checklist
 - Between sessions this is Axis 2's anchor: the ledger is the thing a player opens on a Tuesday to reread what they owe.
 
 **PHASE NEXT-3 — The Reliquary, A3 (Axes 2, 3). The endgame engine; build the architecture now, fill it from play.**
-- Three tracks, `Track 1/2/3`, all identical first-class citizens with: a motif type (sound / image / text — chosen with the DM after each character exists), fragment slots as illustrated card frames (original SVG in-palette), a "recovered" ceremony per fragment, and a completion state reserved for the finale.
+- One track per protagonist (PARTY_SIZE — currently four), all identical first-class citizens with: a motif type (sound / image / text — chosen with the DM after each character exists), fragment slots as illustrated card frames (original SVG in-palette), a "recovered" ceremony per fragment, and a completion state reserved for the finale.
 - Populate nothing. Seed the mermaid's *song* motif only if/when that character actually gets made. The owner produces music in GarageBand — leave an owner-upload slot for melody layers (small audio files), never generate audio.
 - DM side: a private Reliquary editor bound to each character's Lost Thing.
 

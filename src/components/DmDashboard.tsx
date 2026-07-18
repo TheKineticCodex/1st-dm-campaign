@@ -8,6 +8,7 @@ import { CONDITIONS, fmt, mod } from '../data/rules'
 import { computeSheet, skillMod } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
+import { PARTY_SIZE } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { TableSection } from './TableSection'
@@ -212,8 +213,10 @@ function HomeSection({
     setSeeded(true)
   }
 
-  // Three seats, always — the Three Protagonists rule made visible.
-  const seats = [0, 1, 2].map((i) => roster[i] ?? null)
+  // One chair per protagonist, always — the Equal Protagonists rule
+  // made visible. Extra joiners beyond the configured seats still show.
+  const seatCount = Math.max(PARTY_SIZE, roster.length)
+  const seats = Array.from({ length: seatCount }, (_, i) => roster[i] ?? null)
 
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
@@ -222,7 +225,7 @@ function HomeSection({
       <Section style={{ marginTop: 12 }}>
         <div className="flex items-center justify-between">
           <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
-            The three chairs
+            The {PARTY_SIZE === 4 ? 'four' : `${PARTY_SIZE}`} chairs
           </p>
           <button
             type="button"
@@ -233,7 +236,7 @@ function HomeSection({
             look again
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-2 mt-2">
+        <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
           {seats.map((r, i) => (
             <div
               key={r?.playerId ?? `empty-${i}`}

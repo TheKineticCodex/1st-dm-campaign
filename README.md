@@ -9,7 +9,7 @@
 > Attribution 4.0 International License. This app is free, private, and
 > non-commercial, and must remain so.
 
-Campaign companion web app for a 3-player *Wild Beyond the Witchlight*
+Campaign companion web app for a 4-player *Wild Beyond the Witchlight*
 campaign (D&D 2024 rules). Mobile-first, no accounts — players join with a
 code, the DM has a separate code.
 
