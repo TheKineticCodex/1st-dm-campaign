@@ -8,9 +8,12 @@ import { CONDITIONS, fmt, mod } from '../data/rules'
 import { computeSheet, skillMod } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
+import { keepGlassLit } from '../lib/wakeLock'
 import { PARTY_SIZE } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
+import { AmbientMode } from './AmbientMode'
+import { NightOne } from './NightOne'
 import { TableSection } from './TableSection'
 import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display } from './ui'
 
@@ -44,6 +47,9 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   const [roster, setRoster] = useState<RosterEntry[]>([])
   const [loaded, setLoaded] = useState(false)
   const [whisperPrefill, setWhisperPrefill] = useState<WhisperPrefill | null>(null)
+  const [ambient, setAmbient] = useState(false)
+
+  useEffect(() => keepGlassLit(), [])
 
   // Roster keeps itself fresh — no more tapping refresh to see a new player.
   useEffect(() => {
@@ -81,6 +87,10 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
     }
   }
 
+  if (ambient) {
+    return <AmbientMode roster={roster} onClose={() => setAmbient(false)} />
+  }
+
   return (
     <div
       style={{
@@ -97,6 +107,14 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
             ✦ The Lantern-Keeper's Book
           </h1>
           <span className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setAmbient(true)}
+              className="text-xs"
+              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            >
+              🕯 ambient
+            </button>
             <CalmToggle />
             <button
               type="button"
@@ -222,7 +240,11 @@ function HomeSection({
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <H>The Book opens</H>
 
-      <Section style={{ marginTop: 12 }}>
+      <div className="mt-3">
+        <NightOne store={store} roster={roster} />
+      </div>
+
+      <Section>
         <div className="flex items-center justify-between">
           <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
             The {PARTY_SIZE === 4 ? 'four' : `${PARTY_SIZE}`} chairs

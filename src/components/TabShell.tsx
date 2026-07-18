@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
+import { keepGlassLit } from '../lib/wakeLock'
 import {
   EMPTY_BUILD,
   EMPTY_NOTES,
@@ -42,6 +43,8 @@ export function TabShell({ session, onLeave }: TabShellProps) {
   const [draftBuild, setDraftBuild] = useState<CharacterBuild>(EMPTY_BUILD)
   const [quiz, setQuiz] = useState<QuizResult | null>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => keepGlassLit(), [])
 
   useEffect(() => {
     let cancelled = false
