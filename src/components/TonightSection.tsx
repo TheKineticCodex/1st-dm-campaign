@@ -3,19 +3,31 @@
 // and the stage controls that drive what the iPad shows.
 
 import { useEffect, useRef, useState } from 'react'
+import { ACT1_SCENES, type SceneCue } from '../data/act1Scenes'
 import { seedStory } from '../data/storySeeds'
+import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import { SFX } from '../lib/sfx'
 import type { RosterEntry, Store } from '../lib/store'
-import type { StageState, StageToken, StoryNode } from '../types'
+import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
 import { Btn, C, Eyebrow, H, TextArea, TextInput, display } from './ui'
 
 const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', '#C96A6A', '#8BB8E0']
 
 const EMPTY_STAGE: StageState = { mode: 'ambient', mapUrl: null, tokens: [] }
 
-export function TonightSection({ store, roster }: { store: Store; roster: RosterEntry[] }) {
+export function TonightSection({
+  store,
+  roster,
+  onGo,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  onGo: (section: string) => void
+}) {
   const channelRef = useRef<TableChannel | null>(null)
+  const [running, setRunning] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -31,14 +43,315 @@ export function TonightSection({ store, roster }: { store: Store; roster: Roster
 
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
-      <H>Tonight</H>
+      <div className="flex items-center justify-between">
+        <H>Tonight</H>
+        <button
+          type="button"
+          onClick={() => setRunning(!running)}
+          className="rounded-lg px-5 py-2"
+          style={{
+            ...display,
+            fontSize: 17,
+            fontWeight: 600,
+            background: running ? C.panel : C.gold,
+            color: running ? C.faint : C.ink,
+            border: `1px solid ${running ? C.panelEdge : C.gold}`,
+            minHeight: 44,
+            cursor: 'pointer',
+          }}
+        >
+          {running ? '✎ back to planning' : '▶ Run the night'}
+        </button>
+      </div>
       <PartyStrip roster={roster} />
-      <div
-        className="grid gap-3 mt-3"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', alignItems: 'start' }}
-      >
-        <StoryTimeline store={store} />
-        <StageControls store={store} roster={roster} channelRef={channelRef} />
+      {running ? (
+        <RunNight store={store} roster={roster} channelRef={channelRef} onGo={onGo} />
+      ) : (
+        <div
+          className="grid gap-3 mt-3"
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', alignItems: 'start' }}
+        >
+          <StoryTimeline store={store} />
+          <StageControls store={store} roster={roster} channelRef={channelRef} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------- run the night
+
+function RunNight({
+  store,
+  roster,
+  channelRef,
+  onGo,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  channelRef: { current: TableChannel | null }
+  onGo: (section: string) => void
+}) {
+  const [nodes, setNodes] = useState<StoryNode[]>([])
+  const [npcs, setNpcs] = useState<Npc[]>([])
+  const [wonder, setWonder] = useState<string | null>(null)
+  const [sentNote, setSentNote] = useState<string | null>(null)
+
+  const reload = async () => setNodes(await store.listStory())
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [n, p] = await Promise.all([store.listStory(), store.listNpcs()])
+      if (!cancelled) {
+        setNodes(n)
+        setNpcs(p)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [store])
+
+  const current = nodes.find((n) => n.status === 'current') ?? null
+  const guide = current ? ACT1_SCENES[current.title] : undefined
+  const byId = new Map(nodes.map((n) => [n.id, n]))
+  const nextInAct = current
+    ? nodes.find((n) => n.act === current.act && n.ord === current.ord + 1)
+    : null
+  const rosterNames = new Set(roster.map((r) => r.playerName))
+
+  const note = (msg: string) => {
+    setSentNote(msg)
+    setTimeout(() => setSentNote(null), 2500)
+  }
+
+  const fireCue = (cue: SceneCue) => {
+    if (cue.kind === 'sfx' && cue.sfx) {
+      SFX[cue.sfx]?.play()
+      return
+    }
+    if (cue.kind === 'go-table') {
+      onGo('table')
+      return
+    }
+    if (cue.kind === 'whisper' && cue.whisper) {
+      const h: Handout = {
+        id: crypto.randomUUID(),
+        target: cue.whisper.target,
+        title: cue.whisper.title,
+        body: cue.whisper.body,
+        ephemeral: cue.whisper.ephemeral,
+        sentAt: new Date().toISOString(),
+      }
+      void store.sendHandout(h)
+      channelRef.current?.sendHandout(h)
+      note(`Whisper sealed and sent ${cue.whisper.target ? `to ${cue.whisper.target}` : 'to everyone'} ✦`)
+    }
+  }
+
+  const advanceTo = async (target: StoryNode) => {
+    if (current && current.id !== target.id) await store.saveStoryNode({ ...current, status: 'done' })
+    await store.saveStoryNode({ ...target, status: 'current' })
+    await reload()
+  }
+
+  const sendWonder = (text: string) => {
+    const h: Handout = {
+      id: crypto.randomUUID(),
+      target: null,
+      title: 'The Feywild, meanwhile',
+      body: text,
+      ephemeral: true,
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    note('Wonder sent to every phone ✦')
+  }
+
+  return (
+    <div className="mt-3">
+      <p className="text-sm rounded-lg px-4 py-2 mb-3" style={{ background: `${C.sea}14`, border: `1px solid ${C.sea}55`, color: C.sea }}>
+        ✦ Lost? Read the gold words aloud. Press a button. Then ask the table: “What do you do?”
+        That is the entire job — the Book does the rest.
+      </p>
+      {sentNote && (
+        <p role="status" className="text-sm mb-2" style={{ color: C.gold }}>
+          {sentNote}
+        </p>
+      )}
+
+      {!current || !guide ? (
+        <p style={{ color: C.faint }}>
+          No current beat. Flip to planning and tap “go here” on a beat to begin.
+        </p>
+      ) : (
+        <div className="rounded-xl p-5" style={{ background: C.panel, border: `1px solid ${C.gold}66`, boxShadow: `0 0 24px ${C.gold}22` }}>
+          <Eyebrow>now — act {current.act}</Eyebrow>
+          <h3 style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>{current.title}</h3>
+
+          <p className="mt-3 text-base leading-relaxed" style={{ color: C.gold, fontStyle: 'italic' }}>
+            “{guide.readAloud}”
+          </p>
+          <p className="text-sm mt-3" style={{ color: C.parchment }}>
+            <span className="uppercase text-xs tracking-widest" style={{ color: C.sea }}>
+              the truth ·{' '}
+            </span>
+            {guide.truth}
+          </p>
+
+          <div className="grid gap-1 mt-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+            {(
+              [
+                ['⚔ If they fight', guide.doors.fight],
+                ['💬 If they talk', guide.doors.talk],
+                ['🤫 If they sneak', guide.doors.sneak],
+                ['⚖ If they bargain', guide.doors.bargain],
+                ['🌀 If they go sideways', guide.doors.insane],
+              ] as const
+            ).map(([label, text]) => (
+              <div key={label} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
+                <p className="text-xs" style={{ color: C.sea }}>
+                  {label}
+                </p>
+                <p className="text-xs mt-1" style={{ color: C.parchment }}>
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {guide.npcs.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.sea, letterSpacing: '0.2em' }}>
+                in this scene
+              </p>
+              <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+                {guide.npcs.map((name) => {
+                  const npc = npcs.find((p) => p.name === name)
+                  return (
+                    <div key={name} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
+                      <p className="text-sm" style={{ ...display, fontWeight: 600, color: C.gold }}>
+                        {name}
+                        {npc?.pronunciation && (
+                          <span className="text-xs font-normal" style={{ color: C.faint }}>
+                            {' '}
+                            · “{npc.pronunciation}”
+                          </span>
+                        )}
+                      </p>
+                      {npc && (
+                        <>
+                          <p className="text-xs mt-1">🎭 {npc.trait}</p>
+                          <p className="text-xs" style={{ color: C.faint }}>
+                            🔒 {npc.secret}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {guide.cues.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {guide.cues.map((cue) => {
+                const missing =
+                  cue.kind === 'whisper' && cue.whisper?.target && !rosterNames.has(cue.whisper.target)
+                return (
+                  <button
+                    key={cue.label}
+                    type="button"
+                    disabled={!!missing}
+                    onClick={() => fireCue(cue)}
+                    title={missing ? `${cue.whisper!.target} hasn't joined yet` : undefined}
+                    className="rounded-lg px-3 py-2 text-sm"
+                    style={{
+                      background: cue.kind === 'whisper' ? `${C.gold}22` : C.night,
+                      border: `1px solid ${cue.kind === 'whisper' ? C.gold : C.panelEdge}`,
+                      color: missing ? C.faint : cue.kind === 'whisper' ? C.gold : C.parchment,
+                      minHeight: 44,
+                      cursor: missing ? 'not-allowed' : 'pointer',
+                      opacity: missing ? 0.5 : 1,
+                    }}
+                  >
+                    {cue.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 mt-4">
+            {current.branches.map((b) => {
+              const target = byId.get(b.toId)
+              return (
+                <button
+                  key={b.toId}
+                  type="button"
+                  onClick={() => {
+                    if (target && window.confirm(`They chose: ${b.label}?`)) void advanceTo(target)
+                  }}
+                  className="rounded-lg px-4 py-3"
+                  style={{ ...display, fontSize: 16, fontWeight: 600, background: C.gold, color: C.ink, border: 'none', minHeight: 48, cursor: 'pointer' }}
+                >
+                  ⑂ {b.label}
+                </button>
+              )
+            })}
+            {current.branches.length === 0 && nextInAct && (
+              <button
+                type="button"
+                onClick={() => void advanceTo(nextInAct)}
+                className="rounded-lg px-4 py-3"
+                style={{ ...display, fontSize: 16, fontWeight: 600, background: C.gold, color: C.ink, border: 'none', minHeight: 48, cursor: 'pointer' }}
+              >
+                next: {nextInAct.title} →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* the soundboard */}
+      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+        <Eyebrow>the soundboard — plays from this MacBook</Eyebrow>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {Object.entries(SFX).map(([key, s]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => s.play()}
+              className="rounded-lg px-3 py-2 text-sm"
+              style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* the wonder deck */}
+      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+        <Eyebrow>the wonder deck — ten seconds of Feywild, any time</Eyebrow>
+        {wonder && (
+          <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
+            “{wonder}”
+          </p>
+        )}
+        <div className="flex gap-2 mt-2">
+          <Btn secondary onClick={() => setWonder(WONDER[Math.floor(Math.random() * WONDER.length)])}>
+            ✦ draw a wonder
+          </Btn>
+          {wonder && (
+            <Btn secondary onClick={() => sendWonder(wonder)}>
+              ✉ send it to every phone
+            </Btn>
+          )}
+        </div>
       </div>
     </div>
   )

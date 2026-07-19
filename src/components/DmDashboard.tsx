@@ -139,7 +139,9 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
             {section === 'home' && (
               <HomeSection store={store} roster={roster} onGo={setSection} onRefresh={refreshRoster} />
             )}
-            {section === 'tonight' && <TonightSection store={store} roster={roster} />}
+            {section === 'tonight' && (
+              <TonightSection store={store} roster={roster} onGo={(s) => setSection(s as DmSection)} />
+            )}
             {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
             {section === 'vault' && <VaultSection roster={roster} onForgeWhisper={forgeWhisper} />}
             {section === 'lost' && <LostSection store={store} roster={roster} />}
