@@ -30,8 +30,8 @@ Reliquary tracks are the party gathering those notes/proofs.
 | Peaches capiche | Peaches, mermaid Druid (Aasimar) | **Her tail** | Sold in the Under-Sea market, priced "one song, already paid" — collateral on the FIRST bargain. She walks on borrowed feet; her alligator **followed her out of the sea** and is the only witness to the sale. Her fear (losing the alligator) is the Court's leverage. |
 | William "Blue-Chew Billy" Blackwood | Human Wizard, showman | **His late mentor's handwritten spellbook** | The Court is *buying his mentor posthumously* — un-writing him page by page. Pages surface at the carnival as prize-stall currency. Billy's true terror (nobody stays when the mask drops) is what the Hall of Facets offers to "fix." |
 | Philip | *(not yet divined)* | slot open | Fill from his quiz the moment it lands. |
-| *(4th player)* | *(not yet joined)* | slot open | Same. |
-| *(5th player)* | *(not yet joined)* | slot open | Same. |
+| Josh (Aubrey's brother) | *(not yet joined)* | slot open | Same. |
+| Josh's wife (Aubrey's sister-in-law) | *(not yet joined)* | slot open | Same. |
 
 ## Cast (original — perform freely)
 
