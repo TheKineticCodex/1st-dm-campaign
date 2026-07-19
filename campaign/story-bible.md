@@ -23,7 +23,7 @@ the Sea's alone — every creature born of the Sea holds a note of it.
 the remaining holders of the song sing their notes in one place. The
 Reliquary tracks are the party gathering those notes/proofs.
 
-## The four Lost Things (from the real Vault)
+## The five Lost Things (from the real Vault)
 
 | Player | Character | Lost Thing | The truth (DM only) |
 |---|---|---|---|
@@ -31,6 +31,7 @@ Reliquary tracks are the party gathering those notes/proofs.
 | William "Blue-Chew Billy" Blackwood | Human Wizard, showman | **His late mentor's handwritten spellbook** | The Court is *buying his mentor posthumously* — un-writing him page by page. Pages surface at the carnival as prize-stall currency. Billy's true terror (nobody stays when the mask drops) is what the Hall of Facets offers to "fix." |
 | Philip | *(not yet divined)* | slot open | Fill from his quiz the moment it lands. |
 | *(4th player)* | *(not yet joined)* | slot open | Same. |
+| *(5th player)* | *(not yet joined)* | slot open | Same. |
 
 ## Cast (original — perform freely)
 

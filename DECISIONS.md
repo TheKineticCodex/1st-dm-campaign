@@ -105,3 +105,9 @@ Choices made where the spec left room. Newest at the bottom.
    module scope in its own file — the prototype's keyboard-focus bug
    (components defined inside components remounting on each render) is
    structurally prevented.
+
+20. **Party of five.** PARTY_SIZE moved 4→5 (a fifth player joined two days
+    before Night One). Equal Protagonists holds: chairs, Lost Things, and
+    Night One tracker all scale from the one constant; the Battle Book
+    carries a standing "fifth chair" adjustment (+1 creature per major
+    battle) rather than re-mathing every ledger.

@@ -9,7 +9,7 @@ import { computeSheet, skillMod } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { keepGlassLit } from '../lib/wakeLock'
-import { PARTY_SIZE } from '../data/campaign'
+import { PARTY_SIZE, partyWord } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { NightOne } from './NightOne'
@@ -252,7 +252,7 @@ function HomeSection({
       <Section>
         <div className="flex items-center justify-between">
           <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
-            The {PARTY_SIZE === 4 ? 'four' : `${PARTY_SIZE}`} chairs
+            The {partyWord} chairs
           </p>
           <button
             type="button"

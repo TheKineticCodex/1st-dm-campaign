@@ -4,7 +4,7 @@
 // persisted on this device.
 
 import { useEffect, useMemo, useState } from 'react'
-import { PARTY_SIZE } from '../data/campaign'
+import { PARTY_SIZE, partyWord } from '../data/campaign'
 import { readCache, writeCache } from '../lib/storage'
 import type { RosterEntry, Store } from '../lib/store'
 import { C, display } from './ui'
@@ -80,7 +80,7 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
     () => [
       {
         id: 'party',
-        title: 'The four travelers',
+        title: `The ${partyWord} travelers`,
         glyph: '❖',
         auto: [
           { label: 'walked through the gate', done: roster.length, total: PARTY_SIZE },

@@ -131,6 +131,18 @@ See Battle Book. Win: **the tail's consignment papers** (with the blank proxy-se
 
 # PART III — THE BATTLE BOOK
 
+**The fifth chair (party is now FIVE):** every budget below was mathed for four adventurers. With five, XP thresholds rise ~25% (L1 Moderate 300→375, L2 Moderate 600→750, L3 Moderate 900→1,125 `// VERIFY DMG 2024 thresholds`) and — more importantly — the party gets five turns to the foes' few. Standing adjustment, one line per battle:
+
+- **CARN-A:** +1 Flying Sword (350 XP).
+- **BOG-A:** +2 Awakened Shrub (490 XP — stays gentle; the Tree just has more voices to hush).
+- **BOG-B:** +1 Zombie (850 XP; the barge clock matters more than the bodies).
+- **FAC-A:** +1 Flying Sword (350 XP; the Understudy now mimics TWO of Billy's spells per round of theatre).
+- **FAC-B:** +1 Shadow (1,000 XP).
+- **MAR-A:** +1 Merfolk Skirmisher (still deliberately easy — it is an escort).
+- **SEA-B:** +1 Merfolk Skirmisher (~725–925 XP; the real fight is procedural anyway).
+
+If a fight is running away from you either direction, the retreat condition is your throttle — pull it early, never apologize. Minor battles need no adjustment; they are seasoning.
+
 **Standing rules for every battle:** foes take, delay, or repossess — never murder. Every battle lists its retreat condition; use it. A downed PC at 0 HP is offered a bargain by the nearest foe (see What-If 10). **The alligator** is present in every major battle: it warns (one round early, always), drags one drowning/dying PC to safety once per battle, and stares at the water when the Court is near. It cannot be killed; it can be *taken* — only by paperwork, and that's an Act 2 plot, not a combat outcome.
 
 ### CARN-A · "The Empty Costumes" (carnival, optional — L1, must be gentle)
