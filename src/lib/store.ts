@@ -15,6 +15,8 @@ import type {
   QuizResult,
   SavedCharacter,
   SessionNote,
+  StageState,
+  StoryNode,
 } from '../types'
 
 export interface RosterEntry {
@@ -63,6 +65,15 @@ export interface Store {
   sendHandout(h: Handout): Promise<void>
   /** Player: handouts addressed to me (or everyone). */
   listMyHandouts(): Promise<Handout[]>
+
+  // ---- Story engine & stage ----
+  listStory(): Promise<StoryNode[]>
+  saveStoryNode(n: StoryNode): Promise<void>
+  deleteStoryNode(id: string): Promise<void>
+  getStage(): Promise<StageState | null>
+  saveStage(s: StageState): Promise<void>
+  /** Upload a map image; returns a URL the stage can load. Null offline. */
+  uploadMapImage(file: File): Promise<string | null>
 }
 
 // --------------------------------------------------------------- LocalStore
@@ -165,6 +176,26 @@ class LocalStore implements Store {
   async listMyHandouts() {
     const all = readCache<Handout[]>('handouts') ?? []
     return all.filter((h) => !h.target || h.target === this.session.playerName)
+  }
+
+  async listStory() {
+    return readCache<StoryNode[]>('story') ?? []
+  }
+  async saveStoryNode(n: StoryNode) {
+    const all = (readCache<StoryNode[]>('story') ?? []).filter((x) => x.id !== n.id)
+    writeCache('story', [...all, n].sort((a, b) => a.act - b.act || a.ord - b.ord))
+  }
+  async deleteStoryNode(id: string) {
+    writeCache('story', (readCache<StoryNode[]>('story') ?? []).filter((x) => x.id !== id))
+  }
+  async getStage() {
+    return readCache<StageState>('stage')
+  }
+  async saveStage(s: StageState) {
+    writeCache('stage', s)
+  }
+  async uploadMapImage() {
+    return null // no server to hold it; the stage needs the campaign lantern
   }
 }
 
@@ -303,6 +334,31 @@ class SupabaseStore implements Store {
   }
   async listMyHandouts() {
     return (await this.rpc<Handout[]>('list_my_handouts', { p_device_token: this.token })) ?? []
+  }
+
+  async listStory() {
+    return (await this.rpc<StoryNode[]>('dm_list_story', { p_dm_code: this.dmCode })) ?? []
+  }
+  async saveStoryNode(n: StoryNode) {
+    await this.rpc('dm_save_story_node', { p_dm_code: this.dmCode, p_node: n })
+  }
+  async deleteStoryNode(id: string) {
+    await this.rpc('dm_delete_story_node', { p_dm_code: this.dmCode, p_id: id })
+  }
+  async getStage() {
+    return this.rpc<StageState>('get_stage', { p_code: this.session.campaignCode })
+  }
+  async saveStage(s: StageState) {
+    await this.rpc('dm_save_stage', { p_dm_code: this.dmCode, p_state: s })
+  }
+  async uploadMapImage(file: File) {
+    const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    const { error } = await supabase!.storage.from('maps').upload(path, file)
+    if (error) {
+      console.error('map upload:', error.message)
+      return null
+    }
+    return supabase!.storage.from('maps').getPublicUrl(path).data.publicUrl
   }
 }
 

@@ -202,6 +202,39 @@ export interface RaceEvent {
   results?: string[]
 }
 
+// ---- The story engine (choose-your-own-adventure timeline) ----
+
+export interface StoryBranch {
+  label: string
+  toId: string
+}
+
+export interface StoryNode {
+  id: string
+  act: number
+  ord: number
+  title: string
+  summary: string
+  status: 'possible' | 'current' | 'done' | 'skipped'
+  branches: StoryBranch[]
+}
+
+// ---- The stage (MacBook-controlled, iPad-displayed) ----
+
+export interface StageToken {
+  id: string
+  label: string
+  color: string
+  x: number
+  y: number
+}
+
+export interface StageState {
+  mode: 'ambient' | 'map'
+  mapUrl: string | null
+  tokens: StageToken[]
+}
+
 export interface SessionNote {
   id: string
   sessionNumber: number

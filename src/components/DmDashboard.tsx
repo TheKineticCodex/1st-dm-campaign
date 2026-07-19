@@ -12,15 +12,17 @@ import { keepGlassLit } from '../lib/wakeLock'
 import { PARTY_SIZE } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
-import { AmbientMode } from './AmbientMode'
 import { NightOne } from './NightOne'
+import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
+import { TonightSection } from './TonightSection'
 import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display } from './ui'
 
-type DmSection = 'home' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
+type DmSection = 'home' | 'tonight' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
 const SECTIONS: [DmSection, string, string][] = [
   ['home', '✦', 'Book'],
+  ['tonight', '⚑', 'Tonight'],
   ['roster', '❖', 'Roster'],
   ['vault', '☾', 'Vault'],
   ['lost', '🔒', 'Lost'],
@@ -88,7 +90,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   }
 
   if (ambient) {
-    return <AmbientMode roster={roster} onClose={() => setAmbient(false)} />
+    return <StageScreen store={store} roster={roster} onClose={() => setAmbient(false)} />
   }
 
   return (
@@ -113,7 +115,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
               className="text-xs"
               style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
             >
-              🕯 ambient
+              🎭 stage
             </button>
             <CalmToggle />
             <button
@@ -137,6 +139,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
             {section === 'home' && (
               <HomeSection store={store} roster={roster} onGo={setSection} onRefresh={refreshRoster} />
             )}
+            {section === 'tonight' && <TonightSection store={store} roster={roster} />}
             {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
             {section === 'vault' && <VaultSection roster={roster} onForgeWhisper={forgeWhisper} />}
             {section === 'lost' && <LostSection store={store} roster={roster} />}
