@@ -1,0 +1,33 @@
+# On-demand roster summary, runnable from anywhere GitHub is reachable —
+# a fallback for when the DM (or an assistant) can't reach Supabase
+# directly. Prints only names + progress flags, never sheet contents.
+# The DM code arrives as a dispatch input so it is never committed.
+
+name: Roster check
+
+on:
+  workflow_dispatch:
+    inputs:
+      dm_code:
+        description: 'The Lantern-Keeper word'
+        required: true
+        type: string
+
+jobs:
+  roster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask the Book who is in the game
+        env:
+          DM_CODE: ${{ inputs.dm_code }}
+        run: |
+          ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxemJvZnJ2YWhpb3B0cnJnY2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyODUxODMsImV4cCI6MjA5OTg2MTE4M30.l3P3CdizfVJkHDUPnlc8nGSIyhx0aEWiGJjqZ3PCK8s"
+          curl -sf -X POST "https://dqzbofrvahioptrrgche.supabase.co/rest/v1/rpc/dm_roster" \
+            -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+            -H "Content-Type: application/json" \
+            -d "{\"p_dm_code\":\"$DM_CODE\"}" \
+          | jq -r '.[] | [
+              .playerName,
+              (if .quiz then "divined" else "not divined" end),
+              (if .character then "forged (" + (.character.build.species // "?") + " " + (.character.build.klass // .character.build.class // "?") + ")" else "not forged" end)
+            ] | join(" · ")'
