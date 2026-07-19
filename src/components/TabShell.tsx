@@ -22,9 +22,17 @@ import { C, CalmToggle, body } from './ui'
 
 export type TabId = 'fortune' | 'build' | 'sheet' | 'ledger' | 'guide'
 
-const TABS: [TabId, string, string][] = [
+// Quiet Interface law 2: the tab bar shows only the current chapter of a
+// player's story. Before the forge seals: the path to a character. After:
+// the tools of play. Build stays reachable via "Edit character".
+const TABS_CREATION: [TabId, string, string][] = [
   ['fortune', '✦', 'Fortune'],
   ['build', '⚒', 'Build'],
+  ['sheet', '❖', 'Sheet'],
+  ['guide', '✧', 'Guide'],
+]
+
+const TABS_PLAY: [TabId, string, string][] = [
   ['sheet', '❖', 'Sheet'],
   ['ledger', '⚖', 'Ledger'],
   ['guide', '✧', 'Guide'],
@@ -280,6 +288,25 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         </div>
       )}
 
+      {(tab === 'build' || tab === 'fortune') && character && (
+        <button
+          type="button"
+          onClick={() => setTab('sheet')}
+          className="fixed left-4 text-sm rounded-lg px-4 py-2"
+          style={{
+            top: 'calc(8px + env(safe-area-inset-top))',
+            background: C.panel,
+            border: `1px solid ${C.panelEdge}`,
+            color: C.sea,
+            minHeight: 44,
+            cursor: 'pointer',
+            zIndex: 55,
+          }}
+        >
+          ← back to your sheet
+        </button>
+      )}
+
       {(quiz || character) && (
         <nav
         className="fixed bottom-0 left-0 right-0 flex justify-center"
@@ -293,7 +320,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         aria-label="Sections"
       >
         <div className="flex w-full" style={{ maxWidth: 560 }}>
-          {TABS.map(([id, icon, label]) => (
+          {(character ? TABS_PLAY : TABS_CREATION).map(([id, icon, label]) => (
             <button
               key={id}
               type="button"
