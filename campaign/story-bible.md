@@ -33,6 +33,53 @@ Reliquary tracks are the party gathering those notes/proofs.
 | Freya | Fairy Fighter | **The suffering she survived** — whatever she endured that she vows no loved one ever will | Black-winged, twin swords, armored in tattoos and menace so nobody checks for the wound. Her vow ("I would risk everything so they never suffer what I did") is, to the Court, a *standing offer*. The Buyer intends to accept it. ⚠ Two Freyas at the table — full names on all paperwork (great recurring gag AND an Act 3 contract loophole). |
 | Freya Moon | Fairy Druid | **The Heartbloom Grove's spring** — her home's magic, "blighted" to silence; she carries its last living blossom in a crystal pendant | The blight was a PURCHASE. The Court bought the grove's spring (filed BELOW, same inventory as the Sea's song) — a blight is what a bought season looks like from outside. Her pendant blossom is the unsold remainder; the Court would love to complete the set. Restoring the grove = finding the receipt. Parallels Peaches: both carry the last piece of something the Court holds. |
 
+## Where it starts (names the DM says out loud)
+
+- **Saltmere** — a small grey fishing town on a cold coast. Nets, salt sheds,
+  one crooked lighthouse. Three nights ago the tide went out of Saltmere and
+  did not come back.
+- **The Low-Tide Carnival** — standing a mile out on the exposed seabed,
+  where deep water was last week. Its banners read: *THE SPLENDID LOW-TIDE
+  CARNIVAL, BRIEFLY ASHORE.* It is the Still Court's storefront: it appears
+  where something was bought, when the Court comes to collect — or to shop.
+
+## The cold open (how the five meet — read/paraphrase aloud)
+
+"Three nights ago, in the town of Saltmere, the tide went out and forgot to
+come back. Two nights ago, lights appeared on the sand — a carnival, standing
+where the sea should be. And last night, a paper lantern found each of you,
+wherever you were, with your name on it in wet ink. Tonight you stand at the
+edge of the sand, five strangers, each holding a lantern that is tugging
+toward the lights like a dog on a lead. — Why did you follow yours?"
+
+(Go around the table; each player answers. That answer is their introduction.)
+
+Then the Gate: the Twins will not open it for fewer than five. Sister Hum
+hums it; Brother Hush writes it: **"ADMISSION IS SOLD IN SETS. YOU FIVE
+ARRIVED ON ONE TIDE."** The Court prefers complete sets. They are a party
+because the paperwork says so — and the paperwork is never wrong.
+
+### Why each lantern came (private flavor, use anytime)
+
+- **Peaches** — her lantern smells of under-the-sea, of home. The alligator
+  was already walking toward the lights when she woke.
+- **Billy** — folded inside his lantern: a page in his mentor's handwriting
+  he has never seen before.
+- **Philip** — his lantern is addressed *almost* to him — to the man he is
+  afraid of no longer being. He came for answers.
+- **Freya** — hers is not for her. It bears the names of the people she
+  protects. She came so they never would.
+- **Freya Moon** — when her lantern drifted past the window, the blossom in
+  her pendant opened one petal. First time ever.
+
+### What was actually stolen, and when (DM clarity)
+
+Nothing is stolen AT the carnival — that is the trick of the whole campaign.
+The Still Court never steals; it *bought*, legally, with signatures, long ago
+and far away: Peaches's tail, the grove's spring, the Sea's own song. The
+carnival is where the trail surfaces. The five arrive as victims of old,
+lawful purchases — and leave as the loophole.
+
 ## Cast (original — perform freely)
 
 - **Brother Hush & Sister Hum, the Twins of the Toll** — gatekeepers. Hush only writes on slate; Hum half-sings everything. Admission: one honest answer per guest, recorded. (Those answers are Court paperwork. Callback in Act 3.)

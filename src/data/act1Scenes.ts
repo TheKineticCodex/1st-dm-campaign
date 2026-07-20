@@ -28,7 +28,7 @@ const FREYA_MOON = 'Freya Moon'
 export const ACT1_SCENES: Record<string, SceneGuide> = {
   'The Gate of Paper Lanterns': {
     readAloud:
-      'The tide went out this evening and forgot to come back. Where it should be stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink.',
+      'Three nights ago the tide went out of Saltmere and forgot to come back. Now, a mile out on the wet sand, stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink. The lanterns you each carry tug toward it like dogs on a lead.',
     truth:
       'The toll — one honest answer each — is Court paperwork. Write every answer down; they return in Act 3.',
     doors: {

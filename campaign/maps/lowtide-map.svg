@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <radialGradient id="lantern" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8B84B" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#E8B84B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowG" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7FD4C1" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#7FD4C1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowS" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F2E9D8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#F2E9D8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6FA8E8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#6FA8E8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241A42"/>
+      <stop offset="100%" stop-color="#2B2050"/>
+    </linearGradient>
+  </defs>
+
+  <!-- night -->
+  <rect width="1600" height="1200" fill="#181030"/>
+  <g fill="#F2E9D8">
+    <circle cx="120" cy="70" r="1.6" opacity="0.7"/><circle cx="340" cy="40" r="1.2" opacity="0.5"/>
+    <circle cx="560" cy="90" r="1.4" opacity="0.6"/><circle cx="820" cy="50" r="1.2" opacity="0.5"/>
+    <circle cx="1050" cy="80" r="1.6" opacity="0.7"/><circle cx="1280" cy="45" r="1.2" opacity="0.5"/>
+    <circle cx="1470" cy="95" r="1.5" opacity="0.6"/><circle cx="240" cy="130" r="1" opacity="0.4"/>
+    <circle cx="700" cy="120" r="1" opacity="0.4"/><circle cx="1180" cy="130" r="1" opacity="0.4"/>
+  </g>
+  <circle cx="1440" cy="120" r="46" fill="#F2E9D8" opacity="0.85"/>
+  <circle cx="1424" cy="110" r="44" fill="#181030"/>
+
+  <!-- SALTMERE on its ridge -->
+  <path d="M0,205 Q300,165 640,195 T1600,180 L1600,245 Q1100,275 640,255 T0,265 Z" fill="#251A48" stroke="#3A2C66" stroke-width="3"/>
+  <g stroke="#3A2C66" stroke-width="2" fill="#2E2258">
+    <rect x="180" y="150" width="52" height="46"/><path d="M174,152 L206,124 L238,152 Z"/>
+    <rect x="260" y="158" width="44" height="40"/><path d="M254,160 L282,136 L310,160 Z"/>
+    <rect x="335" y="150" width="56" height="48"/><path d="M329,152 L363,122 L397,152 Z"/>
+    <rect x="1150" y="145" width="50" height="46"/><path d="M1144,147 L1175,120 L1206,147 Z"/>
+    <rect x="1230" y="152" width="42" height="40"/><path d="M1224,154 L1251,132 L1278,154 Z"/>
+  </g>
+  <g fill="#E8B84B" opacity="0.9">
+    <rect x="200" y="164" width="7" height="9"/><rect x="352" y="166" width="7" height="9"/>
+    <rect x="1166" y="160" width="7" height="9"/><rect x="1244" y="164" width="6" height="8"/>
+  </g>
+  <!-- lighthouse -->
+  <path d="M1382,88 L1398,88 L1406,190 L1374,190 Z" fill="#2E2258" stroke="#3A2C66" stroke-width="2"/>
+  <rect x="1378" y="74" width="24" height="16" fill="#251A48" stroke="#3A2C66" stroke-width="2"/>
+  <circle cx="1390" cy="82" r="26" fill="url(#lantern)"/>
+  <text x="1390" y="215" text-anchor="middle" fill="#9C8FC4" font-size="17" font-style="italic">the crooked light</text>
+  <text x="300" y="100" fill="#F2E9D8" font-size="40" letter-spacing="10">SALTMERE</text>
+  <text x="300" y="128" fill="#9C8FC4" font-size="17" font-style="italic">a fishing town, lately short one sea</text>
+
+  <!-- exposed seabed -->
+  <rect x="0" y="245" width="1600" height="955" fill="url(#sand)"/>
+  <g stroke="#3A2C66" stroke-width="1.5" opacity="0.5" fill="none">
+    <path d="M60,330 Q300,315 520,335 T980,330 T1540,340"/>
+    <path d="M40,420 Q360,400 700,425 T1560,415"/>
+    <path d="M80,1105 Q420,1085 760,1105 T1520,1100"/>
+  </g>
+
+  <!-- stranded boats -->
+  <g transform="rotate(-14 260 380)">
+    <path d="M190,380 Q260,412 330,380 L316,364 L204,364 Z" fill="#251A48" stroke="#3A2C66" stroke-width="2.5"/>
+    <line x1="260" y1="364" x2="260" y2="308" stroke="#3A2C66" stroke-width="3"/>
+  </g>
+  <text x="262" y="440" text-anchor="middle" fill="#9C8FC4" font-size="16" font-style="italic">the Kindly Debt, aground</text>
+  <g transform="rotate(10 1340 350)">
+    <path d="M1285,350 Q1340,376 1395,350 L1384,338 L1296,338 Z" fill="#251A48" stroke="#3A2C66" stroke-width="2.5"/>
+  </g>
+
+  <!-- tide pools -->
+  <g fill="#7FD4C1" opacity="0.28" stroke="#7FD4C1" stroke-opacity="0.5" stroke-width="1.5">
+    <ellipse cx="150" cy="620" rx="64" ry="26"/>
+    <ellipse cx="1450" cy="580" rx="76" ry="30"/>
+    <ellipse cx="1390" cy="880" rx="56" ry="22"/>
+    <ellipse cx="180" cy="920" rx="48" ry="20"/>
+  </g>
+  <text x="150" y="662" text-anchor="middle" fill="#7FD4C1" font-size="15" font-style="italic" opacity="0.8">tide pools (they watch)</text>
+
+  <!-- lantern path from town to gate -->
+  <path d="M800,255 C790,300 810,340 800,395" stroke="#E8B84B" stroke-width="2" stroke-dasharray="3 10" fill="none" opacity="0.8"/>
+
+  <!-- carnival fence: ellipse of lanterns -->
+  <g>
+    <ellipse cx="800" cy="720" rx="560" ry="330" fill="#251A48" opacity="0.45"/>
+    <ellipse cx="800" cy="720" rx="560" ry="330" fill="none" stroke="#E8B84B" stroke-width="1.5" stroke-dasharray="1 26" opacity="0.9"/>
+  </g>
+  <g fill="#E8B84B">
+    <circle cx="800" cy="390" r="4"/><circle cx="590" cy="415" r="3.5"/><circle cx="1010" cy="415" r="3.5"/>
+    <circle cx="420" cy="490" r="3.5"/><circle cx="1180" cy="490" r="3.5"/>
+    <circle cx="300" cy="600" r="3.5"/><circle cx="1300" cy="600" r="3.5"/>
+    <circle cx="245" cy="720" r="3.5"/><circle cx="1355" cy="720" r="3.5"/>
+    <circle cx="300" cy="845" r="3.5"/><circle cx="1300" cy="845" r="3.5"/>
+    <circle cx="430" cy="950" r="3.5"/><circle cx="1170" cy="950" r="3.5"/>
+    <circle cx="620" cy="1022" r="3.5"/><circle cx="980" cy="1022" r="3.5"/><circle cx="800" cy="1048" r="4"/>
+  </g>
+
+  <!-- 1 · GATE -->
+  <g>
+    <circle cx="800" cy="415" r="60" fill="url(#lantern)"/>
+    <path d="M756,455 L756,392 Q800,352 844,392 L844,455" fill="none" stroke="#E8B84B" stroke-width="5"/>
+    <rect x="742" y="392" width="10" height="26" rx="3" fill="#E8B84B"/>
+    <rect x="848" y="392" width="10" height="26" rx="3" fill="#E8B84B"/>
+    <circle cx="770" cy="470" r="9" fill="#251A48" stroke="#9C8FC4" stroke-width="2"/>
+    <circle cx="830" cy="470" r="9" fill="#251A48" stroke="#9C8FC4" stroke-width="2"/>
+    <text x="800" y="505" text-anchor="middle" fill="#F2E9D8" font-size="21">① The Gate of Paper Lanterns</text>
+    <text x="800" y="527" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">the Twins take one honest answer each</text>
+  </g>
+
+  <!-- 2 · MIDWAY stalls, two rows -->
+  <g stroke="#3A2C66" stroke-width="2.5">
+    <g fill="#2E2258">
+      <path d="M600,590 L680,590 L680,640 L600,640 Z"/><path d="M594,592 L640,562 L686,592 Z" fill="#B58A2E"/>
+      <path d="M720,590 L800,590 L800,640 L720,640 Z"/><path d="M714,592 L760,562 L806,592 Z" fill="#2E2258"/>
+      <path d="M840,590 L920,590 L920,640 L840,640 Z"/><path d="M834,592 L880,562 L926,592 Z" fill="#B58A2E"/>
+      <path d="M600,690 L680,690 L680,740 L600,740 Z"/><path d="M594,692 L640,662 L686,692 Z" fill="#2E2258"/>
+      <path d="M840,690 L920,690 L920,740 L840,740 Z"/><path d="M834,692 L880,662 L926,692 Z" fill="#2E2258"/>
+    </g>
+  </g>
+  <text x="760" y="775" text-anchor="middle" fill="#F2E9D8" font-size="21">② The Games of the Midway</text>
+  <text x="760" y="797" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">everything glitters · nothing has a price tag</text>
+
+  <!-- 3 · PRIZE STALL -->
+  <g>
+    <path d="M1060,660 L1160,660 L1160,720 L1060,720 Z" fill="#2E2258" stroke="#3A2C66" stroke-width="2.5"/>
+    <path d="M1052,662 L1110,626 L1168,662 Z" fill="#B58A2E" stroke="#3A2C66" stroke-width="2.5"/>
+    <circle cx="1110" cy="694" r="8" fill="#E8B84B" opacity="0.9"/>
+    <text x="1110" y="752" text-anchor="middle" fill="#F2E9D8" font-size="20">③ The Prize Stall</text>
+    <text x="1110" y="773" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">crates addressed BELOW</text>
+  </g>
+
+  <!-- 4 · GREY-GILL'S TENT -->
+  <g>
+    <path d="M420,650 Q460,600 500,650 L492,712 L428,712 Z" fill="#2E2258" stroke="#3A2C66" stroke-width="2.5"/>
+    <path d="M460,606 L460,586" stroke="#9C8FC4" stroke-width="2"/>
+    <circle cx="460" cy="580" r="6" fill="#7FD4C1"/>
+    <circle cx="460" cy="676" r="14" fill="url(#glowG)"/>
+    <text x="460" y="748" text-anchor="middle" fill="#F2E9D8" font-size="20">④ Grey-Gill's Tent</text>
+    <text x="460" y="769" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">fortunes · salt · a pinned-high shawl</text>
+  </g>
+
+  <!-- 5 · CAROUSEL -->
+  <g>
+    <circle cx="800" cy="890" r="62" fill="#2E2258" stroke="#3A2C66" stroke-width="3"/>
+    <circle cx="800" cy="890" r="62" fill="url(#lantern)" opacity="0.5"/>
+    <circle cx="800" cy="890" r="8" fill="#B58A2E"/>
+    <g stroke="#9C8FC4" stroke-width="2">
+      <line x1="800" y1="890" x2="800" y2="836"/><line x1="800" y1="890" x2="847" y2="863"/>
+      <line x1="800" y1="890" x2="847" y2="917"/><line x1="800" y1="890" x2="800" y2="944"/>
+      <line x1="800" y1="890" x2="753" y2="917"/><line x1="800" y1="890" x2="753" y2="863"/>
+    </g>
+    <g fill="#E8B84B"><circle cx="800" cy="842" r="5"/><circle cx="842" cy="866" r="5"/><circle cx="842" cy="914" r="5"/><circle cx="800" cy="938" r="5"/><circle cx="758" cy="914" r="5"/><circle cx="758" cy="866" r="5"/></g>
+    <text x="800" y="985" text-anchor="middle" fill="#F2E9D8" font-size="20">⑤ The Carousel</text>
+    <text x="800" y="1006" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">its song has a hole in it</text>
+  </g>
+
+  <!-- 6 · THREE GATES at the back fence -->
+  <g>
+    <text x="800" y="1090" text-anchor="middle" fill="#F2E9D8" font-size="21">⑥ The Three Gates · the back fence</text>
+    <!-- green -->
+    <circle cx="560" cy="1135" r="34" fill="url(#glowG)"/>
+    <path d="M536,1158 L536,1122 Q560,1100 584,1122 L584,1158" fill="none" stroke="#7FD4C1" stroke-width="4"/>
+    <text x="560" y="1185" text-anchor="middle" fill="#7FD4C1" font-size="15">green lanterns · the Bog</text>
+    <!-- silver -->
+    <circle cx="800" cy="1135" r="34" fill="url(#glowS)"/>
+    <path d="M776,1158 L776,1122 Q800,1100 824,1122 L824,1158" fill="none" stroke="#F2E9D8" stroke-width="4"/>
+    <text x="800" y="1185" text-anchor="middle" fill="#F2E9D8" font-size="15">silver lanterns · the Facets</text>
+    <!-- blue -->
+    <circle cx="1040" cy="1135" r="34" fill="url(#glowB)"/>
+    <path d="M1016,1158 L1016,1122 Q1040,1100 1064,1122 L1064,1158" fill="none" stroke="#6FA8E8" stroke-width="4"/>
+    <text x="1040" y="1185" text-anchor="middle" fill="#6FA8E8" font-size="15">blue lanterns · the Under-Sea</text>
+  </g>
+
+  <!-- whisper lane -->
+  <path d="M940,640 Q1000,760 940,850" stroke="#9C8FC4" stroke-width="1.5" stroke-dasharray="2 8" fill="none" opacity="0.7"/>
+  <text x="1010" y="830" fill="#9C8FC4" font-size="15" font-style="italic" opacity="0.85">the dark between lanterns</text>
+
+  <!-- alligator -->
+  <g transform="translate(1210 940) rotate(-8)" opacity="0.95">
+    <ellipse cx="0" cy="0" rx="46" ry="12" fill="#2E2258" stroke="#7FD4C1" stroke-width="2"/>
+    <path d="M44,0 L74,-4 L74,4 Z" fill="#2E2258" stroke="#7FD4C1" stroke-width="2"/>
+    <circle cx="-30" cy="-6" r="3" fill="#E8B84B"/>
+  </g>
+  <text x="1218" y="985" text-anchor="middle" fill="#7FD4C1" font-size="15" font-style="italic">an alligator, patient</text>
+
+  <!-- title cartouche -->
+  <g>
+    <rect x="52" y="985" width="420" height="170" rx="8" fill="#251A48" stroke="#B58A2E" stroke-width="2.5"/>
+    <rect x="60" y="993" width="404" height="154" rx="6" fill="none" stroke="#3A2C66" stroke-width="1.5"/>
+    <text x="262" y="1032" text-anchor="middle" fill="#E8B84B" font-size="27" letter-spacing="4">THE LOW-TIDE CARNIVAL</text>
+    <text x="262" y="1058" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">briefly ashore · on the sands below Saltmere</text>
+    <text x="262" y="1092" text-anchor="middle" fill="#F2E9D8" font-size="15">① Gate  ② Midway  ③ Prize Stall</text>
+    <text x="262" y="1115" text-anchor="middle" fill="#F2E9D8" font-size="15">④ Grey-Gill  ⑤ Carousel  ⑥ Three Gates</text>
+    <text x="262" y="1141" text-anchor="middle" fill="#9C8FC4" font-size="13" font-style="italic">the sea has withdrawn — for now — beyond the back fence</text>
+  </g>
+
+  <!-- compass -->
+  <g transform="translate(1490 1060)" stroke="#B58A2E" stroke-width="2" fill="none">
+    <circle r="34"/>
+    <path d="M0,-30 L7,0 L0,30 L-7,0 Z" fill="#E8B84B" stroke="none"/>
+    <text y="-42" text-anchor="middle" fill="#F2E9D8" font-size="16" stroke="none">N</text>
+    <text y="-46" dy="102" text-anchor="middle" fill="#9C8FC4" font-size="12" stroke="none" font-style="italic">toward town</text>
+  </g>
+</svg>
