@@ -114,4 +114,20 @@ export const SFX: Record<string, { label: string; play: () => void }> = {
       ;[900, 700, 500].forEach((f, i) => tone(f, 0.15, 'sine', 0.06, 0.1 + i * 0.08, -100))
     },
   },
+  punch: {
+    label: '👊 Haymaker',
+    play: () => {
+      tone(85, 0.16, 'sine', 0.4, 0, -30)
+      noise(0.08, 0.25, 0, 900)
+    },
+  },
+  crash: {
+    label: '🍾 Bottles & Furniture',
+    play: () => {
+      noise(0.35, 0.45, 0, 3500)
+      noise(0.2, 0.3, 0.12, 2500)
+      ;[1800, 1400, 950].forEach((f, i) => tone(f, 0.1, 'triangle', 0.07, 0.05 + i * 0.06, -300))
+      tone(70, 0.3, 'sine', 0.25, 0.28, -20)
+    },
+  },
 }

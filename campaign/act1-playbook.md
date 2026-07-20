@@ -226,3 +226,94 @@ Salt-Mother Naretha (Sea Hag, 2, 450 `// VERIFY SRD`) + 2× Merfolk Skirmisher (
 
 # CLOSING VERIFY LIST
 Encounter budget table values (2024) · every battle's XP sum vs budget · SRD 5.2 inclusion & CR for: Awakened Tree/Shrub, Water Weird, Specter, Shadow, Green Hag, Sea Hag, Merfolk Skirmisher, Reef Shark, Swarm of Quippers/Ravens, Giant Crab/Frog, Crocodile, Wolf, Will-o'-Wisp, Zombie, Animated Armor, Flying Sword, Rug of Smothering, Mimic, Quasit(unused) · all `// VERIFY house` rules above (marked micro-rules: fence-mark disadvantage, tithe-bell stun, mirror-advantage, mirror-break Inspiration, note-stun, crown save, quill +2, exhaustion sip, silence damage, mentor's free casting, group DC 13) — each is small, optional, and yours to keep or cut.
+
+---
+
+# SESSION 1 (REVISED) — SALTMERE NIGHT · the Dry Anchor tutorial
+
+The original Session 1 (gate → Three Gates) is now **Session 2**, unchanged.
+Session 1 is a zero-death tutorial night inside Saltmere, ending on the tide
+cliffhanger. Beats: **Talent Night at the Dry Anchor → The Brawl ✦ tutorial →
+The Tide Goes Out.**
+
+## The flow
+
+1. **Cold open:** everyone is already IN the tavern, on the bill for Talent
+   Night. First table moment: Maddy Brine collects every weapon by name —
+   "weapons sleep behind the bar" — and each player introduces their
+   character as she takes theirs.
+2. **The talent show:** each player describes their act, then makes ONE check
+   with any skill they can justify, DC 10 `// VERIFY house`. Success = the
+   room is theirs. Failure = a beautiful disaster, cheered anyway. The show
+   is spotlight, not gatekeeping — everyone wins Talent Night.
+   The Appraiser writes after each act. When Peaches performs, send her
+   whisper (the water stops to listen) — her song is WHY the tide leaves.
+3. **The brawl** (below).
+4. **The cliffhanger:** outside, the sea is gone; carnival lights a mile out
+   on the sand. END ON THE LIGHTS.
+
+## S1-BRAWL · "The Dry Anchor Classic" (L1, zero-death teaching fight)
+
+**THE ONE RULE (house, announce it proudly):** tonight, every hit is a
+knockout hit. ANY creature reduced to 0 HP — players included — is
+unconscious and stable: no death saves, no dying, wake at dawn with a
+headache and a story. (Grounded in the 2024 "knocking a creature out on a
+melee hit" option `// VERIFY PHB 2024`, extended tonight to all brawl
+damage as an explicit house rule so being KO'd is genuinely possible and
+genuinely safe.)
+
+**No blades:** their weapons are behind the bar. Unarmed strikes: 1 + STR
+modifier bludgeoning; a hit can instead Grapple or Shove `// VERIFY PHB
+2024 Unarmed Strike`. Improvised weapons: 1d4 + modifier `// VERIFY`.
+
+**The opposition** (waves — pace to the table):
+- **Wave 1:** 4× Brawling Local — Commoner `// VERIFY SRD: AC 10, HP 4,
+  +2 to hit, 1d4 fists`. They telegraph, they miss, they fall over tables.
+- **Wave 2:** 4 more, plus flying stew.
+- **"Boss":** **Old Griff**, harbormaster — Bandit stats reskinned to bare
+  knuckles `// VERIFY SRD: AC 12, HP 11, +3 to hit, 1d4+1` — wading in to
+  "restore order" by participating enthusiastically.
+- **Never fighting:** Maddy (bar sovereignty), the Appraiser (watching).
+
+**Teaching waves:** R1 initiative + attack rolls vs AC · R2 Shove/Grapple +
+improvised weapons · R3 advantage, Help action, the environment · R4 Griff +
+the chandelier moment. Call out each new tool as the round starts.
+
+## The Brawl Moves menu (house rules — read options aloud, invite invention)
+
+| Move | Roll | Effect |
+|---|---|---|
+| Chair over the head | attack, 1d4+STR | chair explodes gloriously (one use) |
+| Tankard toss | ranged attack 20/60, 1d4 | dripping target is annoyed |
+| Table flip | STR check DC 10 | half cover for two behind it |
+| Bar slide | DEX (Acrobatics) DC 10 | move the bar's length + attack with advantage |
+| **The chandelier** | DEX or STR (Athletics) DC 12 | swing, land within 20 ft, next attack advantage · fail = land in the stew, prone, immortalized |
+| Stew-pot catapult | attack vs DEX save DC 12 | target blinded until end of its next turn (gravy) |
+| Barrel roll | STR check DC 12 | 10-ft line; DC 10 DEX save or knocked prone |
+| Mop of destiny | attack, 1d4, reach | it has REACH and dignity |
+| A truly great one-liner | CHA (your call) DC 10 | one brawler sits down laughing, out of the fight |
+| "DRINKS ON ME!" | no roll, costs coin | two brawlers instantly retire to the bar |
+
+All numbers house rules `// VERIFY house` — tuned for comedy, not simulation.
+
+**If a PC goes down:** narrate stars, distant fiddle music, and waking up
+propped in a chair with Maddy applying a cold ham to their eye. Being KO'd
+in the Dry Anchor Classic is a badge of honor — Old Griff respects them
+MORE.
+
+**Aftermath:** no XP math — milestone leveling stands (Level 2 remains the
+gate crossing, Session 2). Maddy returns the weapons with one dry comment
+each. Then the door, the cold air, and the sea that isn't there.
+
+## Saltmere cast (Session 1)
+
+- **Maddy Brine** — keeper of the Dry Anchor. Calls everyone "love" or
+  "trouble," no third option. Secret: her cellar shares a wall with
+  something that hums on spring tides; she's never told a soul.
+- **Old Griff** — harbormaster, forty years at sea. Ends the night saying
+  the campaign's thesis out loud: "The tide doesn't forget. The tide got
+  BOUGHT."
+- **The Appraiser** — the Still Court's scout. Hooded, drinks nothing, pays
+  with coins minted forty years too old, writes after each act. Gone before
+  the brawl ends; his chair was never sat in. He is the reason the lanterns
+  come addressed by name in Session 2.

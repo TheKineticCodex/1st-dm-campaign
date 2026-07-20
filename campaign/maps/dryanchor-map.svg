@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <radialGradient id="hearthglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8B84B" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#E8B84B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="chandglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8B84B" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#E8B84B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="1200" fill="#181030"/>
+
+  <!-- outer walls -->
+  <rect x="140" y="120" width="1320" height="960" rx="14" fill="#241A42" stroke="#B58A2E" stroke-width="6"/>
+
+  <!-- floorboards -->
+  <g stroke="#2B2050" stroke-width="2">
+    <line x1="150" y1="200" x2="1450" y2="200"/><line x1="150" y1="280" x2="1450" y2="280"/>
+    <line x1="150" y1="360" x2="1450" y2="360"/><line x1="150" y1="440" x2="1450" y2="440"/>
+    <line x1="150" y1="520" x2="1450" y2="520"/><line x1="150" y1="600" x2="1450" y2="600"/>
+    <line x1="150" y1="680" x2="1450" y2="680"/><line x1="150" y1="760" x2="1450" y2="760"/>
+    <line x1="150" y1="840" x2="1450" y2="840"/><line x1="150" y1="920" x2="1450" y2="920"/>
+    <line x1="150" y1="1000" x2="1450" y2="1000"/>
+  </g>
+  <!-- faint 5-ft grid -->
+  <g stroke="#3A2C66" stroke-width="1" opacity="0.45">
+    <line x1="220" y1="126" x2="220" y2="1074"/><line x1="300" y1="126" x2="300" y2="1074"/>
+    <line x1="380" y1="126" x2="380" y2="1074"/><line x1="460" y1="126" x2="460" y2="1074"/>
+    <line x1="540" y1="126" x2="540" y2="1074"/><line x1="620" y1="126" x2="620" y2="1074"/>
+    <line x1="700" y1="126" x2="700" y2="1074"/><line x1="780" y1="126" x2="780" y2="1074"/>
+    <line x1="860" y1="126" x2="860" y2="1074"/><line x1="940" y1="126" x2="940" y2="1074"/>
+    <line x1="1020" y1="126" x2="1020" y2="1074"/><line x1="1100" y1="126" x2="1100" y2="1074"/>
+    <line x1="1180" y1="126" x2="1180" y2="1074"/><line x1="1260" y1="126" x2="1260" y2="1074"/>
+    <line x1="1340" y1="126" x2="1340" y2="1074"/><line x1="1420" y1="126" x2="1420" y2="1074"/>
+  </g>
+
+  <!-- THE BAR along the left -->
+  <g>
+    <path d="M180,240 L360,240 L360,860 L180,860 Z" fill="#2E2258" stroke="#B58A2E" stroke-width="4"/>
+    <rect x="180" y="240" width="60" height="620" fill="#251A48" stroke="#3A2C66" stroke-width="2"/>
+    <text x="270" y="540" text-anchor="middle" fill="#F2E9D8" font-size="24" transform="rotate(-90 270 540)">THE BAR · Maddy's deck</text>
+    <!-- weapons shelf -->
+    <rect x="186" y="260" width="48" height="200" fill="#181030" stroke="#E8B84B" stroke-width="2.5"/>
+    <g stroke="#E8B84B" stroke-width="2.5">
+      <line x1="196" y1="280" x2="224" y2="308"/><line x1="196" y1="320" x2="224" y2="348"/>
+      <line x1="196" y1="360" x2="224" y2="388"/><line x1="196" y1="400" x2="224" y2="428"/>
+    </g>
+    <text x="210" y="490" text-anchor="middle" fill="#E8B84B" font-size="14" transform="rotate(-90 210 490)">WEAPONS SLEEP HERE</text>
+    <!-- barrels behind bar -->
+    <g fill="#2E2258" stroke="#B58A2E" stroke-width="2.5">
+      <circle cx="212" cy="700" r="24"/><circle cx="212" cy="760" r="24"/><circle cx="212" cy="820" r="24"/>
+    </g>
+  </g>
+
+  <!-- STAGE bottom right -->
+  <g>
+    <rect x="1080" y="820" width="360" height="240" fill="#2E2258" stroke="#B58A2E" stroke-width="4"/>
+    <g stroke="#3A2C66" stroke-width="2"><line x1="1080" y1="880" x2="1440" y2="880"/><line x1="1080" y1="940" x2="1440" y2="940"/><line x1="1080" y1="1000" x2="1440" y2="1000"/></g>
+    <text x="1260" y="950" text-anchor="middle" fill="#F2E9D8" font-size="26">THE STAGE</text>
+    <text x="1260" y="978" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">fish crates · tonight: YOU</text>
+    <circle cx="1120" cy="850" r="8" fill="#E8B84B" opacity="0.8"/>
+    <circle cx="1400" cy="850" r="8" fill="#E8B84B" opacity="0.8"/>
+  </g>
+
+  <!-- HEARTH top right -->
+  <g>
+    <rect x="1300" y="150" width="140" height="120" fill="#2E2258" stroke="#B58A2E" stroke-width="4"/>
+    <circle cx="1370" cy="230" r="90" fill="url(#hearthglow)"/>
+    <path d="M1340,250 Q1355,205 1370,245 Q1382,210 1398,250 Z" fill="#E8B84B" opacity="0.9"/>
+    <text x="1370" y="300" text-anchor="middle" fill="#9C8FC4" font-size="16" font-style="italic">hearth</text>
+    <!-- stew pot -->
+    <circle cx="1235" cy="235" r="30" fill="#251A48" stroke="#7FD4C1" stroke-width="3"/>
+    <text x="1235" y="298" text-anchor="middle" fill="#7FD4C1" font-size="15" font-style="italic">THE STEW (loaded)</text>
+  </g>
+
+  <!-- CHANDELIER center -->
+  <g>
+    <circle cx="800" cy="560" r="120" fill="url(#chandglow)"/>
+    <circle cx="800" cy="560" r="52" fill="none" stroke="#E8B84B" stroke-width="4"/>
+    <circle cx="800" cy="560" r="30" fill="none" stroke="#B58A2E" stroke-width="2.5"/>
+    <g fill="#E8B84B"><circle cx="800" cy="508" r="6"/><circle cx="852" cy="560" r="6"/><circle cx="800" cy="612" r="6"/><circle cx="748" cy="560" r="6"/></g>
+    <line x1="800" y1="508" x2="800" y2="470" stroke="#B58A2E" stroke-width="2.5" stroke-dasharray="4 6"/>
+    <text x="800" y="452" text-anchor="middle" fill="#E8B84B" font-size="17" font-style="italic">the chandelier (DC 12 · always the chandelier)</text>
+  </g>
+
+  <!-- TABLES: rounds with chairs -->
+  <g fill="#2E2258" stroke="#B58A2E" stroke-width="3.5">
+    <circle cx="560" cy="320" r="52"/><circle cx="880" cy="270" r="52"/>
+    <circle cx="560" cy="760" r="52"/><circle cx="900" cy="820" r="52"/>
+    <circle cx="1120" cy="500" r="52"/><circle cx="620" cy="540" r="44"/>
+  </g>
+  <g fill="#251A48" stroke="#3A2C66" stroke-width="2">
+    <circle cx="500" cy="270" r="14"/><circle cx="620" cy="270" r="14"/><circle cx="505" cy="372" r="14"/><circle cx="618" cy="372" r="14"/>
+    <circle cx="826" cy="222" r="14"/><circle cx="936" cy="222" r="14"/><circle cx="828" cy="320" r="14"/><circle cx="934" cy="320" r="14"/>
+    <circle cx="506" cy="712" r="14"/><circle cx="616" cy="712" r="14"/><circle cx="506" cy="810" r="14"/><circle cx="616" cy="810" r="14"/>
+    <circle cx="846" cy="772" r="14"/><circle cx="956" cy="772" r="14"/><circle cx="848" cy="870" r="14"/><circle cx="954" cy="870" r="14"/>
+    <circle cx="1066" cy="452" r="14"/><circle cx="1176" cy="452" r="14"/><circle cx="1068" cy="550" r="14"/><circle cx="1174" cy="550" r="14"/>
+  </g>
+  <text x="560" y="325" text-anchor="middle" fill="#9C8FC4" font-size="13" font-style="italic">flippable</text>
+  <text x="1120" y="505" text-anchor="middle" fill="#9C8FC4" font-size="13" font-style="italic">flippable</text>
+
+  <!-- barrels corner -->
+  <g fill="#2E2258" stroke="#B58A2E" stroke-width="3">
+    <circle cx="420" cy="990" r="30"/><circle cx="490" cy="1010" r="30"/><circle cx="452" cy="935" r="30"/>
+  </g>
+  <text x="455" y="1062" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">barrels (they roll)</text>
+
+  <!-- stairs top left -->
+  <g stroke="#3A2C66" stroke-width="3" fill="#251A48">
+    <rect x="420" y="150" width="180" height="34"/><rect x="436" y="184" width="164" height="30"/>
+    <rect x="452" y="214" width="148" height="26"/><rect x="468" y="240" width="132" height="22"/>
+  </g>
+  <text x="516" y="292" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">stairs · rooms above</text>
+
+  <!-- the Appraiser's corner table -->
+  <g>
+    <circle cx="1360" cy="640" r="44" fill="#181030" stroke="#9C8FC4" stroke-width="3"/>
+    <circle cx="1408" cy="592" r="13" fill="#181030" stroke="#9C8FC4" stroke-width="2"/>
+    <text x="1348" y="712" text-anchor="middle" fill="#9C8FC4" font-size="16" font-style="italic">the Appraiser's table</text>
+    <text x="1348" y="732" text-anchor="middle" fill="#9C8FC4" font-size="13" font-style="italic">(his chair was never sat in)</text>
+  </g>
+
+  <!-- DOOR bottom left -->
+  <g>
+    <rect x="140" y="900" width="14" height="120" fill="#E8B84B"/>
+    <path d="M154,900 A120,120 0 0 1 154,1020" fill="none" stroke="#3A2C66" stroke-width="2" stroke-dasharray="4 8"/>
+    <text x="230" y="965" fill="#F2E9D8" font-size="17">the DOOR</text>
+    <text x="230" y="987" fill="#9C8FC4" font-size="13" font-style="italic">(cliffhanger waits outside)</text>
+  </g>
+
+  <!-- title -->
+  <g>
+    <rect x="560" y="70" width="480" height="72" rx="8" fill="#251A48" stroke="#B58A2E" stroke-width="3"/>
+    <text x="800" y="103" text-anchor="middle" fill="#E8B84B" font-size="26" letter-spacing="3">THE DRY ANCHOR</text>
+    <text x="800" y="128" text-anchor="middle" fill="#9C8FC4" font-size="14" font-style="italic">Saltmere · Talent Night · one square = 5 feet</text>
+  </g>
+</svg>

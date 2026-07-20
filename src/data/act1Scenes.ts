@@ -26,6 +26,103 @@ const FREYA = 'Freya'
 const FREYA_MOON = 'Freya Moon'
 
 export const ACT1_SCENES: Record<string, SceneGuide> = {
+  'Talent Night at the Dry Anchor': {
+    readAloud:
+      'Saltmere smells of salt and woodsmoke, and tonight every soul in town is crammed into the Dry Anchor for Talent Night. Maddy Brine runs the bar like a ship’s deck. House rule, posted over the door and repeated to your faces: ALL WEAPONS SLEEP BEHIND THE BAR. She takes yours personally, names each one, and sets them on the shelf like sleeping cats. The stage is a pallet of fish crates. You’re on the bill.',
+    truth:
+      'This is the audition. A hooded stranger in the corner — the Appraiser — never drinks, never claps, and writes after each act. Everything performed tonight gets PRICED. Peaches singing is why the tide leaves. Let every player describe their act, then one check of their choice, DC 10 — success or glorious disaster, the room cheers either way.',
+    doors: {
+      fight: 'Early scuffles get one warning from Old Griff the harbormaster. The real brawl waits for the finale.',
+      talk: 'Gossip: fish crowding the shallows like they’re scared of the deep · the lighthouse keeper swears the horizon "moved" · Maddy’s cellar is COLD tonight.',
+      sneak: 'The weapons shelf is guarded by Maddy and a ladle with a service record. Nothing else in Saltmere is locked.',
+      bargain: 'The Appraiser quietly offers to "buy an encore" from any performer. Do not explain. Session 2 will.',
+      insane: 'Whatever they perform, it lands. The lanterns flicker in time with the applause — nobody else notices.',
+    },
+    npcs: ['Maddy Brine', 'Old Griff', 'The Appraiser'],
+    cues: [
+      { label: '🎪 The show begins', kind: 'sfx', sfx: 'carnival' },
+      { label: '🔔 Maddy rings last orders', kind: 'sfx', sfx: 'bell' },
+      {
+        label: '✉ Peaches: after she performs',
+        kind: 'whisper',
+        whisper: {
+          target: PEACHES,
+          title: 'When the applause fades',
+          body: 'Far away — farther than hearing should reach — the water goes very, very still. Like something enormous stopped swimming to listen. You are the only one in the room who feels it.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya Moon: after she performs',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Mid-spectacle',
+          body: 'At the height of your act, the blossom in your pendant grows warm — pleasantly, like a held hand. It has decided it likes stages. Or something watching from the corner does.',
+          ephemeral: true,
+        },
+      },
+    ],
+  },
+  'The Brawl at the Dry Anchor ✦ tutorial': {
+    readAloud:
+      'It starts, as history’s finest disasters do, over the applause vote. A dockhand calls it rigged. A netmender calls HIM rigged. Somebody’s stew leaves somebody’s bowl at speed — and the Dry Anchor, as one, rises. Maddy bellows THE FURNITURE STAYS — which everyone correctly understands to mean the furniture is now a weapon.',
+    truth:
+      'The teaching fight — run it loose and loud. HOUSE RULE tonight: every hit is a knockout hit. Anyone at 0 HP (players included!) is out cold and stable — no death saves, they wake at dawn with a headache and a story. No blades: weapons are behind the bar. Everything else is legal. Full moves list + brawler stats: playbook, Session 1. The Appraiser watches it all, taking notes.',
+    doors: {
+      fight: 'Waves of brawlers (4, then 4). Round 1 teach initiative + attacks · R2 shove/grapple/improvised · R3 advantage & Help · then Old Griff wades in as the "boss."',
+      talk: 'A genuinely great speech or joke: one brawler sits down, or grants the table advantage for a round. Reward every clever word.',
+      sneak: 'Under the tables to anywhere — but the weapons stay guarded. Maddy’s ladle has never lost.',
+      bargain: '"DRINKS ON ME" buys out two brawlers instantly. The Appraiser smiles for the first time.',
+      insane: 'The chandelier. It is ALWAYS the chandelier. DC 12 to swing, land anywhere, next attack has advantage. Failing means landing in the stew, prone, legendary.',
+    },
+    npcs: ['Maddy Brine', 'Old Griff', 'The Appraiser'],
+    cues: [
+      { label: '👊 Haymaker', kind: 'sfx', sfx: 'punch' },
+      { label: '🍾 Bottles & furniture', kind: 'sfx', sfx: 'crash' },
+      { label: '🎺 Someone goes down (comedy)', kind: 'sfx', sfx: 'trombone' },
+      { label: '⚔ Roll initiative →', kind: 'go-table' },
+      {
+        label: '✉ Philip: mid-brawl',
+        kind: 'whisper',
+        whisper: {
+          target: PHILIP,
+          title: 'In the thick of it',
+          body: 'The barmaid ducks behind you, and you realize nobody told you to step in front of her. You already had. Trained hands, gentle purpose — maybe the line holds after all.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya: mid-brawl',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA,
+          title: 'In the thick of it',
+          body: 'Your flying tackle takes a dockhand clean over the bar, and the whole room ROARS — not in fear. Laughter. Real, warm, at the sheer glory of it. You did that. Dangerous and beloved are allowed to be the same thing.',
+          ephemeral: true,
+        },
+      },
+    ],
+  },
+  'The Tide Goes Out (cliffhanger)': {
+    readAloud:
+      'You spill out of the Dry Anchor into the cold night air, ears ringing, knuckles humming. And Saltmere is silent. Wrong-silent. The harbor is EMPTY — boats lying on their sides on wet sand that shines all the way to the horizon. The sea is gone. And a mile out, where deep water was this morning, there are lights. Strings of them. Gold and green and blue. Music, very faint. A carnival, glowing where the sea should be.',
+    truth:
+      'END THE SESSION HERE. On the lights. No questions answered, one minute of gasping allowed, then snuff the lanterns. Session 2 opens the next night: a paper lantern with each of their names on it, in wet ink. Do NOT send any whispers now — save everything.',
+    doors: {
+      fight: 'Nothing to fight. The sea has simply… left.',
+      talk: 'Sixty seconds of "what do we do" — then cut to black. Cruel. Perfect.',
+      sneak: 'If someone walks toward it tonight: the lights recede exactly as fast as they walk. It is not open yet.',
+      bargain: 'The Appraiser is gone. His table is dry. His chair was never sat in.',
+      insane: 'Old Griff, quietly: "Forty years at sea. The tide doesn’t forget. The tide got BOUGHT."',
+    },
+    npcs: ['Old Griff'],
+    cues: [
+      { label: '🌊 The sea… then silence', kind: 'sfx', sfx: 'ocean' },
+      { label: '🕳 Something noticed you', kind: 'sfx', sfx: 'ominous' },
+      { label: '🔔 A bell, far out on the sand', kind: 'sfx', sfx: 'bell' },
+    ],
+  },
   'The Gate of Paper Lanterns': {
     readAloud:
       'Three nights ago the tide went out of Saltmere and forgot to come back. Now, a mile out on the wet sand, stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink. The lanterns you each carry tug toward it like dogs on a lead.',

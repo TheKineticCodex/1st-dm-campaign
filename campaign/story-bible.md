@@ -33,6 +33,17 @@ Reliquary tracks are the party gathering those notes/proofs.
 | Freya | Fairy Fighter | **The suffering she survived** — whatever she endured that she vows no loved one ever will | Black-winged, twin swords, armored in tattoos and menace so nobody checks for the wound. Her vow ("I would risk everything so they never suffer what I did") is, to the Court, a *standing offer*. The Buyer intends to accept it. ⚠ Two Freyas at the table — full names on all paperwork (great recurring gag AND an Act 3 contract loophole). |
 | Freya Moon | Fairy Druid | **The Heartbloom Grove's spring** — her home's magic, "blighted" to silence; she carries its last living blossom in a crystal pendant | The blight was a PURCHASE. The Court bought the grove's spring (filed BELOW, same inventory as the Sea's song) — a blight is what a bought season looks like from outside. Her pendant blossom is the unsold remainder; the Court would love to complete the set. Restoring the grove = finding the receipt. Parallels Peaches: both carry the last piece of something the Court holds. |
 
+## Session structure (revised)
+
+- **Session 1 — Saltmere Night (tutorial):** Talent Night at the Dry Anchor
+  (weapons behind the bar) → the zero-death tavern brawl (every hit is a
+  knockout hit; improvised weapons only) → cliffhanger: the tide is gone,
+  carnival lights a mile out. The talent show is the Court's audition — the
+  Appraiser prices each act, and Peaches's song is why the sea leaves.
+- **Session 2 — the original Night One:** paper-lantern invitations arrive
+  (the cold open below), then Gate → Midway → Grey-Gill → Carousel →
+  Whispers → the Three Gates. Level 2 at the crossing.
+
 ## Where it starts (names the DM says out loud)
 
 - **Saltmere** — a small grey fishing town on a cold coast. Nets, salt sheds,
