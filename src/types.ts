@@ -19,6 +19,15 @@ export interface CharacterBuild {
   portraitUrl?: string
 }
 
+/** One thing carried in the Bag. Weapons equip/unequip; the rest ride along. */
+export interface BagItem {
+  id: string
+  name: string
+  icon: string
+  kind: 'weapon' | 'armor' | 'trinket'
+  equipped: boolean
+}
+
 /** Volatile play state, tracked separately from the build. */
 export interface CharacterState {
   /** Damage taken (max HP is derived, so healing rules never desync). */
@@ -28,6 +37,8 @@ export interface CharacterState {
   conditions: string[]
   /** Concentration co-pilot: set when holding a concentration spell. */
   concentrating?: boolean
+  /** The Bag — undefined until first render, then seeded from the class. */
+  bag?: BagItem[]
 }
 
 /** Player free text. `lost` is private: visible to this player and the DM only. */

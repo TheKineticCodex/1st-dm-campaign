@@ -5,6 +5,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
+import { SPELL_NOTES } from '../data/spells'
+import { seedBag } from '../lib/bag'
+import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
@@ -20,6 +23,171 @@ interface SheetTabProps {
   onGoFortune: () => void
   store: Store
   playerName: string
+}
+
+const BAG_EMOJI = ['🗡', '🪄', '🧭', '📜', '🍾', '🪙', '🎻', '🌸', '🗝', '🐚']
+
+/** The Bag: tile inventory. Weapons toggle equipped; trinkets ride along. */
+function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next: BagItem[]) => void }) {
+  const [newName, setNewName] = useState('')
+  const [newIcon, setNewIcon] = useState(BAG_EMOJI[0])
+  const [note, setNote] = useState<string | null>(null)
+
+  const toggle = (item: BagItem) => {
+    if (item.kind === 'weapon') {
+      onChange(bag.map((i) => (i.id === item.id ? { ...i, equipped: !i.equipped } : i)))
+      setNote(
+        item.equipped
+          ? `${item.name} put away — your hands are your weapons now.`
+          : `${item.name} in hand.`,
+      )
+    } else if (item.kind === 'armor') {
+      setNote('Armor stays on — it practically sleeps with you.')
+    } else {
+      setNote(`${item.name}: carried, ready when the story wants it.`)
+    }
+  }
+
+  const addItem = () => {
+    const name = newName.trim()
+    if (!name) return
+    onChange([
+      ...bag,
+      { id: `custom-${crypto.randomUUID()}`, name, icon: newIcon, kind: 'trinket', equipped: false },
+    ])
+    setNewName('')
+  }
+
+  return (
+    <Section style={{ marginTop: 16 }}>
+      <Eyebrow>🎒 the bag</Eyebrow>
+      <p className="text-xs" style={{ color: C.faint }}>
+        Tap a weapon to equip or put it away. No weapon in hand = unarmed strikes.
+      </p>
+      <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))' }}>
+        {bag.map((item) => {
+          const lit = item.equipped && item.kind !== 'trinket'
+          return (
+            <div key={item.id} className="relative">
+              <button
+                type="button"
+                onClick={() => toggle(item)}
+                aria-pressed={item.kind === 'weapon' ? item.equipped : undefined}
+                className="w-full rounded-lg px-1 py-2 text-center"
+                style={{
+                  background: lit ? `${C.gold}1f` : C.night,
+                  border: `1.5px solid ${lit ? C.gold : C.panelEdge}`,
+                  boxShadow: lit ? `0 0 10px ${C.gold}44` : 'none',
+                  minHeight: 76,
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 26, display: 'block', filter: item.kind === 'weapon' && !item.equipped ? 'grayscale(1) opacity(0.6)' : 'none' }}>
+                  {item.icon}
+                </span>
+                <span className="text-xs block mt-1" style={{ color: lit ? C.gold : C.parchment, lineHeight: 1.15 }}>
+                  {item.name}
+                </span>
+                {item.kind !== 'trinket' && (
+                  <span className="text-[10px] block" style={{ color: lit ? C.gold : C.faint }}>
+                    {item.equipped ? '✦ equipped' : 'put away'}
+                  </span>
+                )}
+              </button>
+              {item.id.startsWith('custom-') && (
+                <button
+                  type="button"
+                  aria-label={`Drop ${item.name}`}
+                  onClick={() => onChange(bag.filter((i) => i.id !== item.id))}
+                  className="absolute -top-1.5 -right-1.5 rounded-full"
+                  style={{ width: 22, height: 22, fontSize: 11, background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.faint, cursor: 'pointer' }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      {note && (
+        <p role="status" className="text-xs mt-2" style={{ color: C.sea }}>
+          {note}
+        </p>
+      )}
+      <div className="flex gap-2 mt-3 items-center">
+        <select
+          value={newIcon}
+          onChange={(e) => setNewIcon(e.target.value)}
+          aria-label="Icon for the new thing"
+          style={{ background: C.night, border: `1px solid ${C.panelEdge}`, borderRadius: 8, color: C.parchment, fontSize: 18, minHeight: 44, padding: '0 6px' }}
+        >
+          {BAG_EMOJI.map((e) => (
+            <option key={e} value={e}>
+              {e}
+            </option>
+          ))}
+        </select>
+        <input
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && addItem()}
+          placeholder="Something the story handed you…"
+          className="flex-1 rounded-lg px-3"
+          style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44 }}
+        />
+        <button
+          type="button"
+          onClick={addItem}
+          className="rounded-lg px-3"
+          style={{ background: `${C.gold}22`, border: `1px solid ${C.gold}`, color: C.gold, minHeight: 44, cursor: 'pointer' }}
+        >
+          + keep it
+        </button>
+      </div>
+    </Section>
+  )
+}
+
+/** Tappable spell names — tap one to unfold what it does, in plain words. */
+function SpellChips({ label, names }: { label: string; names: string[] }) {
+  const [open, setOpen] = useState<string | null>(null)
+  if (names.length === 0) return null
+  return (
+    <div className="mt-1">
+      <p className="text-sm">
+        <strong>{label}:</strong>
+      </p>
+      <div className="flex flex-wrap gap-1.5 mt-1">
+        {names.map((n) => (
+          <button
+            key={n}
+            type="button"
+            aria-expanded={open === n}
+            onClick={() => setOpen(open === n ? null : n)}
+            className="rounded-md px-2.5 py-1.5 text-sm"
+            style={{
+              background: open === n ? `${C.gold}22` : C.night,
+              border: `1px solid ${open === n ? C.gold : C.panelEdge}`,
+              color: open === n ? C.gold : C.parchment,
+              minHeight: 36,
+              cursor: 'pointer',
+            }}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      {open && (
+        <p
+          className="text-sm mt-2 rounded-lg px-3 py-2 leading-relaxed"
+          style={{ background: C.night, border: `1px solid ${C.gold}44`, color: C.parchment }}
+        >
+          <span style={{ color: C.gold, fontStyle: 'italic' }}>{open} · </span>
+          {(SPELL_NOTES[open] ?? 'Ask the Lantern-Keeper — this one isn’t in the pocket-book yet.').replace(/\s*\/\/ VERIFY.*$/, '')}
+        </p>
+      )}
+    </div>
+  )
 }
 
 export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName }: SheetTabProps) {
@@ -111,7 +279,19 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
     broadcastRoll(r)
   }
 
+  // No weapon equipped in the Bag → fists. Unarmed strike: STR + prof to
+  // hit, flat 1 + STR bludgeoning damage. // VERIFY PHB 2024 Unarmed Strike
+  const weaponInHand = !state.bag || state.bag.some((i) => i.kind === 'weapon' && i.equipped)
+  const unarmedMod = mod(sheet.A.STR) + sheet.prof
+
   const rollAttack = () => {
+    if (!weaponInHand) {
+      const r = rollD20('Unarmed strike', unarmedMod, rollMode)
+      setRoll(r)
+      broadcastRoll(r)
+      setDamage({ rolls: [], total: Math.max(1, 1 + mod(sheet.A.STR)) })
+      return
+    }
     const r = rollD20(`${sheet.K.weapon.name} attack`, sheet.atkMod, rollMode)
     setRoll(r)
     broadcastRoll(r)
@@ -377,23 +557,59 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           className="text-left w-full rounded-lg px-3 py-2"
           style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
         >
-          <strong>{sheet.K.weapon.name}</strong>: d20 {fmt(sheet.atkMod)} to hit · damage{' '}
-          {sheet.K.weapon.die} {fmt(mod(sheet.A[sheet.K.weapon.ab]))} 🎲
+          {weaponInHand ? (
+            <>
+              <strong>{sheet.K.weapon.name}</strong>: d20 {fmt(sheet.atkMod)} to hit · damage{' '}
+              {sheet.K.weapon.die} {fmt(mod(sheet.A[sheet.K.weapon.ab]))} 🎲
+            </>
+          ) : (
+            <>
+              <strong>👊 Unarmed strike</strong>: d20 {fmt(unarmedMod)} to hit · damage{' '}
+              {Math.max(1, 1 + mod(sheet.A.STR))} flat 🎲
+            </>
+          )}
         </button>
+        {!weaponInHand && (
+          <p className="text-xs mt-1" style={{ color: C.faint }}>
+            Your {sheet.K.weapon.name.toLowerCase()} is put away. Fists, furniture, and wit remain.
+          </p>
+        )}
       </Section>
+
+      {/* The Bag */}
+      <BagSection
+        bag={state.bag ?? seedBag(sheet.K.weapon.name, sheet.ac.note ?? '')}
+        onChange={(next) => updateState({ bag: next })}
+      />
+
+      {/* Fairy Magic — species-born, no class required. Faerie Fire arrives at level 3. VERIFY Witchlight fairy */}
+      {character.build.species === 'Fairy ✦' && (
+        <Section>
+          <Eyebrow>fairy magic — born in you, no slots needed</Eyebrow>
+          <p className="text-xs" style={{ color: C.faint }}>
+            Tap a spell to see what it does.
+          </p>
+          <SpellChips
+            label="Always yours"
+            names={sheet.level >= 3 ? ['Druidcraft', 'Faerie Fire'] : ['Druidcraft']}
+          />
+          {sheet.level < 3 && (
+            <p className="text-xs mt-2" style={{ color: C.faint }}>
+              Faerie Fire wakes in your blood at level 3 — once per long rest. 🔒
+            </p>
+          )}
+        </Section>
+      )}
 
       {/* Spells & slots */}
       {sheet.K.spells && (
         <Section>
           <Eyebrow>Spellcasting</Eyebrow>
-          {sheet.K.spells.cantrips.length > 0 && (
-            <p className="text-sm">
-              <strong>Cantrips (always free):</strong> {sheet.K.spells.cantrips.join(', ')}
-            </p>
-          )}
-          <p className="text-sm mt-1">
-            <strong>Level 1 (use spell slots):</strong> {sheet.K.spells.leveled.join(', ')}
+          <p className="text-xs" style={{ color: C.faint }}>
+            Tap a spell to see what it does.
           </p>
+          <SpellChips label="Cantrips (always free)" names={sheet.K.spells.cantrips} />
+          <SpellChips label="Level 1 (use spell slots)" names={sheet.K.spells.leveled} />
           <p className="text-xs mt-2" style={{ color: C.faint }}>
             <button
               type="button"
