@@ -64,6 +64,26 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       },
     ],
   },
+  'The Intermission Games': {
+    readAloud:
+      'While the judges "deliberate" — three fishermen arguing loudly over a chalkboard — Maddy declares intermission, which in the Dry Anchor means GAMES. The whole room turns competitive at once, the way only a small town can.',
+    truth:
+      'Every game secretly teaches a mechanic — run whichever ones the table bites on, let players challenge each other, and be loud about the dice. Winners drink free next Talent Night. Games: ARM-WRESTLE OLD GRIFF (Strength/Athletics contest — he wins the first, coaches them after), DARTS (three ranged attack rolls vs rings AC 10/13/15), MADDY’S ORDER (Intelligence check — recite a seven-drink order back perfectly), STEADY HAND (Dexterity — stack the tankard tower one higher), LAST ROUND STANDING (escalating Constitution saves — the room spins, nobody is harmed, everyone is hilarious), and READ THE ROOM (Wisdom/Insight — whoever tries it on the corner stranger notices his mug has never emptied).',
+    doors: {
+      fight: 'Not yet. Competitive shoving gets one Griff-glare. The real thing comes with the vote.',
+      talk: 'Between games, Saltmere talks: the fish crowding the shallows, the cold cellar, the horizon that "moved."',
+      sneak: 'Anyone casing the room clocks the Appraiser writing during GAMES nobody is performing. He is pricing habits now.',
+      bargain: 'Griff bets his lucky compass on the arm-wrestle rematch. It always points to the sea. Keep this in play — later it points at the carnival.',
+      insane: 'Someone challenges the Appraiser to a game. He declines with terrible politeness: "I only play for keeps."',
+    },
+    npcs: ['Maddy Brine', 'Old Griff', 'The Appraiser'],
+    cues: [
+      { label: '🎪 Games begin', kind: 'sfx', sfx: 'carnival' },
+      { label: '🔔 Round bell', kind: 'sfx', sfx: 'bell' },
+      { label: '✨ A winner!', kind: 'sfx', sfx: 'sparkle' },
+      { label: '🎺 A magnificent loser', kind: 'sfx', sfx: 'trombone' },
+    ],
+  },
   'The Brawl at the Dry Anchor ✦ tutorial': {
     readAloud:
       'It starts, as history’s finest disasters do, over the applause vote. A dockhand calls it rigged. A netmender calls HIM rigged. Somebody’s stew leaves somebody’s bowl at speed — and the Dry Anchor, as one, rises. Maddy bellows THE FURNITURE STAYS — which everyone correctly understands to mean the furniture is now a weapon.',
@@ -99,6 +119,45 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           target: FREYA,
           title: 'In the thick of it',
           body: 'Your flying tackle takes a dockhand clean over the bar, and the whole room ROARS — not in fear. Laughter. Real, warm, at the sheer glory of it. You did that. Dangerous and beloved are allowed to be the same thing.',
+          ephemeral: true,
+        },
+      },
+    ],
+  },
+  'The Hum in the Cellar': {
+    readAloud:
+      'The brawl is over; the room is wreckage and laughter. Maddy rights a chair, looks at the five of you a long moment, and says — quieter than anyone in Saltmere has ever heard her — "You lot seem… capable. Before you sleep. My cellar. It’s been humming."',
+    truth:
+      'Investigation tutorial + the night’s foreshadow. In the cellar: it is COLD, colder than it should be. The north wall has barnacles growing on the INSIDE. Low on the stone, a child’s chalk drawing of a carousel — Old Griff drew it forty years ago and will admit it if asked straight. The hum is HALF A SONG. If Peaches touches the wall, it harmonizes with her — and both of them are missing the same note. Let them try anything: Perception (the hum comes in tides, six seconds apart, like breathing), Investigation (the barnacles are arranged in a line — a water level, rising), History via Griff (he saw lights on the sand as a boy; nobody believed him), Arcana (this is not haunting; it is INVENTORY).',
+    doors: {
+      fight: 'Nothing to fight. The wall does not care.',
+      talk: 'Griff, asked about the chalk carousel, goes grey and tells the truth: "I was eight. The tide went out. There were lights. It came back before dawn and took my drawing off the SEAWARD side of the wall."',
+      sneak: 'An ear to the wall: a fiddle, very far away, playing a jig with a hole in it.',
+      bargain: 'Maddy offers free lodging, forever, to anyone who can tell her what her cellar wall is humming. She means it.',
+      insane: 'If they start digging through the wall: a trickle of seawater, dead cold, and the hum STOPS — like something noticing. Stop there. Do not explain.',
+    },
+    npcs: ['Maddy Brine', 'Old Griff'],
+    cues: [
+      { label: '💓 The hum (six-second tide)', kind: 'sfx', sfx: 'heartbeat' },
+      { label: '🕳 The hum stops', kind: 'sfx', sfx: 'ominous' },
+      { label: '💧 Seawater through stone', kind: 'sfx', sfx: 'splash' },
+      {
+        label: '✉ Peaches: touching the wall',
+        kind: 'whisper',
+        whisper: {
+          target: PEACHES,
+          title: 'The wall, under your palm',
+          body: 'The hum climbs to meet you — half a song, reaching. You know it the way you know your own pulse: it is missing the same note you are. Whatever is on the other side of this wall has been singing your song, without you, for forty years.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya Moon: in the cellar',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Against your collarbone, again',
+          body: 'The blossom in your pendant turns — slowly, like a compass finding north — until it points at the humming wall. Then, gently, it closes. As if it does not want to be seen.',
           ephemeral: true,
         },
       },

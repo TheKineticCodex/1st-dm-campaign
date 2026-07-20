@@ -317,3 +317,30 @@ each. Then the door, the cold air, and the sea that isn't there.
   with coins minted forty years too old, writes after each act. Gone before
   the brawl ends; his chair was never sat in. He is the reason the lanterns
   come addressed by name in Session 2.
+
+## The full three-hour run sheet (Session 1)
+
+| ~Time | Beat | What's happening | Teaches |
+|---|---|---|---|
+| 0:00 | Arrivals | Maddy takes weapons BY NAME — each player introduces their character as she takes theirs | who everyone is |
+| 0:20 | **Talent Night** | each player describes an act + one DC 10 check of their choice; Appraiser writes; Peaches's whisper after her act | checks, the dice, the phones |
+| 1:00 | **The Intermission Games** | judges "deliberate"; tavern games — every one is a mechanic in costume (see scene guide) | contests, attack rolls, saves, Insight |
+| 1:40 | **The Brawl** | the vote is announced → riot; every hit a knockout hit; Moves menu open on the table | initiative, combat, improvisation |
+| 2:20 | **The Hum in the Cellar** | Maddy, quiet: "my cellar's been humming" — cold wall, inside barnacles, Griff's chalk carousel, half a song | investigation, roleplay, DREAD |
+| 2:50 | **The Tide Goes Out** | outside: no sea, distant lights. END ON THE LIGHTS. | the campaign |
+
+**Intermission Games menu** (prizes: free drinks next Talent Night + Griff's
+lucky compass on the rematch — it always points to the sea; later it will
+point at the carnival):
+- Arm-wrestle Old Griff — STR (Athletics) contest; he takes the first, then coaches
+- Darts — three ranged attack rolls vs rings AC 10 / 13 / 15
+- Maddy's Order — INT check: recite a seven-drink order back perfectly
+- Steady Hand — DEX check: the tankard tower goes one higher
+- Last Round Standing — escalating CON saves; nobody harmed, everyone legendary
+- Read the Room — WIS (Insight): whoever reads the corner stranger notices his mug never empties
+All DCs 10-13, house-tuned `// VERIFY house` — the games are lessons wearing hats.
+
+**Cellar timing note:** run it AFTER the brawl as the room quiets — the
+contrast (roaring comedy → cold hum) is the best sixty seconds of the night,
+and it hands you the cliffhanger: they come UP from the cellar and step
+outside into the missing sea.
