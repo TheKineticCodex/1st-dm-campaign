@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ACT1_SCENES, type SceneCue } from '../data/act1Scenes'
+import { DM_BASICS, SESSION1_RUN_SHEET } from '../data/dmBasics'
 import { seedStory } from '../data/storySeeds'
 import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
@@ -11,7 +12,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
-import { Btn, C, Eyebrow, H, TextArea, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, display } from './ui'
 
 const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', '#C96A6A', '#8BB8E0']
 
@@ -222,6 +223,30 @@ function RunNight({
             ))}
           </div>
 
+          {guide.moves && guide.moves.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.gold, letterSpacing: '0.2em' }}>
+                the menu — read these options aloud, reward invention
+              </p>
+              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+                {guide.moves.map((m) => (
+                  <div key={m.label} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.gold}44` }}>
+                    <p className="text-sm" style={{ color: C.gold }}>
+                      {m.label}
+                      <span className="text-xs" style={{ color: C.sea }}>
+                        {' '}
+                        · {m.roll}
+                      </span>
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: C.parchment }}>
+                      {m.effect}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {guide.npcs.length > 0 && (
             <div className="mt-3">
               <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.sea, letterSpacing: '0.2em' }}>
@@ -315,6 +340,47 @@ function RunNight({
           </div>
         </div>
       )}
+
+      {/* tonight's run sheet */}
+      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+        <Fold id="dm-runsheet" title="🗓 Tonight’s run sheet — the whole night at a glance">
+          <div className="grid gap-1 mt-2">
+            {SESSION1_RUN_SHEET.map((row) => (
+              <div key={row.time} className="rounded-lg p-2 flex gap-3" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
+                <span className="text-sm shrink-0" style={{ ...display, color: C.gold, fontWeight: 700, width: 44 }}>
+                  {row.time}
+                </span>
+                <div>
+                  <p className="text-sm" style={{ color: C.parchment, fontWeight: 600 }}>
+                    {row.beat}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: C.faint }}>
+                    {row.what}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Fold>
+      </div>
+
+      {/* the nervous-DM basics */}
+      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+        <Fold id="dm-basics" title="📖 How to DM — the whole job on eight cards">
+          <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+            {DM_BASICS.map((card) => (
+              <div key={card.title} className="rounded-lg p-3" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
+                <p className="text-sm" style={{ ...display, fontWeight: 600, color: C.gold }}>
+                  {card.title}
+                </p>
+                <p className="text-xs mt-1 leading-relaxed" style={{ color: C.parchment }}>
+                  {card.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Fold>
+      </div>
 
       {/* the soundboard */}
       <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>

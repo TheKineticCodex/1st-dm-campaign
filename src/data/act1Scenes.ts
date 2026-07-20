@@ -11,12 +11,20 @@ export interface SceneCue {
   sfx?: string
 }
 
+export interface SceneMove {
+  label: string
+  roll: string
+  effect: string
+}
+
 export interface SceneGuide {
   readAloud: string
   truth: string
   doors: { fight: string; talk: string; sneak: string; bargain: string; insane: string }
   npcs: string[]
   cues: SceneCue[]
+  /** Optional table of scene-specific moves/games — rendered as a menu the DM reads aloud. */
+  moves?: SceneMove[]
 }
 
 const PEACHES = 'Peaches capiche'
@@ -83,6 +91,14 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       { label: '✨ A winner!', kind: 'sfx', sfx: 'sparkle' },
       { label: '🎺 A magnificent loser', kind: 'sfx', sfx: 'trombone' },
     ],
+    moves: [
+      { label: '💪 Arm-wrestle Old Griff', roll: 'STR (Athletics) contest vs his +3', effect: 'He takes the first bout, then coaches. Rematch stake: his lucky compass.' },
+      { label: '🎯 Darts', roll: '3 ranged attack rolls', effect: 'Rings are AC 10 / 13 / 15. Teaches attack vs AC before the brawl.' },
+      { label: '🍺 Maddy’s Order', roll: 'INT check DC 12', effect: 'Recite a seven-drink order back perfectly. Maddy narrates the order FAST.' },
+      { label: '🗼 Steady Hand', roll: 'DEX check DC 12', effect: 'The tankard tower goes one higher. It is currently nine tall and haunted.' },
+      { label: '🥴 Last Round Standing', roll: 'CON saves DC 10, +2 each round', effect: 'Room spins, nobody is harmed, the loser becomes legend.' },
+      { label: '👁 Read the Room', roll: 'WIS (Insight) DC 13', effect: 'On the corner stranger: his mug has NEVER emptied. First dread, earned.' },
+    ],
   },
   'The Brawl at the Dry Anchor ✦ tutorial': {
     readAloud:
@@ -122,6 +138,18 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           ephemeral: true,
         },
       },
+    ],
+    moves: [
+      { label: '🪑 Chair over the head', roll: 'attack, 1d4 + STR', effect: 'The chair explodes gloriously. One use per chair.' },
+      { label: '🍺 Tankard toss', roll: 'ranged attack (20/60), 1d4', effect: 'Target is soaked and personally offended.' },
+      { label: '🛡 Table flip', roll: 'STR check DC 10', effect: 'Half cover for two people behind it.' },
+      { label: '🛝 Bar slide', roll: 'DEX (Acrobatics) DC 10', effect: 'Move the bar’s length, then attack with advantage.' },
+      { label: '💡 THE CHANDELIER', roll: 'DEX or STR (Athletics) DC 12', effect: 'Swing, land within 20 ft, next attack has advantage. Fail: land in the stew, prone, immortal.' },
+      { label: '🍲 Stew-pot catapult', roll: 'attack vs DEX save DC 12', effect: 'Blinded by gravy until end of their next turn.' },
+      { label: '🛢 Barrel roll', roll: 'STR check DC 12', effect: '10-ft line; DC 10 DEX save or knocked prone.' },
+      { label: '🧹 Mop of destiny', roll: 'attack, 1d4, REACH', effect: 'It has reach. It has dignity. It has seen things.' },
+      { label: '😂 A truly great one-liner', roll: 'CHA check DC 10', effect: 'One brawler sits down laughing, out of the fight.' },
+      { label: '💰 “DRINKS ON ME!”', roll: 'no roll — costs real coin', effect: 'Two brawlers instantly retire to the bar. The Appraiser smiles.' },
     ],
   },
   'The Hum in the Cellar': {
