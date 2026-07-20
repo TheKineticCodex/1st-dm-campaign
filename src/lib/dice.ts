@@ -12,7 +12,24 @@ export interface RollResult {
   isNat1: boolean
 }
 
-const d20 = () => Math.floor(Math.random() * 20) + 1
+// Dice use the platform's cryptographic random source — hardware-seeded,
+// unpredictable, and (via rejection sampling) exactly uniform: every face
+// has precisely equal probability, with no modulo bias.
+const UINT32_RANGE = 0x100000000
+function secureRandomInt(size: number): number {
+  if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+    return Math.floor(Math.random() * size)
+  }
+  const limit = UINT32_RANGE - (UINT32_RANGE % size)
+  const buf = new Uint32Array(1)
+  do {
+    crypto.getRandomValues(buf)
+  } while (buf[0] >= limit)
+  return buf[0] % size
+}
+
+const die = (size: number) => secureRandomInt(size) + 1
+const d20 = () => die(20)
 
 export function rollD20(label: string, modifier: number, mode: RollMode): RollResult {
   const a = d20()
@@ -36,6 +53,6 @@ export function rollDamage(notation: string, modifier: number): { rolls: number[
   const m = notation.match(/^(\d+)d(\d+)$/)
   if (!m) return { rolls: [], total: modifier }
   const [, n, size] = m
-  const rolls = Array.from({ length: Number(n) }, () => Math.floor(Math.random() * Number(size)) + 1)
+  const rolls = Array.from({ length: Number(n) }, () => die(Number(size)))
   return { rolls, total: rolls.reduce((s, r) => s + r, 0) + modifier }
 }
