@@ -287,7 +287,7 @@ the chandelier moment. Call out each new tool as the round starts.
 | Tankard toss | ranged attack 20/60, 1d4 | dripping target is annoyed |
 | Table flip | STR check DC 10 | half cover for two behind it |
 | Bar slide | DEX (Acrobatics) DC 10 | move the bar's length + attack with advantage |
-| **The chandelier** | DEX or STR (Athletics) DC 12 | swing, land within 20 ft, next attack advantage · fail = land in the stew, prone, immortalized |
+| **The chandelier** | DEX or STR (Athletics) DC 12 | swing, land within 20 ft, next attack advantage · fail = land in the stew, prone, immortalized · **NAT 20 = the Perfect Swing** (below) |
 | Stew-pot catapult | attack vs DEX save DC 12 | target blinded until end of its next turn (gravy) |
 | Barrel roll | STR check DC 12 | 10-ft line; DC 10 DEX save or knocked prone |
 | Mop of destiny | attack, 1d4, reach | it has REACH and dignity |
@@ -295,6 +295,20 @@ the chandelier moment. Call out each new tool as the round starts.
 | "DRINKS ON ME!" | no roll, costs coin | two brawlers instantly retire to the bar |
 
 All numbers house rules `// VERIFY house` — tuned for comedy, not simulation.
+
+**THE PERFECT SWING (natural 20 on the chandelier):** two layers, run in order.
+1. **Aloud, over the top:** time goes honey-slow. They arc the FULL length of
+   the room, drop a brawler flat with both boots (instant KO, no damage roll),
+   and the entire tavern — both sides of the fight — stops to roar their
+   name. Maddy rings the bell: a new all-time Dry Anchor record. They are
+   Talent Night champion regardless of any vote. Free drinks for life
+   ("for life" = "while I like you" — Maddy).
+2. **Privately, press their ⭐ Perfect Swing button** (Run the Night, brawl
+   scene): at the top of the arc, one held breath, they see the room the way
+   the Appraiser sees it — a small paper tag over every tankard, hat, and
+   laugh; PENDING over each of their friends; and over the hooded stranger,
+   no tag at all. Nothing is priced on the one doing the pricing. Say nothing
+   more. Let them decide whether to tell the table.
 
 **If a PC goes down:** narrate stars, distant fiddle music, and waking up
 propped in a chair with Maddy applying a cold ham to their eye. Being KO'd
