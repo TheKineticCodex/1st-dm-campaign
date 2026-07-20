@@ -29,9 +29,9 @@ Reliquary tracks are the party gathering those notes/proofs.
 |---|---|---|---|
 | Peaches capiche | Peaches, mermaid Druid (Aasimar) | **Her tail** | Sold in the Under-Sea market, priced "one song, already paid" — collateral on the FIRST bargain. She walks on borrowed feet; her alligator **followed her out of the sea** and is the only witness to the sale. Her fear (losing the alligator) is the Court's leverage. |
 | William "Blue-Chew Billy" Blackwood | Human Wizard, showman | **His late mentor's handwritten spellbook** | The Court is *buying his mentor posthumously* — un-writing him page by page. Pages surface at the carnival as prize-stall currency. Billy's true terror (nobody stays when the mask drops) is what the Hall of Facets offers to "fix." |
-| Philip | *(not yet divined)* | slot open | Fill from his quiz the moment it lands. |
-| Josh (Aubrey's brother) | *(not yet joined)* | slot open | Same. |
-| Josh's wife (Aubrey's sister-in-law) | *(not yet joined)* | slot open | Same. |
+| Philip | Halfling Fighter | **His certainty** — the unshakable line between the killer he was trained to be and the gentle man he chose to be | Trained from childhood to kill; fears losing his love and his way. The Court has opened a file on his *convictions* — they price principles by the pound, and a man this anchored is worth a fortune unmoored. His honest answer at the gate is already in the file. |
+| Freya | Fairy Fighter | **The suffering she survived** — whatever she endured that she vows no loved one ever will | Black-winged, twin swords, armored in tattoos and menace so nobody checks for the wound. Her vow ("I would risk everything so they never suffer what I did") is, to the Court, a *standing offer*. The Buyer intends to accept it. ⚠ Two Freyas at the table — full names on all paperwork (great recurring gag AND an Act 3 contract loophole). |
+| Freya Moon | Fairy Druid | **The Heartbloom Grove's spring** — her home's magic, "blighted" to silence; she carries its last living blossom in a crystal pendant | The blight was a PURCHASE. The Court bought the grove's spring (filed BELOW, same inventory as the Sea's song) — a blight is what a bought season looks like from outside. Her pendant blossom is the unsold remainder; the Court would love to complete the set. Restoring the grove = finding the receipt. Parallels Peaches: both carry the last piece of something the Court holds. |
 
 ## Cast (original — perform freely)
 

@@ -21,6 +21,9 @@ export interface SceneGuide {
 
 const PEACHES = 'Peaches capiche'
 const BILLY = 'William Blackwood'
+const PHILIP = 'Philip'
+const FREYA = 'Freya'
+const FREYA_MOON = 'Freya Moon'
 
 export const ACT1_SCENES: Record<string, SceneGuide> = {
   'The Gate of Paper Lanterns': {
@@ -100,6 +103,33 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           body: '“A man who jokes about everything, so nothing true can land on him. But you told the lanterns the truth once: the book matters because HIS hand wrote it. Hold that. Paper remembers, dear — and someone is un-remembering him, page by page.”',
         },
       },
+      {
+        label: '✉ Philip: his reading',
+        kind: 'whisper',
+        whisper: {
+          target: PHILIP,
+          title: 'Grey-Gill reads your scar',
+          body: '“Hands trained to end things, held gentle on the table. That is the hardest grip there is, dear. You told the lanterns what you fear — not death, but falling away from your own convictions. Careful here. This place buys convictions. It pays very well.”',
+        },
+      },
+      {
+        label: '✉ Freya: her reading',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA,
+          title: 'Grey-Gill reads your blades',
+          body: '“Two swords, and daggers besides — armor worn on the outside so nobody checks for the wound underneath. You told the lanterns you would risk everything so your people never suffer what you suffered. The Court heard that too, love. To them that is not a vow. It is a PRICE.”',
+        },
+      },
+      {
+        label: '✉ Freya Moon: her reading',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Grey-Gill reads your pendant',
+          body: '“May I see it? …No — keep it closed. A last blossom from a grove gone quiet. Child, blights do not keep receipts. But somewhere BELOW, something does. If the spring of your Heartbloom was taken and not killed, then somewhere it is still filed. And what is filed can be found.”',
+        },
+      },
       { label: '🌊 The sea breathes', kind: 'sfx', sfx: 'ocean' },
       { label: '💧 Bubbles (she tries the name)', kind: 'sfx', sfx: 'splash' },
     ],
@@ -127,6 +157,16 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           target: PEACHES,
           title: 'The hole in the song',
           body: 'You know the missing note. You have always known it. It is the first note you ever sang, and the organ is leaving a chair empty for it — the way the sea sets a place at supper.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya Moon: the pendant stirs',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Against your collarbone',
+          body: 'Each time the song reaches the hole where the note should be, the blossom in your pendant leans toward it — the way a flower leans toward morning. It has never done that before. Whatever spring your grove lost, this music knows a piece of the same silence.',
           ephemeral: true,
         },
       },
@@ -161,6 +201,36 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           target: BILLY,
           title: 'Between the lanterns',
           body: 'A page, mid-air, writing itself in a hand you love — and then un-writing, letter by letter, like someone reading it backwards out of the world.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Philip: the vision',
+        kind: 'whisper',
+        whisper: {
+          target: PHILIP,
+          title: 'Between the lanterns',
+          body: 'A voice you love says your name, once, from behind a stall curtain. Before you can answer, a politer voice answers for you — reading your answer aloud from a slate, in your own words, perfectly. You never said them to anyone here.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya: the vision',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA,
+          title: 'Between the lanterns',
+          body: 'The people you protect, asleep and safe. Beside them, an open ledger and a patient quill, itemizing — line by line — exactly what keeping them that way would cost. The quill pauses. It is waiting for you to look.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Freya Moon: the vision',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Between the lanterns',
+          body: 'The Heartbloom Grove in full spring — every blossom open, every spirit laughing. And on every single flower, a small paper tag, tied with string, printed in the same careful hand: SOLD.',
           ephemeral: true,
         },
       },
