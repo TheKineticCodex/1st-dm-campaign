@@ -358,3 +358,29 @@ All DCs 10-13, house-tuned `// VERIFY house` — the games are lessons wearing h
 contrast (roaring comedy → cold hum) is the best sixty seconds of the night,
 and it hands you the cliffhanger: they come UP from the cellar and step
 outside into the missing sea.
+
+---
+
+# THE SETLIST — one song per session, played once, at the climax
+
+The ritual: each session has ONE song, chosen in prep, queued on Spotify
+before anyone arrives, played exactly once at the planned climax — never as
+background. After it plays at the table, it joins the campaign playlist
+("The Song the Sea Forgot — The Setlist"). At the campaign finale, the
+playlist plays through in order.
+
+- **Session 1 — Saltmere Night:** *(played untracked — retro-pick optional;
+  candidate: the Davy Jones music-box theme, reserved below)*
+- **Session 2 — the Night of Lanterns:** **"Demolition Lovers" — My Chemical
+  Romance.** THE CUE: press play the moment the argument ends — when the
+  table commits to a gate, before you read the crossing. The soft "hand in
+  mine" opening carries the walk to the chosen gate and the crossing whisper;
+  the song detonates right around the time every lantern in the carnival goes
+  out behind them; Level 2 blooms mid-crescendo. End the session with the
+  song still burning — lanterns snuffed, lights down, "I mean this forever"
+  playing them out. Do not talk over the back half. Let it end the night.
+- **Reserved for the finale: the Still Court's stolen-song motif.** Whenever
+  the missing note matters (carousel, cellar wall, Peaches singing), play a
+  few seconds of ONE chosen melody and always cut it off before it resolves.
+  In the final session, when the song is made whole, it finally plays to the
+  end — first and only time.
