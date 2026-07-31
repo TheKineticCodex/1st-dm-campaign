@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { DmDashboard } from './components/DmDashboard'
 import { JoinScreen } from './components/JoinScreen'
+import { NewPages } from './components/NewPages'
 import { TabShell } from './components/TabShell'
 import { getDeviceSession, initCalm, type DeviceSession } from './lib/storage'
 
@@ -9,15 +10,20 @@ initCalm()
 function App() {
   const [session, setSession] = useState<DeviceSession | null>(() => getDeviceSession())
 
-  if (!session) {
-    return <JoinScreen onJoined={setSession} />
-  }
+  const screen = !session ? (
+    <JoinScreen onJoined={setSession} />
+  ) : session.role === 'dm' ? (
+    <DmDashboard session={session} onLeave={() => setSession(null)} />
+  ) : (
+    <TabShell session={session} onLeave={() => setSession(null)} />
+  )
 
-  if (session.role === 'dm') {
-    return <DmDashboard session={session} onLeave={() => setSession(null)} />
-  }
-
-  return <TabShell session={session} onLeave={() => setSession(null)} />
+  return (
+    <>
+      {screen}
+      <NewPages />
+    </>
+  )
 }
 
 export default App
