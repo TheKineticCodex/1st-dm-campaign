@@ -260,6 +260,44 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       { label: '🔔 A bell, far out on the sand', kind: 'sfx', sfx: 'bell' },
     ],
   },
+  'The Morning After': {
+    readAloud:
+      'Morning comes grey and wrong. No gull-cries — the gulls stand in silent rows along the rooftops, all facing the sand. Where the sea should sound, there is nothing at all. And Saltmere is out in the streets, every soul of it, doing what small towns do with the impossible: sweeping up glass, pouring tea, and arguing about it.',
+    truth:
+      'Daylight in Saltmere: Billy’s reckoning with Tarn (the netmender his bottle blinded — run it EARLY, over Maddy’s free breakfast Griff interrupts), then free exploration until dusk. Full menu, vignettes, and small battles: session2-guide.md. Weapons come back at breakfast — everyone re-equips in the Bag. Be walking the sand by the 90-minute mark.',
+    doors: {
+      fight: 'Giant crabs by the tide pools (herd or fight, AC 15 HP 13) · two wreckers stripping boats (AC 12 HP 11, fold if scared). Both in the guide.',
+      talk: 'Tarn: "Sit down, lad. Skip to the end of the apology." · Wick’s charts: the horizon is eleven feet closer · the little girl: "the tide went to the party."',
+      sneak: 'The salt shed: something scratching. A moon-grey seal-pup, netted — it hums three notes of the sea-song, then runs for the lights.',
+      bargain: 'Restitution is Billy’s to invent — coins, oath, teaching Pip letters. Accept anything sincere. Cure Wounds closes cuts; the glitter stays. It was PRIZE-STALL glass.',
+      insane: 'If they split up: each traveler has a solo vignette in the guide. Narrate it to that player alone.',
+    },
+    npcs: ['Maddy Brine', 'Old Griff', 'Tarn', 'Pip'],
+    cues: [
+      { label: '🌊 The silence where the sea was', kind: 'sfx', sfx: 'ocean' },
+      { label: '🔔 The chapel bell (one soft note)', kind: 'sfx', sfx: 'bell' },
+      {
+        label: '✉ Billy: Tarn’s dark-sight',
+        kind: 'whisper',
+        whisper: {
+          target: BILLY,
+          title: 'What the netmender sees',
+          body: 'Tarn leans close, voice low so his boy won’t hear: "I shouldn’t say. With my eyes dark, I see BETTER. There’s a wheel of light out on the sand. And little paper tags on things — on the kettle, on my boy’s laugh. There’s one on you, lad. Yours says PENDING."',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Peaches: the shed song',
+        kind: 'whisper',
+        whisper: {
+          target: PEACHES,
+          title: 'The pup’s three notes',
+          body: 'The little grey thing goes still the moment it sees you — the way every sea-creature always has. And as the net comes free it hums three notes. YOUR three notes. From your song. With the same hole in it. Then it is gone, flopping joyfully across the sand, straight toward the lights.',
+          ephemeral: true,
+        },
+      },
+    ],
+  },
   'The Gate of Paper Lanterns': {
     readAloud:
       'Three nights ago the tide went out of Saltmere and forgot to come back. Now, a mile out on the wet sand, stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink. The lanterns you each carry tug toward it like dogs on a lead.',
