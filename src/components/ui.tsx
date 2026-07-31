@@ -108,12 +108,14 @@ export function TextInput(props: {
   value: string
   onChange: (v: string) => void
   placeholder?: string
+  onEnter?: () => void
 }) {
   return (
     <input
       id={props.id}
       value={props.value}
       onChange={(e) => props.onChange(e.target.value)}
+      onKeyDown={(e) => e.key === 'Enter' && props.onEnter?.()}
       placeholder={props.placeholder}
       className="w-full rounded-lg px-4 py-3 outline-none"
       style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44 }}

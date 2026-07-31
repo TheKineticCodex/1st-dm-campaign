@@ -458,12 +458,19 @@ function RosterSection({
                 </p>
               ) : (
                 <>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     {r.character.build.portraitUrl && (
                       <img
                         src={r.character.build.portraitUrl}
                         alt=""
-                        style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
+                        style={{
+                          width: 54,
+                          height: 54,
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: `2px solid ${hp === 0 ? '#C96A6A' : C.gold}`,
+                          boxShadow: `0 0 10px ${hp === 0 ? '#C96A6A44' : `${C.gold}33`}`,
+                        }}
                       />
                     )}
                     <p style={{ ...display, fontSize: 22, fontWeight: 700 }}>{r.character.build.name}</p>
@@ -472,13 +479,22 @@ function RosterSection({
                     Level {sheet.level} {r.character.build.species} {r.character.build.klass} ·{' '}
                     {r.character.build.bg}
                   </p>
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
-                    <span>
-                      HP{' '}
-                      <strong style={{ color: hp === 0 ? '#C96A6A' : C.parchment }}>
-                        {hp}/{sheet.hpMax}
-                      </strong>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="flex-1 rounded-full" style={{ height: 7, background: C.night, overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${((hp ?? 0) / sheet.hpMax) * 100}%`,
+                          height: '100%',
+                          background: hp === 0 ? '#C96A6A' : (hp ?? 0) <= sheet.hpMax / 3 ? '#E0928F' : C.sea,
+                          transition: 'width .3s ease',
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs" style={{ color: hp === 0 ? '#C96A6A' : C.sea, whiteSpace: 'nowrap' }}>
+                      ♥ {hp}/{sheet.hpMax}
                     </span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
                     <span>
                       AC <strong>{sheet.ac.val}</strong>
                     </span>
@@ -491,6 +507,12 @@ function RosterSection({
                     {sheet.spellDc !== null && (
                       <span>
                         Spell DC <strong>{sheet.spellDc}</strong>
+                      </span>
+                    )}
+                    {r.character.state.coins && (
+                      <span style={{ color: C.faint }}>
+                        🪙 <strong style={{ color: C.gold }}>{r.character.state.coins.gp}</strong>g{' '}
+                        {r.character.state.coins.sp}s {r.character.state.coins.cp}c
                       </span>
                     )}
                   </div>

@@ -80,6 +80,7 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void handleJoin()}
               placeholder="SEAFORGOT"
               autoCapitalize="characters"
               autoCorrect="off"
@@ -99,7 +100,12 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
             <span className="text-sm" style={{ color: C.sea }}>
               Your name
             </span>
-            <TextInput value={name} onChange={setName} placeholder="What shall the lanterns call you?" />
+            <TextInput
+              value={name}
+              onChange={setName}
+              placeholder="What shall the lanterns call you?"
+              onEnter={() => void handleJoin()}
+            />
           </label>
 
           {error && (
