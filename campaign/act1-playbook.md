@@ -371,14 +371,18 @@ playlist plays through in order.
 
 - **Session 1 — Saltmere Night:** *(played untracked — retro-pick optional;
   candidate: the Davy Jones music-box theme, reserved below)*
-- **Session 2 — the Night of Lanterns:** **"Demolition Lovers" — My Chemical
-  Romance.** THE CUE: press play the moment the argument ends — when the
-  table commits to a gate, before you read the crossing. The soft "hand in
-  mine" opening carries the walk to the chosen gate and the crossing whisper;
-  the song detonates right around the time every lantern in the carnival goes
-  out behind them; Level 2 blooms mid-crescendo. End the session with the
-  song still burning — lanterns snuffed, lights down, "I mean this forever"
-  playing them out. Do not talk over the back half. Let it end the night.
+- **Session 2 — the Night of Lanterns:** **"the lakes" — Taylor Swift.**
+  THE CUE, in two moves: (1) start it LOW — background-soft — the moment the
+  Three Gates appear and the argument begins; let it loop quietly under the
+  whole decision ("take me to the lakes where all the poets went to die" as
+  five people argue over three doors — let the song work). (2) The instant
+  the table commits to a gate: TURN IT UP. That volume swell IS the ending —
+  read the crossing whisper over it if you must, but say nothing after.
+  Lanterns snuffed, Level 2 blooming on their phones, lights down, and the
+  song plays them out to silence. The music ends the session, not you.
+- **On the bench: "Demolition Lovers" — My Chemical Romance.** Held for the
+  session that earns it — a two-against-the-world moment (the Freyas have
+  one coming). "Hand in mine" will wait.
 - **Reserved for the finale: the Still Court's stolen-song motif.** Whenever
   the missing note matters (carousel, cellar wall, Peaches singing), play a
   few seconds of ONE chosen melody and always cut it off before it resolves.
