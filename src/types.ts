@@ -39,6 +39,8 @@ export interface CharacterState {
   concentrating?: boolean
   /** The Bag — undefined until first render, then seeded from the class. */
   bag?: BagItem[]
+  /** The Purse — gold/silver/copper. Seeded with a modest starting sum. */
+  coins?: { gp: number; sp: number; cp: number }
 }
 
 /** Player free text. `lost` is private: visible to this player and the DM only. */

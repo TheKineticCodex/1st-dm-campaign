@@ -16,11 +16,11 @@ export const C = {
   sea: '#7FD4C1',
   parchment: '#F2E9D8',
   ink: '#241A42',
-  faint: '#9C8FC4',
+  faint: '#A89ED0',
 }
 
 export const display: CSSProperties = { fontFamily: "'Cormorant Garamond', Georgia, serif" }
-export const body: CSSProperties = { fontFamily: "'Sorts Mill Goudy', Georgia, serif" }
+export const body: CSSProperties = { fontFamily: "'Alegreya', Georgia, serif" }
 
 export function Section({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return (

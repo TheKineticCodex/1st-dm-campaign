@@ -148,6 +148,63 @@ function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next: BagIte
   )
 }
 
+type Coins = { gp: number; sp: number; cp: number }
+const COIN_META: { key: keyof Coins; name: string; glyph: string; tint: string }[] = [
+  { key: 'gp', name: 'Gold', glyph: '🪙', tint: '#E8B84B' },
+  { key: 'sp', name: 'Silver', glyph: '⚪', tint: '#C6CCD8' },
+  { key: 'cp', name: 'Copper', glyph: '🟤', tint: '#C08B5A' },
+]
+
+/** The Purse: gold / silver / copper with big ± taps. 10 sp = 1 gp, 10 cp = 1 sp. */
+function PurseSection({ coins, onChange }: { coins: Coins; onChange: (next: Coins) => void }) {
+  const bump = (key: keyof Coins, delta: number) =>
+    onChange({ ...coins, [key]: Math.max(0, (coins[key] ?? 0) + delta) })
+  return (
+    <Section style={{ marginTop: 16 }}>
+      <Eyebrow>🪙 the purse</Eyebrow>
+      <p className="text-xs" style={{ color: C.faint }}>
+        10 copper = 1 silver · 10 silver = 1 gold
+      </p>
+      <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        {COIN_META.map(({ key, name, glyph, tint }) => (
+          <div
+            key={key}
+            className="rounded-lg p-2 text-center"
+            style={{ background: C.night, border: `1.5px solid ${tint}55` }}
+          >
+            <p className="text-xs" style={{ color: tint }}>
+              {glyph} {name}
+            </p>
+            <p style={{ ...display, fontSize: 30, fontWeight: 700, color: tint, lineHeight: 1.2 }}>
+              {coins[key] ?? 0}
+            </p>
+            <div className="flex justify-center gap-1 mt-1">
+              <button
+                type="button"
+                aria-label={`Spend one ${name.toLowerCase()}`}
+                onClick={() => bump(key, -1)}
+                className="rounded-md"
+                style={{ minWidth: 44, minHeight: 40, background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, fontSize: 20, cursor: 'pointer' }}
+              >
+                −
+              </button>
+              <button
+                type="button"
+                aria-label={`Gain one ${name.toLowerCase()}`}
+                onClick={() => bump(key, 1)}
+                className="rounded-md"
+                style={{ minWidth: 44, minHeight: 40, background: `${tint}22`, border: `1px solid ${tint}88`, color: tint, fontSize: 20, cursor: 'pointer' }}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
 /** Tappable spell names — tap one to unfold what it does, in plain words. */
 function SpellChips({ label, names }: { label: string; names: string[] }) {
   const [open, setOpen] = useState<string | null>(null)
@@ -582,6 +639,12 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         onChange={(next) => updateState({ bag: next })}
       />
 
+      {/* The Purse — starting sum is a house default; the Keeper adjusts. */}
+      <PurseSection
+        coins={state.coins ?? { gp: 10, sp: 0, cp: 0 }}
+        onChange={(next) => updateState({ coins: next })}
+      />
+
       {/* Fairy Magic — species-born, no class required. Faerie Fire arrives at level 3. VERIFY Witchlight fairy */}
       {character.build.species === 'Fairy ✦' && (
         <Section>
@@ -839,7 +902,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             {roll.label}
             {roll.mode !== 'normal' ? ` · ${roll.mode}` : ''}
           </p>
-          <p style={{ ...display, fontSize: 40, fontWeight: 700 }}>
+          <p style={{ ...display, fontSize: 52, fontWeight: 700, lineHeight: 1.1 }}>
             {roll.total}
             {roll.isNat20 ? ' ✦!' : roll.isNat1 ? ' …oh no' : ''}
           </p>

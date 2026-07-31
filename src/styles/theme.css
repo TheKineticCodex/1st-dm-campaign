@@ -9,10 +9,10 @@
   --seafoam: #7fd4c1;
   --parchment: #f2e9d8;
   --ink: #241a42;
-  --faint: #9c8fc4;
+  --faint: #a89ed0;
 
   --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Sorts Mill Goudy', Georgia, serif;
+  --font-body: 'Alegreya', 'Iowan Old Style', Georgia, serif;
 
   --tap-target: 44px;
   --radius: 14px;
@@ -33,7 +33,7 @@ body {
   color: var(--parchment);
   font-family: var(--font-body);
   font-size: 17px;
-  line-height: 1.55;
+  line-height: 1.6;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
@@ -59,6 +59,21 @@ textarea,
 select {
   font: inherit;
   color: inherit;
+}
+
+/* Newbie-friendly touch feel: no 300ms double-tap delay, no grey iOS
+   flash — feedback comes from our own brightness lift instead. */
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+::selection {
+  background: rgba(232, 184, 75, 0.35);
 }
 
 /* Accessibility floor: visible focus, everywhere */

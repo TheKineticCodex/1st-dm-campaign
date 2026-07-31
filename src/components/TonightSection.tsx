@@ -192,7 +192,7 @@ function RunNight({
           <Eyebrow>now — act {current.act}</Eyebrow>
           <h3 style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>{current.title}</h3>
 
-          <p className="mt-3 text-base leading-relaxed" style={{ color: C.gold, fontStyle: 'italic' }}>
+          <p className="mt-3 leading-relaxed" style={{ color: C.gold, fontStyle: 'italic', fontSize: 19, lineHeight: 1.65 }}>
             “{guide.readAloud}”
           </p>
           <p className="text-sm mt-3" style={{ color: C.parchment }}>
