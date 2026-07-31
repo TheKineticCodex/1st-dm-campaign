@@ -4,6 +4,7 @@
 // to phones needs Supabase.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { computeSheet } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
@@ -30,6 +31,62 @@ interface TableSectionProps {
   roster: RosterEntry[]
   /** Callback engine: a Vault answer forged into a ready-to-send whisper. */
   whisperPrefill?: WhisperPrefill | null
+}
+
+/** Combat glance-strip: every character's HP, AC, and conditions in one line. */
+function PartyGlance({ roster }: { roster: RosterEntry[] }) {
+  const chars = roster.filter((r) => r.character)
+  if (chars.length === 0) return null
+  return (
+    <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+      {chars.map((r) => {
+        const sheet = computeSheet(r.character!.build)
+        if (!sheet) return null
+        const st = r.character!.state
+        const hp = Math.max(0, sheet.hpMax - (st?.damage ?? 0))
+        const frac = hp / sheet.hpMax
+        const barColor = hp === 0 ? '#C96A6A' : frac <= 1 / 3 ? '#E0928F' : C.sea
+        return (
+          <div
+            key={r.playerId}
+            className="rounded-lg px-3 py-2 shrink-0"
+            style={{ background: C.panel, border: `1px solid ${hp === 0 ? '#C96A6A' : C.panelEdge}`, minWidth: 150 }}
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm" style={{ ...display, fontWeight: 700, color: C.gold, whiteSpace: 'nowrap' }}>
+                {r.character!.build.name || r.playerName}
+              </p>
+              <p className="text-xs" style={{ color: C.faint, whiteSpace: 'nowrap' }}>
+                🛡 {sheet.ac.val}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex-1 rounded-full" style={{ height: 7, background: C.night, overflow: 'hidden' }}>
+                <div style={{ width: `${frac * 100}%`, height: '100%', background: barColor, transition: 'width .3s ease' }} />
+              </div>
+              <p className="text-xs" style={{ color: barColor, whiteSpace: 'nowrap' }}>
+                {hp}/{sheet.hpMax}
+              </p>
+            </div>
+            {((st?.conditions?.length ?? 0) > 0 || st?.concentrating) && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {st?.concentrating && (
+                  <span className="text-xs rounded-full px-1.5" style={{ border: `1px solid ${C.sea}66`, color: C.sea }}>
+                    ◐ conc.
+                  </span>
+                )}
+                {(st?.conditions ?? []).map((c) => (
+                  <span key={c} className="text-xs rounded-full px-1.5" style={{ border: `1px solid ${C.gold}66`, color: C.gold }}>
+                    {c}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export function TableSection({ store, roster, whisperPrefill }: TableSectionProps) {
@@ -126,6 +183,8 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
           Each panel below folds — tap its title. The Book remembers which you keep open.
         </HintOnce>
       </div>
+
+      <PartyGlance roster={roster} />
 
       <div className="mt-3" />
       <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen>

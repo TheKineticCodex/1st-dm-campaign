@@ -249,6 +249,7 @@ function SpellChips({ label, names }: { label: string; names: string[] }) {
 
 export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName }: SheetTabProps) {
   const [rollMode, setRollMode] = useState<RollMode>('normal')
+  const [quickRoll, setQuickRoll] = useState(false)
   const [roll, setRoll] = useState<RollResult | null>(null)
   const [damage, setDamage] = useState<{ rolls: number[]; total: number } | null>(null)
   const [showConditionPicker, setShowConditionPicker] = useState(false)
@@ -402,6 +403,93 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
   return (
     <div style={{ animation: 'cardRise .4s ease-out', paddingBottom: roll ? 120 : 0 }}>
+      {/* Quick-bar: the three mid-scene needs, always in reach. Sticky. */}
+      <div
+        className="sticky top-0 -mx-1 px-1 pt-1 pb-1.5"
+        style={{ zIndex: 40, background: `${C.night}F0`, backdropFilter: 'blur(6px)' }}
+      >
+        <div
+          className="flex items-center gap-2 rounded-xl px-2.5 py-1.5"
+          style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}
+        >
+          <span
+            className="rounded-full px-2.5 py-1 text-sm"
+            style={{
+              ...display,
+              fontWeight: 700,
+              background:
+                hpCurrent === 0 ? '#3d2030' : hpCurrent <= sheet.hpMax / 3 ? '#4a2a35' : `${C.sea}1a`,
+              color: hpCurrent === 0 ? '#C96A6A' : hpCurrent <= sheet.hpMax / 3 ? '#E0928F' : C.sea,
+              border: `1px solid ${hpCurrent <= sheet.hpMax / 3 ? '#C96A6A66' : `${C.sea}55`}`,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ♥ {hpCurrent}/{sheet.hpMax}
+          </span>
+          <span className="text-sm" style={{ color: C.faint, whiteSpace: 'nowrap' }}>
+            🛡 {sheet.ac.val}
+          </span>
+          <span className="flex-1 flex flex-wrap gap-1 overflow-hidden" style={{ maxHeight: 26 }}>
+            {state.conditions.map((c) => (
+              <span
+                key={c}
+                className="rounded-full px-2 text-xs"
+                style={{ background: `${C.gold}1a`, border: `1px solid ${C.gold}55`, color: C.gold, lineHeight: '22px' }}
+              >
+                {c}
+              </span>
+            ))}
+          </span>
+          <button
+            type="button"
+            aria-expanded={quickRoll}
+            onClick={() => setQuickRoll(!quickRoll)}
+            className="rounded-lg px-3 py-1.5 text-sm"
+            style={{
+              ...display,
+              fontWeight: 700,
+              background: quickRoll ? C.gold : `${C.gold}22`,
+              color: quickRoll ? C.ink : C.gold,
+              border: `1px solid ${C.gold}`,
+              minHeight: 38,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            🎲 Roll
+          </button>
+        </div>
+        {quickRoll && (
+          <div
+            className="grid grid-cols-6 gap-1 mt-1 rounded-xl p-1.5"
+            style={{ background: C.panel, border: `1px solid ${C.gold}44` }}
+          >
+            {ABILITIES.map((a) => (
+              <button
+                key={a}
+                type="button"
+                onClick={() => {
+                  doRoll(`${a} check`, mod(sheet.A[a as AbilityKey]))
+                  setQuickRoll(false)
+                }}
+                className="rounded-lg py-1.5 text-center"
+                style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 48, cursor: 'pointer' }}
+              >
+                <span className="text-xs block" style={{ color: C.sea }}>
+                  {a}
+                </span>
+                <span className="text-sm block" style={{ ...display, fontWeight: 700 }}>
+                  {fmt(mod(sheet.A[a as AbilityKey]))}
+                </span>
+              </button>
+            ))}
+            <p className="col-span-6 text-center text-xs" style={{ color: C.faint }}>
+              ability checks · saves &amp; skills live below on the sheet
+            </p>
+          </div>
+        )}
+      </div>
+
       <div className="mb-2">
         <CharacterCard build={build} size="full" />
       </div>
