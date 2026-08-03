@@ -165,6 +165,18 @@ they know the way, come five paper lanterns. One finds each of you, wherever
 you are. Your name is on it. The ink is wet. It tugs, gently, toward the
 sand — like a dog on a lead."*
 
+### 🏮 THE LANTERN BOX (physical prop — replaces the verbal go-around)
+
+Real little lanterns in a closed box, one note tied beneath each (printable
+sheet: campaign/lantern-notes.pdf — cut, fold, box before the session).
+
+1. Read the dusk lines. Then STOP TALKING.
+2. Bring out the closed box. Set it on the table. Open it slowly.
+3. Hand each player their lantern PERSONALLY, one at a time, in silence.
+4. They read their notes privately. Don't rush anyone. Phones stay dark.
+5. When the last note lowers, ask each: "Why do you follow yours?"
+6. Their answers are the walk to the sand. Begin it.
+
 Go around the table: **"Why do you follow yours?"** (Their lantern hooks:
 Peaches's smells of home; Billy's holds an unknown page in his mentor's
 hand; Philip's is addressed to the man he fears he's stopped being; Freya's
