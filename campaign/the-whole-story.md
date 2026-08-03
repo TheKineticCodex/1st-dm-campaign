@@ -1,6 +1,40 @@
 # THE WHOLE STORY — for the Lantern-Keeper's eyes only
 ### Everything, from the bottom of the sea to the last note
 
+## ⭐ START HERE — the story in plain words
+
+1. **Magic carnival fairies buy things you can't touch** — names, voices,
+   songs. A pawn shop run by fairies. They never steal, never lie — they
+   just get you to say yes.
+2. **Long ago the heartbroken ocean sold them its own song** — so it could
+   stop remembering what made it sad. It WANTED to forget.
+3. **The loophole: the song wasn't only the ocean's to sell.** Every
+   sea-born creature holds one piece. If every remaining piece-holder sings
+   together in one place, the deal breaks.
+4. **The fairies have spent centuries buying up the pieces. Peaches holds
+   the last one.** Her tail is the pawn-shop hold on her; her alligator is
+   the only witness to the original sale.
+5. **She sang at Talent Night — they heard the last piece — so the carnival
+   came and took the tide hostage.** Make the song whole and the tide comes
+   home. That's the campaign: get the pieces together, and sing.
+
+**Glossary (never say these at the table):** Still Court = the fairy
+pawn-shop bosses ("the ones Below") · Hall of Facets = just a mirror
+theater — say "Hall of Mirrors" · proxy-seal = "signed on someone's
+behalf" — a forged permission slip; the blank one proves nobody could sign
+for the ocean · manifest = cargo list · consignment = selling through
+someone else's shop · tithe = rent · collateral = what the pawn shop keeps ·
+escrow = held hostage · standing offer = Freya's vow, treated as a coupon
+they can cash · un-writing = erasing Billy's bought mentor page by page ·
+Act 3 "courtroom" = a carnival game show where you win by proving the deal
+unfair, on stage — and the proof is singing.
+
+**All players ever need:** "They never steal — they get you to say yes." ·
+"A song belongs to everyone born inside it." · "Get the pieces together.
+Sing. The tide comes home."
+
+---
+
 ## The secret at the bottom of everything
 
 Long ago, the Sea was in grief — over what, even it no longer knows,
