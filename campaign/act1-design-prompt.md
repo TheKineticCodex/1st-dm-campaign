@@ -10,7 +10,7 @@ Design Act 1 so completely that on game night the DM holds a map of **everything
 
 ## 1. Inputs (all exist — use them, never contradict them)
 
-1. **The story bible** — the Still Court, the first bargain and its flaw, the carnival, the Three Gates, the cast (Twins of the Toll, Grandmother Grey-Gill, the Buyer).
+1. **The story bible** — the Court of Kept Things, the first bargain and its flaw, the carnival, the Three Gates, the cast (Twins of the Toll, Grandmother Grey-Gill, the Buyer).
 2. **The real party** (from the live Vault; refresh before designing): Peaches capiche (Aasimar Druid — mermaid, Lost Thing: her tail; fear: her alligator) · William "Blue-Chew Billy" Blackwood (Human Wizard — showman, Lost Thing: mentor's spellbook; fear: the mask coming off) · Philip (undivined — leave a woven slot) · Player 4 (unjoined — leave a woven slot). Slots must be first-class: scenes reference "the third traveler's thread" with connection points ready to bind the moment their confessions land.
 3. **The app's instruments** — every scene must name its cues: sealed whispers ✉, contracts ⚖, the Snail Derby 🐌, conditions/concentration, the dice feed, the stage 🎭 (which map is showing), and the timeline beat it belongs to.
 4. **The rules floor** — 2024 rules; SRD 5.2 (CC-BY-4.0) creatures ONLY, referenced by name with page-free stat summaries; never reproduce non-SRD text; house adaptations get `// VERIFY` and a line in the summary.
@@ -18,7 +18,7 @@ Design Act 1 so completely that on game night the DM holds a map of **everything
 ## 2. The leveling law (milestone — no XP bookkeeping, ever)
 
 - **Level 1 → 2: end of Session 1**, the moment the party steps through whichever Gate they choose. Crossing the threshold IS the milestone; the Feywild notices. (App: the level-up lands before Session 2 so sheets are ready — the party fights nothing deadlier than a Hard encounter while level 1.)
-- **Level 2 → 3: the midpoint of their chosen Act 2 road** — specifically, the scene where they first **cost the Still Court something real** (free a jarred voice, crack a mirror, void a market contract). Power as a consequence of defiance.
+- **Level 2 → 3: the midpoint of their chosen Act 2 road** — specifically, the scene where they first **cost the Court of Kept Things something real** (free a jarred voice, crack a mirror, void a market contract). Power as a consequence of defiance.
 - **Level 3 at Act 1's true end** (the road's climax, entering Act 2 proper) — subclasses unlock exactly when the story widens. Design the climax to *earn* it.
 - Constraint on all combat design: at level 1, 4 PCs with ~9–11 HP each; **no single foe whose max damage one-shots a PC from full**; save-or-suffer effects get warning beats first. At level 2+, loosen accordingly.
 - `// VERIFY` every encounter-budget claim against the 2024 DMG encounter math (Low/Moderate/High XP budgets for 4 PCs at levels 1–3).

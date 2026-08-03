@@ -18,7 +18,7 @@
    came and took the tide hostage.** Make the song whole and the tide comes
    home. That's the campaign: get the pieces together, and sing.
 
-**Glossary (never say these at the table):** Still Court = the fairy
+**Glossary (never say these at the table):** Court of Kept Things = the fairy
 pawn-shop bosses ("the ones Below") · Hall of Facets = just a mirror
 theater — say "Hall of Mirrors" · proxy-seal = "signed on someone's
 behalf" — a forged permission slip; the blank one proves nobody could sign
@@ -39,7 +39,7 @@ Sing. The tide comes home."
 
 Long ago, the Sea was in grief — over what, even it no longer knows,
 because grief was the point. The Sea went to the only power that buys such
-things: **the Still Court**, a fey court of acquisition that never steals,
+things: **the Court of Kept Things**, a fey court of acquisition that never steals,
 never lies, and always has the paperwork. And the Sea sold them **its own
 song** — the music the tides move to — because a sea that cannot sing
 cannot remember what it lost.
@@ -58,7 +58,7 @@ collateralizing the outstanding notes one sea-born creature at a time.
 
 ## The villain
 
-The Still Court sits BELOW — a courtroom that is also a vault that is also
+The Court of Kept Things sits BELOW — a courtroom that is also a vault that is also
 a carnival. Its power: it discovered that anyone will sell anything if the
 price names something they believe they'll never miss. Centuries of lawful
 purchases made it a treasury of the intangible: names, voices, springs,
@@ -131,7 +131,7 @@ on whose terms.
 
 ## ACT 1 — The Carnival and the Three Roads (now)
 
-Saltmere, the Low-Tide Carnival, and the choice at the back fence. The
+Saltmere, the Getting Fair, and the choice at the back fence. The
 three roads each hold a piece of the case (the Reliquary fragments):
 
 - **GREEN — the Drowned Bog:** Cassia's jars of voices, the Whispering
@@ -174,7 +174,7 @@ fight about it. Someone will side with the Sea's choice. Let them.)
 Also Act 2: Tarn's offer. The Court, through the Appraiser, offers to
 restore his sight — price to be named — with Billy holding the pen.
 
-## ACT 3 — The Still Court
+## ACT 3 — The Court of Kept Things
 
 BELOW, at last: a courtroom-carnival where the gallery bids on testimony.
 The Court produces its evidence — including the five honest answers from
@@ -204,6 +204,39 @@ The Court survives. It always does — it keeps everything that was freely
 and fairly given, and it files the loss under "instructive." The Buyer's
 last line, to whichever PC out-lawyered him: a card, and a genuine
 compliment, and "The Court will be watching your career with interest."
+
+## How the magic works — the law nobody wrote
+
+The Court of Kept Things never buys without permission. Permission is their
+entire power: they price what you think you'll never miss, arrive at your
+weakest hour, never lie but let you mis-hear, and put every offer inside a
+carnival, where saying yes feels like a game.
+
+Nothing "allows" them. In the old world, **a given word is a law of
+nature** — among the fey, a promise is physics. Say yes to a true bargain
+and the thing simply moves, the way a dropped stone falls. No king wrote
+that rule and none can repeal it; the Court are merely the only ones who
+have spent ten thousand years reading it closely. They are not the law.
+They are the best lawyers of a law nobody wrote.
+
+Which is also exactly how they lose. The magic enforces a bargain *as
+written* — so a flawed sale can be unwound by the same force that bound it.
+And every major holding the party will unwind shares one defect: **it was
+bought from someone who didn't fully own it.** The Sea sold a song with
+co-owners. The tail was seized under fine print, never sold by Peaches.
+The tide is "escrow" — a stretch. The grove's spring was sold by someone
+with only partial claim. Real silk, four bad seams.
+
+Last consequence, and the engine of all their behavior toward Peaches:
+since the magic moves only on a true yes, **her note cannot be taken —
+only sold, by her.** That is why a carnival came instead of an army.
+Every kindness the Getting Fair ever shows her is the same weapon, aimed
+the same way. Their politeness is what hunting looks like.
+
+The table line, when someone finally asks: *"No one allows them, love.
+The magic does. In the old places a promise is like gravity — say yes,
+and the thing falls out of you. They didn't make the rule. They just
+read it closer than anyone alive."*
 
 ## The theme, in one line
 

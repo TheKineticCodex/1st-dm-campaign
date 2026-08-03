@@ -37,7 +37,7 @@ Major Battle B, the road's setpiece. Win, lose, or draw, Act 1 ends with the fir
 ### C2 · The Games of the Midway
 **Open:** *"Everything glitters, nothing has a price tag, and every stall-keeper knows your name before you say it."*
 **Truth:** Prizes are skimmed things. The prize stall pays Billy in a page of his mentor's handwriting — the stallkeep genuinely doesn't know its worth ("things wash up").
-**Five doors:** *Fight:* → Minor Battles m1/m2, or interfere with the Empty Costumes → Major Battle CARN-A. *Talk:* stallkeeps gossip: "the Toll-Twins never sleep," "don't hum near the carousel." *Sneak:* behind the prize stall — crates addressed in salt-crusted labels to "THE STILL COURT, BELOW." First written clue. *Bargain:* anything can be bought here — for teeth, memories, birthdays (⚖ quill for anything serious). *Insane:* What-Ifs 4, 13, 14.
+**Five doors:** *Fight:* → Minor Battles m1/m2, or interfere with the Empty Costumes → Major Battle CARN-A. *Talk:* stallkeeps gossip: "the Toll-Twins never sleep," "don't hum near the carousel." *Sneak:* behind the prize stall — crates addressed in salt-crusted labels to "THE COURT OF KEPT THINGS, BELOW." First written clue. *Bargain:* anything can be bought here — for teeth, memories, birthdays (⚖ quill for anything serious). *Insane:* What-Ifs 4, 13, 14.
 **App cues:** 🐌 **run the Snail Derby here** — winner takes the Paper Crown; runner-up the Bottled Applause. Billy's page: hand him a real folded note at the table if you can.
 **Exits:** → C3 (Grey-Gill beckons the Derby winner personally) or C4.
 
@@ -51,7 +51,7 @@ Major Battle B, the road's setpiece. Win, lose, or draw, Act 1 ends with the fir
 ### C4 · The Missing Note
 **Open:** *"The carousel turns. The organ plays a sea-song. And every few bars — a hole, the same hole, where a note should be. The horses' glass eyes are all turned toward the water."*
 **Truth:** The organ was built around the Sea's stolen song; the missing note is the one the Court could not buy — because it belongs to Peaches.
-**Five doors:** *Fight/steal the organ:* What-If 4 (Major CARN-A triggers). *Talk:* the operator hums along and weeps without noticing. *Sneak:* inside the organ, a brass cylinder etched: "PROPERTY OF THE STILL COURT — TRANSCRIPTION INCOMPLETE." Third written clue (three-clue rule satisfied on "the Court exists and owns this place's heart"). *Bargain:* the operator will stop the ride for a song sung live — if Peaches sings, every lantern in the carnival turns toward her (goosebumps beat; the Court now knows she's here). *Insane:* if anyone HUMS the missing note — the carnival holds its breath for three full seconds. Do this with real table silence.
+**Five doors:** *Fight/steal the organ:* What-If 4 (Major CARN-A triggers). *Talk:* the operator hums along and weeps without noticing. *Sneak:* inside the organ, a brass cylinder etched: "PROPERTY OF THE COURT OF KEPT THINGS — TRANSCRIPTION INCOMPLETE." Third written clue (three-clue rule satisfied on "the Court exists and owns this place's heart"). *Bargain:* the operator will stop the ride for a song sung live — if Peaches sings, every lantern in the carnival turns toward her (goosebumps beat; the Court now knows she's here). *Insane:* if anyone HUMS the missing note — the carnival holds its breath for three full seconds. Do this with real table silence.
 **Exits:** → C5 (dusk falls, lanterns dim for the midnight show).
 
 ### C5 · Whispers in the Dark
@@ -221,7 +221,7 @@ Salt-Mother Naretha (Sea Hag, 2, 450 `// VERIFY SRD`) + 2× Merfolk Skirmisher (
 
 **Story beats to add** (the app's timeline already holds C1–C6 + road entries; add as Act 2 beats under each road): B2 "Cassia's Jar-House ✦L3", B3 "The Tithe Barge", M2 "The Restoration Room ✦L3", M3 "Opening Night", U2 "The Collector's Window ✦L3", U3 "The Auction of the Tail". *(I can push these into the live timeline on request — "seed the playbook".)*
 **NPC cards:** Brother Hush & Sister Hum · Grandmother Grey-Gill · Old Cassia · Master Vetrine, Curator of Faces · Salt-Mother Naretha · The Ferryman of Receipts · The Buyer (card mostly blank: "polite. paperwork. pending.") · The Bog Merchant.
-**Clue tracker (three-clue rule):** "The Still Court exists and owns the carnival's heart" (crates BELOW / Grey-Gill's receipt / the organ cylinder) · "The first bargain is flawed — a signatory never signed" (consignment proxy-seal / bog voice's tale / mentor's journal page) · "Lost Things route through the Market BELOW" (barge manifest / Curator's in-transit catalog / auction provenance).
+**Clue tracker (three-clue rule):** "The Court of Kept Things exists and owns the carnival's heart" (crates BELOW / Grey-Gill's receipt / the organ cylinder) · "The first bargain is flawed — a signatory never signed" (consignment proxy-seal / bog voice's tale / mentor's journal page) · "Lost Things route through the Market BELOW" (barge manifest / Curator's in-transit catalog / auction provenance).
 **Stage maps needed (owner-drawn or found CC art):** the carnival midway · causeway & barge dock · mirror theatre · shell amphitheater.
 
 # CLOSING VERIFY LIST
@@ -327,7 +327,7 @@ each. Then the door, the cold air, and the sea that isn't there.
 - **Old Griff** — harbormaster, forty years at sea. Ends the night saying
   the campaign's thesis out loud: "The tide doesn't forget. The tide got
   BOUGHT."
-- **The Appraiser** — the Still Court's scout. Hooded, drinks nothing, pays
+- **The Appraiser** — the Court of Kept Things's scout. Hooded, drinks nothing, pays
   with coins minted forty years too old, writes after each act. Gone before
   the brawl ends; his chair was never sat in. He is the reason the lanterns
   come addressed by name in Session 2.
@@ -383,7 +383,7 @@ playlist plays through in order.
 - **On the bench: "Demolition Lovers" — My Chemical Romance.** Held for the
   session that earns it — a two-against-the-world moment (the Freyas have
   one coming). "Hand in mine" will wait.
-- **Reserved for the finale: the Still Court's stolen-song motif.** Whenever
+- **Reserved for the finale: the Court of Kept Things's stolen-song motif.** Whenever
   the missing note matters (carousel, cellar wall, Peaches singing), play a
   few seconds of ONE chosen melody and always cut it off before it resolves.
   In the final session, when the song is made whole, it finally plays to the

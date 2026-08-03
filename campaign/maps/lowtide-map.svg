@@ -192,8 +192,8 @@
   <g>
     <rect x="52" y="985" width="420" height="170" rx="8" fill="#251A48" stroke="#B58A2E" stroke-width="2.5"/>
     <rect x="60" y="993" width="404" height="154" rx="6" fill="none" stroke="#3A2C66" stroke-width="1.5"/>
-    <text x="262" y="1032" text-anchor="middle" fill="#E8B84B" font-size="27" letter-spacing="4">THE LOW-TIDE CARNIVAL</text>
-    <text x="262" y="1058" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">briefly ashore · on the sands below Saltmere</text>
+    <text x="262" y="1032" text-anchor="middle" fill="#E8B84B" font-size="27" letter-spacing="4" style="letter-spacing:6px">THE GETTING FAIR</text>
+    <text x="262" y="1058" text-anchor="middle" fill="#9C8FC4" font-size="15" font-style="italic">EVERYTHING FOR A SONG · on the sands below Saltmere</text>
     <text x="262" y="1092" text-anchor="middle" fill="#F2E9D8" font-size="15">① Gate  ② Midway  ③ Prize Stall</text>
     <text x="262" y="1115" text-anchor="middle" fill="#F2E9D8" font-size="15">④ Grey-Gill  ⑤ Carousel  ⑥ Three Gates</text>
     <text x="262" y="1141" text-anchor="middle" fill="#9C8FC4" font-size="13" font-style="italic">the sea has withdrawn — for now — beyond the back fence</text>

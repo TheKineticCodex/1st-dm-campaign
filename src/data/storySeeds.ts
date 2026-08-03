@@ -76,7 +76,7 @@ const SEEDS: SeedNode[] = [
     ord: 0,
     title: 'The Drowned Bog',
     summary:
-      'ACT 2, ROAD A. A marsh where sound sinks: the bog-wife Old Cassia keeps stolen VOICES in green glass jars, half-mad with the noise of them. She trades in secrets and owes the Still Court a tithe she can no longer pay. She knows where tails and songs are kept — for a price written in the app\'s contract quill.',
+      'ACT 2, ROAD A. A marsh where sound sinks: the bog-wife Old Cassia keeps stolen VOICES in green glass jars, half-mad with the noise of them. She trades in secrets and owes the Court of Kept Things a tithe she can no longer pay. She knows where tails and songs are kept — for a price written in the app\'s contract quill.',
   },
   {
     key: 'mirrors',
@@ -84,7 +84,7 @@ const SEEDS: SeedNode[] = [
     ord: 0,
     title: 'The Hall of Facets',
     summary:
-      'ACT 2, ROAD B. A palace of standing mirrors that show not reflections but PERFORMANCES — everyone\'s best face, kept. Billy\'s road: one mirror holds his mentor mid-laugh, another holds Billy with no smile at all. The keeper, the Curator of Faces, collects masks for the Still Court and would dearly love Billy\'s.',
+      'ACT 2, ROAD B. A palace of standing mirrors that show not reflections but PERFORMANCES — everyone\'s best face, kept. Billy\'s road: one mirror holds his mentor mid-laugh, another holds Billy with no smile at all. The keeper, the Curator of Faces, collects masks for the Court of Kept Things and would dearly love Billy\'s.',
   },
   {
     key: 'undersea',
@@ -92,13 +92,13 @@ const SEEDS: SeedNode[] = [
     ord: 0,
     title: 'The Under-Sea',
     summary:
-      'ACT 2, ROAD C. Stairs into water that lets you breathe if you were owed a life there. The drowned market where large things are sold: seasons, first loves, tails. Peaches\' road: her tail hangs in the Collector\'s window, priced at "one song, already paid." The merchants fear the Still Court\'s buyer, who is overdue for a visit.',
+      'ACT 2, ROAD C. Stairs into water that lets you breathe if you were owed a life there. The drowned market where large things are sold: seasons, first loves, tails. Peaches\' road: her tail hangs in the Collector\'s window, priced at "one song, already paid." The merchants fear the Court of Kept Things\'s buyer, who is overdue for a visit.',
   },
   {
     key: 'still-court',
     act: 3,
     ord: 0,
-    title: 'The Still Court',
+    title: 'The Court of Kept Things',
     summary:
       'ACT 3. The power that bought the Sea\'s song and salts it away — because where there is no song, nothing changes, and nothing is ever lost again. The Court does not steal; it BUYS, with consent, on signed paper. Every contract in the campaign was legal. The finale: the party must find the flaw in the very first bargain — the one the Sea itself signed. (Fill in from what the table has done; their Reliquary fragments are the evidence.)',
   },

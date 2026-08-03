@@ -324,7 +324,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     doors: {
       fight: 'Minors m1/m2, or interfere with the Empty Costumes → battle CARN-A.',
       talk: 'Gossip: "the Toll-Twins never sleep" · "don’t hum near the carousel."',
-      sneak: 'Behind the stall: crates addressed THE STILL COURT, BELOW. First written clue.',
+      sneak: 'Behind the stall: crates addressed THE COURT OF KEPT THINGS, BELOW. First written clue.',
       bargain: 'Anything can be bought — for teeth, memories, birthdays. Quill for anything serious.',
       insane: 'What-ifs 4, 13, 14.',
     },
@@ -414,7 +414,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     doors: {
       fight: 'Stealing the organ triggers CARN-A with double costumes (What-if 4 — let them keep it if they win).',
       talk: 'The operator hums along and weeps without noticing.',
-      sneak: 'Inside: a brass cylinder — PROPERTY OF THE STILL COURT. Third written clue.',
+      sneak: 'Inside: a brass cylinder — PROPERTY OF THE COURT OF KEPT THINGS. Third written clue.',
       bargain: 'The ride stops for a song sung live. If Peaches sings, every lantern turns toward her.',
       insane: 'If anyone hums the missing note: hold three seconds of REAL silence at the table.',
     },
@@ -745,7 +745,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       { label: '🕳 The Buyer raises a hand', kind: 'sfx', sfx: 'ominous' },
     ],
   },
-  'The Still Court': {
+  'The Court of Kept Things': {
     readAloud: '(Act 3 — not tonight. But when you get here: they signed nothing. That is the whole key.)',
     truth: 'The finale engine. Their Session-1 honest answers return as evidence. See the playbook.',
     doors: { fight: '—', talk: '—', sneak: '—', bargain: '—', insane: '—' },

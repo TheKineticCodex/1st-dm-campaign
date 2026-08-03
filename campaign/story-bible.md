@@ -5,7 +5,7 @@
 
 Long ago the **Sea had a song** — the melody that made tides turn, storms end,
 and lost things wash home. The Sea traded it away. It signed the **first
-bargain** with the **Still Court**: a power that *buys* precious, intangible
+bargain** with the **Court of Kept Things**: a power that *buys* precious, intangible
 things — songs, names, tails, faces, laughs — always legally, always with
 consent, always on signed paper. Where the Court's collection grows, nothing
 changes, and nothing is ever lost again — because nothing *moves*.
@@ -49,9 +49,9 @@ Reliquary tracks are the party gathering those notes/proofs.
 - **Saltmere** — a small grey fishing town on a cold coast. Nets, salt sheds,
   one crooked lighthouse. Three nights ago the tide went out of Saltmere and
   did not come back.
-- **The Low-Tide Carnival** — standing a mile out on the exposed seabed,
-  where deep water was last week. Its banners read: *THE SPLENDID LOW-TIDE
-  CARNIVAL, BRIEFLY ASHORE.* It is the Still Court's storefront: it appears
+- **The Getting Fair** — standing a mile out on the exposed seabed,
+  where deep water was last week. Its banners read: *THE GETTING FAIR —
+  EVERYTHING FOR A SONG.* It is the Court of Kept Things's storefront: it appears
   where something was bought, when the Court comes to collect — or to shop.
 
 ## The cold open (how the five meet — read/paraphrase aloud)
@@ -86,7 +86,7 @@ because the paperwork says so — and the paperwork is never wrong.
 ### What was actually stolen, and when (DM clarity)
 
 Nothing is stolen AT the carnival — that is the trick of the whole campaign.
-The Still Court never steals; it *bought*, legally, with signatures, long ago
+The Court of Kept Things never steals; it *bought*, legally, with signatures, long ago
 and far away: Peaches's tail, the grove's spring, the Sea's own song. The
 carnival is where the trail surfaces. The five arrive as victims of old,
 lawful purchases — and leave as the loophole.
@@ -97,7 +97,7 @@ lawful purchases — and leave as the loophole.
 - **Grandmother Grey-Gill** — fortune-teller with hidden gills; sold her own *name* for her tent. Kind, cagey, terrified of the Court's buyer. Knows Peaches on sight: *"You walked in on borrowed feet."*
 - **The Curator of Faces** (Act 2, Hall of Facets) — collects perfect performances. Wants Billy's stage-smile *specifically*.
 - **Old Cassia, the bog-wife** (Act 2, Drowned Bog) — keeps stolen voices in jars; behind on her tithe; will deal.
-- **The Buyer** (the Still Court's agent, unseen until late) — never steals, never lies, always has the paperwork. The villain who is *polite*.
+- **The Buyer** (the Court of Kept Things's agent, unseen until late) — never steals, never lies, always has the paperwork. The villain who is *polite*.
 
 ## Session 1 — "The Night of Lanterns" (runnable beat by beat; mirrors the app's timeline)
 
@@ -118,7 +118,7 @@ unchosen roads grow stranger and will be there in later sessions.
 
 - **Act 1** — the carnival (Session 1, above).
 - **Act 2** — the three roads (one per 1–2 sessions; each holds one character's Lost-Thing thread, a bargainer to out-lawyer with the app's contract quill, and one **fragment** for that character's Reliquary track).
-- **Act 3** — the Still Court: discover the flaw in the first bargain, gather the song's holders, and choose — void the bargain and let the Sea *change* again (things can be lost, and found), or keep the world safe and still. The players' Session-1 "honest answers" return as the Court's evidence.
+- **Act 3** — the Court of Kept Things: discover the flaw in the first bargain, gather the song's holders, and choose — void the bargain and let the Sea *change* again (things can be lost, and found), or keep the world safe and still. The players' Session-1 "honest answers" return as the Court's evidence.
 
 ## Running notes
 

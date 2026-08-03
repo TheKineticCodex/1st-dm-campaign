@@ -200,7 +200,7 @@ YOUR SCREEN in the right scene. Quick reminders only:
   loud. WRITE THEM DOWN (Notes tab) — they return in Act 3. Buttons: 🔔 toll
   bell, 🎪 chime.
 - **The Midway:** run a snail derby (⚔ go-table button). Fire **✉ Billy:
-  the page**. Sneaking finds the STILL COURT crates — same glass as Tarn's.
+  the page**. Sneaking finds the COURT OF KEPT THINGS crates — same glass as Tarn's.
 - **Grey-Gill's tent:** the heart. Fire the reading whispers ONE AT A TIME —
   Peaches, Billy, Philip, Freya, Freya Moon — with a beat of silence after
   each. Do the bubble-mime when she tries to name the Court. Buttons: all
