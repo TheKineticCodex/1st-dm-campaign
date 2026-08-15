@@ -1,9 +1,15 @@
-import { useState } from 'react'
-import { DmDashboard } from './components/DmDashboard'
+import { Suspense, lazy, useState } from 'react'
 import { JoinScreen } from './components/JoinScreen'
 import { NewPages } from './components/NewPages'
-import { TabShell } from './components/TabShell'
 import { getDeviceSession, initCalm, type DeviceSession } from './lib/storage'
+
+// The DM's Book is one device's worth of code; players never download it.
+const DmDashboard = lazy(() => import('./components/DmDashboard').then((m) => ({ default: m.DmDashboard })))
+const TabShell = lazy(() => import('./components/TabShell').then((m) => ({ default: m.TabShell })))
+
+const Lighting = () => (
+  <p style={{ color: '#A89ED0', textAlign: 'center', marginTop: 80, fontFamily: "'Alegreya', Georgia, serif" }}>The lanterns are lighting…</p>
+)
 
 initCalm()
 
@@ -13,9 +19,13 @@ function App() {
   const screen = !session ? (
     <JoinScreen onJoined={setSession} />
   ) : session.role === 'dm' ? (
-    <DmDashboard session={session} onLeave={() => setSession(null)} />
+    <Suspense fallback={<Lighting />}>
+      <DmDashboard session={session} onLeave={() => setSession(null)} />
+    </Suspense>
   ) : (
-    <TabShell session={session} onLeave={() => setSession(null)} />
+    <Suspense fallback={<Lighting />}>
+      <TabShell session={session} onLeave={() => setSession(null)} />
+    </Suspense>
   )
 
   return (

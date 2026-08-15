@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, Suspense, lazy } from 'react'
 import { clearDeviceSession, type DeviceSession, readCache, writeCache } from '../lib/storage'
 import { CLASSES } from '../data/rules'
 import { getStore } from '../lib/store'
@@ -12,15 +12,17 @@ import {
   type QuizResult,
   type SavedCharacter,
 } from '../types'
-import { BuildTab } from './BuildTab'
 import { CharacterCard } from './CharacterCard'
-import { FortuneTab } from './FortuneTab'
-import { GuideTab } from './GuideTab'
-import { StoryTab } from './StoryTab'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
-import { SpellsTab } from './SpellsTab'
-import { BagTab } from './BagTab'
+
+// Secondary tabs load on first visit — the sheet is what a phone opens to.
+const BuildTab = lazy(() => import('./BuildTab').then((m) => ({ default: m.BuildTab })))
+const FortuneTab = lazy(() => import('./FortuneTab').then((m) => ({ default: m.FortuneTab })))
+const GuideTab = lazy(() => import('./GuideTab').then((m) => ({ default: m.GuideTab })))
+const StoryTab = lazy(() => import('./StoryTab').then((m) => ({ default: m.StoryTab })))
+const SpellsTab = lazy(() => import('./SpellsTab').then((m) => ({ default: m.SpellsTab })))
+const BagTab = lazy(() => import('./BagTab').then((m) => ({ default: m.BagTab })))
 import { C, CalmToggle, body } from './ui'
 
 export type TabId = 'fortune' | 'build' | 'sheet' | 'spells' | 'bag' | 'story' | 'guide'
@@ -221,7 +223,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
             The lanterns are lighting…
           </p>
         ) : (
-          <>
+          <Suspense fallback={<p className="text-center mt-10" style={{ color: C.faint }}>The lanterns are lighting…</p>}>
             {tab === 'fortune' && (
               <FortuneTab
                 store={store}
@@ -275,7 +277,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
               />
             )}
             {tab === 'guide' && <GuideTab />}
-          </>
+          </Suspense>
         )}
       </div>
 
