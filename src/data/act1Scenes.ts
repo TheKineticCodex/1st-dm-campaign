@@ -4,11 +4,13 @@
 
 export interface SceneCue {
   label: string
-  kind: 'whisper' | 'sfx' | 'go-table'
+  kind: 'whisper' | 'sfx' | 'go-table' | 'song'
   /** whisper: prebuilt handout. target = exact player name, or null = all. */
   whisper?: { target: string | null; title: string; body: string; ephemeral?: boolean }
   /** sfx: preset key from lib/sfx.ts */
   sfx?: string
+  /** song: the Sea's song (lib/song.ts). 'whole' is gated behind a confirm. */
+  song?: 'carousel' | 'note' | 'whole' | 'seal-pup' | 'jar' | 'pookie'
 }
 
 export interface SceneMove {
@@ -276,6 +278,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     cues: [
       { label: '🌊 The silence where the sea was', kind: 'sfx', sfx: 'ocean' },
       { label: '🔔 The chapel bell (one soft note)', kind: 'sfx', sfx: 'bell' },
+      { label: '♪ The seal-pup hums three notes', kind: 'song', song: 'seal-pup' },
       {
         label: '✉ Billy: Tarn’s dark-sight',
         kind: 'whisper',
@@ -420,7 +423,8 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     },
     npcs: [],
     cues: [
-      { label: '🎪 The carousel tune', kind: 'sfx', sfx: 'carnival' },
+      { label: '🎠 The carousel — the song with the hole (loops)', kind: 'song', song: 'carousel' },
+      { label: '♪ The missing note, alone', kind: 'song', song: 'note' },
       { label: '🕳 The carnival leans in', kind: 'sfx', sfx: 'ominous' },
       {
         label: '✉ Peaches: the note is yours',
@@ -588,6 +592,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     },
     npcs: ['The jar-woman (Bog road)'],
     cues: [
+      { label: '♪ A jar hums back — reaching for the hole', kind: 'song', song: 'jar' },
       { label: '✨ A jar opens', kind: 'sfx', sfx: 'sparkle' },
       { label: '🔔 The barge horn (end the session)', kind: 'sfx', sfx: 'bell' },
       {
@@ -821,6 +826,9 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     },
     npcs: ['Brother Hush & Sister Hum', 'The Buyer'],
     cues: [
+      { label: '🎠 The carousel — one last time, broken', kind: 'song', song: 'carousel' },
+      { label: '🎵 THE SONG, WHOLE — the note lands (once)', kind: 'song', song: 'whole' },
+      { label: '🐊 Pookie hums (if she chooses the water)', kind: 'song', song: 'pookie' },
       { label: '🌊 The Sea rises', kind: 'sfx', sfx: 'ocean' },
       { label: '🔔 The chapel bell, alone', kind: 'sfx', sfx: 'bell' },
       {

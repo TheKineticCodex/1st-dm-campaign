@@ -10,6 +10,7 @@ import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
+import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
 import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, display } from './ui'
@@ -97,6 +98,8 @@ function RunNight({
   const [npcs, setNpcs] = useState<Npc[]>([])
   const [wonder, setWonder] = useState<string | null>(null)
   const [sentNote, setSentNote] = useState<string | null>(null)
+  const [carouselOn, setCarouselOn] = useState(isCarouselPlaying())
+  useEffect(() => subscribeSong(() => setCarouselOn(isCarouselPlaying())), [])
 
   const reload = async () => setNodes(await store.listStory())
 
@@ -130,6 +133,18 @@ function RunNight({
   const fireCue = (cue: SceneCue) => {
     if (cue.kind === 'sfx' && cue.sfx) {
       SFX[cue.sfx]?.play()
+      return
+    }
+    if (cue.kind === 'song' && cue.song) {
+      if (cue.song === 'carousel') toggleCarousel()
+      else if (cue.song === 'note') playMissingNote()
+      else if (cue.song === 'whole') {
+        // The one thing in the app that must never sound by accident.
+        if (window.confirm('This plays the Sea’s song WHOLE — the note lands, once. Are you at the end?')) {
+          playWhole()
+          note('The song, whole. ✦')
+        }
+      } else playFragment(cue.song)
       return
     }
     if (cue.kind === 'go-table') {
@@ -286,9 +301,11 @@ function RunNight({
               {guide.cues.map((cue) => {
                 const missing =
                   cue.kind === 'whisper' && cue.whisper?.target && !rosterNames.has(cue.whisper.target)
+                const label =
+                  cue.kind === 'song' && cue.song === 'carousel' && carouselOn ? '■ stop the carousel' : cue.label
                 return (
                   <button
-                    key={cue.label}
+                    key={label}
                     type="button"
                     disabled={!!missing}
                     onClick={() => fireCue(cue)}
@@ -385,6 +402,38 @@ function RunNight({
       {/* the soundboard */}
       <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
         <Eyebrow>the soundboard — plays from this MacBook</Eyebrow>
+        <div className="flex flex-wrap gap-2 mt-1 mb-3">
+          <button
+            type="button"
+            onClick={toggleCarousel}
+            className="rounded-lg px-3 py-2 text-sm"
+            style={{
+              background: carouselOn ? `${C.gold}33` : C.night,
+              border: `1px solid ${carouselOn ? C.gold : C.panelEdge}`,
+              color: C.parchment,
+              minHeight: 44,
+              cursor: 'pointer',
+            }}
+          >
+            {carouselOn ? '■ stop the carousel' : '🎠 The carousel — the song with the hole (loops)'}
+          </button>
+          <button
+            type="button"
+            onClick={playMissingNote}
+            className="rounded-lg px-3 py-2 text-sm"
+            style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+          >
+            ♪ The missing note, alone
+          </button>
+          <button
+            type="button"
+            onClick={stopSong}
+            className="rounded-lg px-3 py-2 text-sm"
+            style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.faint, minHeight: 44, cursor: 'pointer' }}
+          >
+            ■ silence the song
+          </button>
+        </div>
         <div className="flex flex-wrap gap-2 mt-1">
           {Object.entries(SFX).map(([key, s]) => (
             <button
