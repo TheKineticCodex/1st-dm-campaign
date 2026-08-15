@@ -21,8 +21,8 @@ jobs:
         env:
           DM_CODE: ${{ inputs.dm_code }}
         run: |
-          ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxemJvZnJ2YWhpb3B0cnJnY2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyODUxODMsImV4cCI6MjA5OTg2MTE4M30.l3P3CdizfVJkHDUPnlc8nGSIyhx0aEWiGJjqZ3PCK8s"
-          curl -sf -X POST "https://dqzbofrvahioptrrgche.supabase.co/rest/v1/rpc/dm_roster" \
+          ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxneWhpdnZmdXZveWF0cXpoYXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyNzE5NTMsImV4cCI6MjA5OTg0Nzk1M30.ILDoQUHbZLB0zVIzGnHcQbZOu9D-MqHDYU6hTU6Dy1E"
+          curl -sf -X POST "https://lgyhivvfuvoyatqzhath.supabase.co/rest/v1/rpc/dm_roster" \
             -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
             -H "Content-Type: application/json" \
             -d "{\"p_dm_code\":\"$DM_CODE\"}" \
