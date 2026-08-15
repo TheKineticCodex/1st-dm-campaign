@@ -208,7 +208,7 @@ export function CalmToggle() {
         setCalm(!calm)
       }}
       className="text-xs"
-      style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+      style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer', whiteSpace: 'nowrap' }}
       title="Toggle animations"
     >
       {calm ? 'wake the lanterns' : 'calm the lanterns'}

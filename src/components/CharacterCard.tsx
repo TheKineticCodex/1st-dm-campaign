@@ -30,9 +30,10 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
       }}
     >
       <div style={{ position: 'relative', width: ring, height: ring, flexShrink: 0 }}>
-        {/* aura halo */}
+        {/* aura halo — leans with the phone when the light is awake */}
         <div
           aria-hidden="true"
+          className="lantern-lean"
           style={{
             position: 'absolute',
             inset: compact ? -4 : -10,
@@ -70,6 +71,7 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
               </span>
             )
           )}
+          <span className="lantern-sheen" aria-hidden="true" />
         </div>
         {/* class badge */}
         {classSigil && (

@@ -425,3 +425,122 @@ html.calm .stage-fx,
 html.calm .stage-fx * {
   animation: none !important;
 }
+
+/* the dice theatre */
+@keyframes moteRise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-140px) translateX(var(--drift, 0)) scale(0.2); opacity: 0; }
+}
+@keyframes natTwentyGlow {
+  0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 24px 4px rgba(232,184,75,.35); }
+  50% { box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 60px 16px rgba(232,184,75,.65); }
+}
+@keyframes natOneGutter {
+  0% { transform: translateY(0); filter: brightness(1.4); }
+  30% { transform: translateY(6px); }
+  100% { transform: translateY(0); filter: brightness(1); }
+}
+html.calm #sea-dice-3d { display: none; }
+
+/* ---------------------------------------------------------- the motion system */
+
+/* press feedback: every real button gives a little under the thumb */
+button:not(:disabled) {
+  transition: transform 90ms cubic-bezier(.2,.8,.2,1), filter 90ms ease;
+}
+button:not(:disabled):active {
+  transform: scale(0.96);
+  filter: brightness(1.08);
+}
+html.calm button:not(:disabled):active {
+  transform: none;
+  filter: none;
+}
+
+/* rolling digits (odometer): real digit text sits transparent; a column of 0–9 slides over it */
+.rolling-number {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+}
+.rolling-digit {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+}
+.rolling-digit-text { color: transparent; }
+.rolling-digit-col {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: transform 520ms cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.rolling-digit-col::before {
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  white-space: pre;
+  display: block;
+  line-height: 1;
+}
+
+/* the lantern light — gyroscope-driven sheen and lean, all in CSS vars */
+:root { --tilt-x: 0; --tilt-y: 0; }
+.lantern-lean {
+  transform: translate(calc(var(--tilt-x) * -6px), calc(var(--tilt-y) * -6px));
+  transition: transform 120ms linear;
+}
+.lantern-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at calc(50% + var(--tilt-x) * 45%) calc(35% + var(--tilt-y) * 45%),
+    rgba(255, 246, 214, 0.28) 0%,
+    rgba(255, 246, 214, 0.08) 28%,
+    transparent 55%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity .8s ease;
+}
+html.tilt .lantern-sheen { opacity: 1; }
+.parchment-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    calc(115deg + var(--tilt-x) * 40deg),
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) calc(50% + var(--tilt-x) * 25%),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity .8s ease;
+}
+html.tilt .parchment-sheen { opacity: 1; }
+
+/* view transitions between tabs: the page slides a breath, the bars stay */
+@keyframes vtOut { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(10px); } }
+::view-transition-old(root) { animation: 160ms ease-in both vtOut; }
+::view-transition-new(root) { animation: 260ms cubic-bezier(.2,.8,.2,1) both vtIn; }
+.vt-static { view-transition-name: var(--vt-name); }
+::view-transition-old(tabbar), ::view-transition-new(tabbar),
+::view-transition-old(topbar), ::view-transition-new(topbar) { animation: none; }
+
+/* casting flourish */
+@keyframes castRise {
+  0% { opacity: 0; transform: translate(-50%, 20px) scale(.96); }
+  15% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -18px) scale(1.02); }
+}
+@keyframes emberEdge {
+  0% { box-shadow: 0 0 0 0 rgba(255,140,60,.0), inset 0 0 0 0 rgba(255,140,60,0); }
+  30% { box-shadow: 0 0 28px 6px rgba(255,150,70,.55), inset 0 0 18px 2px rgba(255,150,70,.35); }
+  100% { box-shadow: 0 0 0 0 rgba(255,140,60,0), inset 0 0 0 0 rgba(255,140,60,0); }
+}

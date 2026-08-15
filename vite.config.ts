@@ -52,6 +52,7 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/scheduler')) return 'react'
           if (id.includes('node_modules/@supabase')) return 'supabase'
           if (id.includes('node_modules/tone/')) return 'tone'
+          if (id.includes('dice-box-threejs')) return 'dice3d'
           return undefined
         },
       },

@@ -18,6 +18,9 @@ import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
 import { YourTurn } from './YourTurn'
 import { armPhoneSound, buzz, chimeUpNext } from '../lib/phoneSound'
+import { clearDice3d, warmDice3d } from '../lib/dice3d'
+import { startTilt, tiltPermission, tiltPossible } from '../lib/tilt'
+import { LanternToggle, goWithTransition } from './motion'
 import { computeSheet } from '../lib/compute'
 
 // Secondary tabs load on first visit — the sheet is what a phone opens to.
@@ -73,6 +76,30 @@ export function TabShell({ session, onLeave }: TabShellProps) {
 
   useEffect(() => keepGlassLit(), [])
   useEffect(() => armPhoneSound(), [])
+
+  // Once a sheet exists: warm the dice engine in the background, and — where
+  // no permission prompt is needed (Android) or it was granted before — let
+  // the lantern light follow the hand from the first touch.
+  useEffect(() => {
+    if (!character) return
+    warmDice3d()
+    if (!tiltPossible()) return
+    const DOE = DeviceOrientationEvent as unknown as { requestPermission?: unknown }
+    const needsPrompt = typeof DOE.requestPermission === 'function'
+    if (needsPrompt && tiltPermission() !== 'granted') return
+    const once = () => {
+      void startTilt()
+      window.removeEventListener('pointerdown', once)
+    }
+    window.addEventListener('pointerdown', once, { passive: true })
+    return () => window.removeEventListener('pointerdown', once)
+  }, [character])
+
+  /** Change tabs under a page transition (Safari 18+/Chrome); plain otherwise. */
+  const go = (id: TabId) => {
+    clearDice3d()
+    goWithTransition(() => setTab(id))
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -239,12 +266,13 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         <YourTurn character={character} sheet={liveSheet} onGo={() => setTurnSeen(true)} />
       )}
       <div className="w-full" style={{ maxWidth: 560 }}>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4" style={{ viewTransitionName: 'topbar' }}>
           <p className="text-xs" style={{ color: C.faint }}>
             ✦ {session.playerName} · {session.campaignCode}
             {!store.shared && ' · offline'}
           </p>
           <span className="flex items-center gap-3">
+            {character && <LanternToggle />}
             <CalmToggle />
             <button
               type="button"
@@ -386,6 +414,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
           backdropFilter: 'blur(8px)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           zIndex: 50,
+          viewTransitionName: 'tabbar',
         }}
         aria-label="Sections"
       >
@@ -394,7 +423,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
             <button
               key={id}
               type="button"
-              onClick={() => setTab(id)}
+              onClick={() => go(id)}
               className="flex-1 py-3 text-center"
               style={{ color: tab === id ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
               aria-current={tab === id ? 'page' : undefined}

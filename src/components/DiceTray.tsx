@@ -5,6 +5,8 @@
 
 import { useState } from 'react'
 import { rollD20, rollDice, type RollMode, type RollResult } from '../lib/dice'
+import { rollDice3d } from '../lib/dice3d'
+import { buzz } from '../lib/phoneSound'
 import { readCache, writeCache } from '../lib/storage'
 import { C, display } from './ui'
 
@@ -30,6 +32,7 @@ export function DiceTray({ mode, onD20 }: DiceTrayProps) {
   const [modifier, setModifier] = useState(0)
   const [history, setHistory] = useState<TrayRoll[]>(() => readCache<TrayRoll[]>('dice-history') ?? [])
   const [last, setLast] = useState<TrayRoll | null>(null)
+  const [inTheAir, setInTheAir] = useState(false)
 
   const chip = (on: boolean) => ({
     background: on ? C.gold : C.night,
@@ -52,6 +55,18 @@ export function DiceTray({ mode, onD20 }: DiceTrayProps) {
     } else {
       const rolls = rollDice(count, die)
       entry = { label, rolls, modifier, total: rolls.reduce((s, x) => s + x, 0) + modifier, at: Date.now() }
+      // the theatre: real dice tumble to these numbers, then the total lands
+      setLast(null)
+      setInTheAir(true)
+      void rollDice3d([{ die, values: rolls }]).then(() => {
+        setInTheAir(false)
+        setLast(entry)
+        buzz(18)
+      })
+      const next = [entry, ...history].slice(0, 6)
+      setHistory(next)
+      writeCache('dice-history', next)
+      return
     }
     setLast(entry)
     const next = [entry, ...history].slice(0, 6)
@@ -103,8 +118,13 @@ export function DiceTray({ mode, onD20 }: DiceTrayProps) {
         {modifier ? (modifier > 0 ? ` +${modifier}` : ` ${modifier}`) : ''}
         {die === 20 && count === 1 && mode !== 'normal' ? ` · ${mode}` : ''}
       </button>
+      {inTheAir && (
+        <p className="text-center mt-2 text-xs uppercase tracking-widest" style={{ color: C.gold, letterSpacing: '0.25em', animation: 'ceremony-fade 2s ease-out infinite' }}>
+          in the air…
+        </p>
+      )}
       {last && (
-        <p className="text-center mt-2" style={{ color: C.parchment }}>
+        <p className="text-center mt-2" style={{ color: C.parchment, animation: 'cardRise .3s ease-out' }}>
           <span style={{ ...display, fontSize: 28, fontWeight: 700, color: C.gold }}>{last.total}</span>
           <span className="text-xs block" style={{ color: C.faint }}>
             {last.label} · [{last.rolls.join(', ')}]{last.modifier ? ` ${last.modifier > 0 ? '+' : ''}${last.modifier}` : ''}

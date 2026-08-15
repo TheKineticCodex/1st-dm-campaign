@@ -8,6 +8,7 @@
 // never chosen — so every existing sheet keeps working unchanged.
 
 import { useState } from 'react'
+import { buzz } from '../lib/phoneSound'
 import { fmt } from '../data/rules'
 import { SPELL_NOTES } from '../data/spells'
 import {
@@ -79,10 +80,13 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
     opacity: disabled ? 0.6 : 1,
   })
 
+  const [casting, setCasting] = useState<{ name: string; lvl: number | null; key: number } | null>(null)
   const cast = (sp: Spell | undefined, name: string, slotLvl: number | null) => {
     castSpell(slotLvl, !!sp?.tags?.includes('C'))
     setOpen(null)
-    void name
+    setCasting({ name, lvl: slotLvl, key: Date.now() })
+    buzz([20, 30, 60])
+    setTimeout(() => setCasting((c) => (c && Date.now() - c.key > 1500 ? null : c)), 1700)
   }
 
   const card = (name: string) => {
@@ -169,6 +173,33 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
 
   return (
     <Section>
+      {casting && (
+        <div
+          key={casting.key}
+          role="status"
+          className="fixed rounded-2xl px-6 py-4 text-center"
+          style={{
+            left: '50%',
+            bottom: 'calc(96px + env(safe-area-inset-bottom))',
+            transform: 'translateX(-50%)',
+            minWidth: 240,
+            maxWidth: 'calc(100vw - 32px)',
+            background: `${C.night}F2`,
+            border: `1px solid ${C.gold}`,
+            color: C.parchment,
+            zIndex: 47,
+            pointerEvents: 'none',
+            animation: 'castRise 1.7s cubic-bezier(.2,.8,.2,1) both, emberEdge 1.7s ease-out both',
+          }}
+        >
+          <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+            {casting.lvl ? `${ordinal(casting.lvl)}-level slot spent` : 'cantrip'}
+          </p>
+          <p style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>
+            ✦ {casting.name}
+          </p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <Eyebrow>Spellcasting</Eyebrow>
         {canEdit && (

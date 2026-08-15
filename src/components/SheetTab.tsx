@@ -7,11 +7,13 @@ import { useEffect, useRef, useState } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
 import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
+import { clearDice3d, rollDice3d, type DiceSpec } from '../lib/dice3d'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
+import { RollingNumber } from './motion'
 import { DiceTray } from './DiceTray'
 import { buzz, heartbeat } from '../lib/phoneSound'
 import { LevelUp } from './LevelUp'
@@ -28,6 +30,30 @@ interface SheetTabProps {
   playerName: string
   /** The level the Lantern-Keeper has announced (0 = none yet). */
   announcedLevel?: number
+}
+
+/** A natural 20: sparks up from the card. Pure CSS, twelve motes. */
+function GoldBurst() {
+  return (
+    <span aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+      {Array.from({ length: 14 }, (_, i) => (
+        <span
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${8 + ((i * 37) % 84)}%`,
+            bottom: 6,
+            width: 6 + (i % 3) * 3,
+            height: 6 + (i % 3) * 3,
+            borderRadius: '50%',
+            background: i % 4 === 0 ? '#FFF6D0' : C.parchment,
+            boxShadow: '0 0 10px #FFF1B8',
+            animation: `moteRise ${1.4 + (i % 5) * 0.25}s ease-out ${(i % 7) * 0.09}s both`,
+          }}
+        />
+      ))}
+    </span>
+  )
 }
 
 const ordinal = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`)
@@ -291,6 +317,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
   const [hpMore, setHpMore] = useState(false)
   const [roll, setRoll] = useState<RollResult | null>(null)
   const [damage, setDamage] = useState<{ rolls: number[]; total: number } | null>(null)
+  const [inTheAir, setInTheAir] = useState(false)
   const [showConditionPicker, setShowConditionPicker] = useState(false)
   const [concPrompt, setConcPrompt] = useState(false)
   const [concOutcome, setConcOutcome] = useState<'held' | 'slipped' | null>(null)
@@ -328,7 +355,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
     const t = setTimeout(() => {
       setRoll(null)
       setDamage(null)
-    }, 6000)
+      clearDice3d()
+    }, 6500)
     return () => clearTimeout(t)
   }, [roll])
 
@@ -382,11 +410,30 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
     })
   }
 
-  const doRoll = (label: string, modifier: number) => {
+  /**
+   * Show a roll the way a table sees one: the dice tumble (real physics,
+   * forced to land on the numbers already rolled), THEN the card lands.
+   * If the theatre isn't available the card just appears.
+   */
+  const present = async (r: RollResult, dmg: { rolls: number[]; total: number; die?: number } | null) => {
+    setRoll(null)
     setDamage(null)
-    const r = rollD20(label, modifier, rollMode)
+    const spec: DiceSpec[] = [{ die: 20, values: r.mode === 'normal' ? [r.dice[0]] : [r.dice[0], r.dice[1]] }]
+    if (dmg?.die && dmg.rolls.length) spec.push({ die: dmg.die, values: dmg.rolls })
+    setInTheAir(true)
+    await rollDice3d(spec)
+    setInTheAir(false)
     setRoll(r)
+    setDamage(dmg ? { rolls: dmg.rolls, total: dmg.total } : null)
+    if (r.isNat20) buzz([30, 40, 30, 40, 90])
+    else if (r.isNat1) buzz(160)
+    else buzz(18)
+  }
+
+  const doRoll = (label: string, modifier: number) => {
+    const r = rollD20(label, modifier, rollMode)
     broadcastRoll(r)
+    void present(r, null)
   }
 
   // No weapon equipped in the Bag → fists. Unarmed strike: STR + prof to
@@ -397,21 +444,21 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
   const rollAttack = () => {
     if (!weaponInHand) {
       const r = rollD20('Unarmed strike', unarmedMod, rollMode)
-      setRoll(r)
       broadcastRoll(r)
-      setDamage({ rolls: [], total: Math.max(1, 1 + mod(sheet.A.STR)) })
+      void present(r, { rolls: [], total: Math.max(1, 1 + mod(sheet.A.STR)) })
       return
     }
     const r = rollD20(`${sheet.K.weapon.name} attack`, sheet.atkMod, rollMode)
-    setRoll(r)
     broadcastRoll(r)
-    setDamage(rollDamage(sheet.K.weapon.die, mod(sheet.A[sheet.K.weapon.ab])))
+    const dmg = rollDamage(sheet.K.weapon.die, mod(sheet.A[sheet.K.weapon.ab]))
+    const die = Number(sheet.K.weapon.die.match(/d(\d+)/)?.[1] ?? 0) || undefined
+    void present(r, { ...dmg, die })
   }
 
   const rollConcentration = () => {
     const r = rollD20('Concentration (CON save)', saveMod(sheet, 'CON'), rollMode)
-    setRoll(r)
     broadcastRoll(r)
+    void present(r, null)
     const held = r.total >= 10
     setConcOutcome(held ? 'held' : 'slipped')
     setConcPrompt(false)
@@ -495,7 +542,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               whiteSpace: 'nowrap',
             }}
           >
-            ♥ {hpCurrent}/{sheet.hpMax}
+            ♥ <RollingNumber value={hpCurrent} />/{sheet.hpMax}
           </span>
           <span className="text-sm" style={{ color: C.faint, whiteSpace: 'nowrap' }}>
             🛡 {sheet.ac.val}
@@ -563,9 +610,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           <DiceTray
             mode={rollMode}
             onD20={(r) => {
-              setDamage(null)
-              setRoll(r)
               broadcastRoll(r)
+              void present(r, null)
             }}
           />
         )}
@@ -591,12 +637,13 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
       {/* HP / AC / Speed */}
       <div className="grid grid-cols-3 gap-2 mt-3">
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink }}>
+        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+          <span className="parchment-sheen" aria-hidden="true" />
           <p className="text-xs" style={{ color: C.goldDim }}>
             HP
           </p>
           <p style={{ ...display, fontSize: 26, fontWeight: 700 }}>
-            {hpCurrent}/{sheet.hpMax}
+            <RollingNumber value={hpCurrent} />/{sheet.hpMax}
           </p>
           <div className="flex justify-center gap-2 mt-1">
             <button
@@ -627,13 +674,15 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             {hpMore ? 'less' : 'more…'}
           </button>
         </div>
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink }}>
+        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+          <span className="parchment-sheen" aria-hidden="true" />
           <p className="text-xs" style={{ color: C.goldDim }}>
             AC
           </p>
           <p style={{ ...display, fontSize: 26, fontWeight: 700 }}>{sheet.ac.val}</p>
         </div>
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink }}>
+        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+          <span className="parchment-sheen" aria-hidden="true" />
           <p className="text-xs" style={{ color: C.goldDim }}>
             Speed
           </p>
@@ -1119,6 +1168,15 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
       </Btn>
 
       {/* Roll result card */}
+      {inTheAir && !roll && (
+        <p
+          role="status"
+          className="fixed left-0 right-0 text-center text-xs uppercase tracking-widest"
+          style={{ bottom: 'calc(84px + env(safe-area-inset-bottom))', color: C.gold, letterSpacing: '0.3em', zIndex: 40, pointerEvents: 'none', animation: 'ceremony-fade 2s ease-out infinite' }}
+        >
+          the dice are in the air
+        </p>
+      )}
       {roll && (
         <div
           role="status"
@@ -1131,14 +1189,17 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             color: roll.isNat20 ? C.ink : C.parchment,
             border: `1px solid ${roll.isNat20 ? C.gold : roll.isNat1 ? '#C96A6A' : C.panelEdge}`,
             boxShadow: '0 8px 32px rgba(0,0,0,.5)',
-            animation: 'cardRise .3s ease-out',
-            zIndex: 40,
+            animation: roll.isNat20 ? 'cardRise .3s ease-out, natTwentyGlow 1.6s ease-in-out infinite' : roll.isNat1 ? 'cardRise .3s ease-out, natOneGutter .5s ease-out' : 'cardRise .3s ease-out',
+            zIndex: 46,
+            overflow: 'hidden',
           }}
           onClick={() => {
             setRoll(null)
             setDamage(null)
+            clearDice3d()
           }}
         >
+          {roll.isNat20 && <GoldBurst />}
           <p className="text-xs uppercase tracking-widest" style={{ opacity: 0.8 }}>
             {roll.label}
             {roll.mode !== 'normal' ? ` · ${roll.mode}` : ''}
