@@ -386,3 +386,9 @@ html.calm * {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Battle mode: the dying section breathes. (Reduced motion is already honoured above.) */
+@keyframes dyingPulse {
+  0%, 100% { box-shadow: 0 0 18px #C96A6A33; }
+  50% { box-shadow: 0 0 40px #C96A6A77; }
+}

@@ -131,3 +131,37 @@ test('the guide: search finds an action, a condition, and a guide card', async (
   await expect(page.getByRole('button', { name: /^Grappled/ })).toBeVisible()
   await expect(page.getByRole('button', { name: /Grappling & shoving/ })).toBeVisible()
 })
+
+test('battle mode: your turn takes over the phone, shows what you can do, then drops to the sheet', async ({ page }) => {
+  await seedPlayer(page, 'Philip', fighter, {
+    encounter: {
+      id: 'enc1',
+      active: true,
+      activeIndex: 1,
+      order: [
+        { id: 'a', name: 'The Understudy', init: 18, isPc: false },
+        { id: 'b', name: 'Philip', init: 15, isPc: true, playerName: 'Philip' },
+        { id: 'c', name: 'Peaches', init: 12, isPc: true, playerName: 'Peaches capiche' },
+      ],
+    },
+  })
+  const dialog = page.getByRole('dialog', { name: 'Your turn' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByText('Your turn', { exact: true })).toBeVisible()
+  await expect(dialog.getByText(/Attack/)).toBeVisible()
+  await expect(dialog.getByText(/Second Wind/)).toBeVisible()
+  await expect(dialog.getByText(/Combat Superiority/)).toBeVisible()
+  await expect(dialog.getByText(/Dodge/)).toBeVisible()
+  await dialog.getByRole('button', { name: /Let’s go/ }).click()
+  await expect(dialog).toHaveCount(0)
+  // the strip stays while it's still your turn
+  await expect(page.getByRole('status')).toContainText('Your turn')
+})
+
+test('battle mode: at 0 HP the death-save ceremony shows and the DM-facing vitals reflect it', async ({ page }) => {
+  const down = { ...fighter, state: { ...fighter.state, damage: 36 } }
+  await seedPlayer(page, 'Philip', down)
+  await expect(page.getByText('Death saving throws — hold on')).toBeVisible()
+  await expect(page.getByRole('button', { name: /Roll a death save/ })).toBeVisible()
+  await expect(page.getByText('♥ 0/36')).toBeVisible()
+})

@@ -11,10 +11,14 @@ import {
   type CharacterBuild,
   type QuizResult,
   type SavedCharacter,
+  type VitalsEvent,
 } from '../types'
 import { CharacterCard } from './CharacterCard'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
+import { YourTurn } from './YourTurn'
+import { armPhoneSound, buzz, chimeUpNext } from '../lib/phoneSound'
+import { computeSheet } from '../lib/compute'
 
 // Secondary tabs load on first visit — the sheet is what a phone opens to.
 const BuildTab = lazy(() => import('./BuildTab').then((m) => ({ default: m.BuildTab })))
@@ -63,9 +67,12 @@ export function TabShell({ session, onLeave }: TabShellProps) {
   const [draftBuild, setDraftBuild] = useState<CharacterBuild>(EMPTY_BUILD)
   const [quiz, setQuiz] = useState<QuizResult | null>(null)
   const [announcedLevel, setAnnouncedLevel] = useState<number>(() => readCache<number>('announced-level') ?? 0)
+  const [turn, setTurn] = useState<{ mine: boolean; next: boolean }>({ mine: false, next: false })
+  const [turnSeen, setTurnSeen] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => keepGlassLit(), [])
+  useEffect(() => armPhoneSound(), [])
 
   useEffect(() => {
     let cancelled = false
@@ -84,6 +91,21 @@ export function TabShell({ session, onLeave }: TabShellProps) {
       cancelled = true
     }
   }, [store])
+
+  const liveSheet = character ? computeSheet(character.build) : null
+  const vitals: VitalsEvent | null =
+    character && liveSheet
+      ? {
+          playerName: session.playerName,
+          characterName: character.build.name || session.playerName,
+          hp: Math.max(0, liveSheet.hpMax - character.state.damage),
+          hpMax: liveSheet.hpMax,
+          deathSaves: character.state.deathSaves,
+          conditions: character.state.conditions,
+          concentrating: !!character.state.concentrating,
+          at: character.updatedAt,
+        }
+      : null
 
   const persistCharacter = (c: SavedCharacter) => {
     setCharacter(c)
@@ -198,7 +220,24 @@ export function TabShell({ session, onLeave }: TabShellProps) {
             return next
           })
         }}
+        onTurn={(mine, next) => {
+          setTurn((cur) => {
+            if (mine && !cur.mine) {
+              setTurnSeen(false)
+              setTab('sheet')
+            }
+            if (next && !cur.next && !mine) {
+              chimeUpNext()
+              buzz(40)
+            }
+            return { mine, next }
+          })
+        }}
+        vitals={vitals}
       />
+      {turn.mine && !turnSeen && character && liveSheet && (
+        <YourTurn character={character} sheet={liveSheet} onGo={() => setTurnSeen(true)} />
+      )}
       <div className="w-full" style={{ maxWidth: 560 }}>
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: C.faint }}>

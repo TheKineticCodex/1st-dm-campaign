@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
-import type { Bargain, Encounter, Handout, RaceEvent } from '../types'
+import type { Bargain, Encounter, Handout, RaceEvent, VitalsEvent } from '../types'
 import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
 import { C, display } from './ui'
@@ -20,6 +20,10 @@ interface PlayerLiveProps {
   onCondition: (condition: string, active: boolean) => void
   /** DM announced a party level (rides on a handout so late joiners hear it). */
   onLevel?: (level: number) => void
+  /** Turn state for this player: (myTurn, upNext). Fires on every change. */
+  onTurn?: (myTurn: boolean, upNext: boolean) => void
+  /** This phone's live vitals; broadcast to the DM whenever they change. */
+  vitals?: VitalsEvent | null
   /** A1: a contract offer arrived — record it as 'offered'. */
   onBargainOffer: (b: Bargain) => void
   /** A1: the player signed — seal it with their hand. */
@@ -43,6 +47,8 @@ export function PlayerLive({
   onBargainSign,
   onBargainResolve,
   onLevel,
+  onTurn,
+  vitals,
 }: PlayerLiveProps) {
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [handout, setHandout] = useState<Handout | null>(null)
@@ -62,6 +68,8 @@ export function PlayerLive({
   onBargainResolveRef.current = onBargainResolve
   const onLevelRef = useRef(onLevel)
   onLevelRef.current = onLevel
+  const onTurnRef = useRef(onTurn)
+  onTurnRef.current = onTurn
 
   useEffect(() => {
     let cancelled = false
@@ -162,6 +170,22 @@ export function PlayerLive({
     encounter && encounter.order[encounter.activeIndex]?.playerName === playerName
   const nextIndex = encounter ? (encounter.activeIndex + 1) % encounter.order.length : 0
   const upNext = encounter && encounter.order[nextIndex]?.playerName === playerName
+
+  // Tell the shell when the turn state changes (it shows the tap-on-the-shoulder).
+  useEffect(() => {
+    onTurnRef.current?.(!!myTurn, !!upNext)
+  }, [myTurn, upNext, encounter?.id, encounter?.activeIndex])
+
+  // Vitals: broadcast on change, gently throttled. The DM's glance goes live.
+  const vitalsTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!vitals) return
+    if (vitalsTimer.current) clearTimeout(vitalsTimer.current)
+    vitalsTimer.current = setTimeout(() => channelRef.current?.sendVitals(vitals), 350)
+    return () => {
+      if (vitalsTimer.current) clearTimeout(vitalsTimer.current)
+    }
+  }, [vitals])
 
   return (
     <>

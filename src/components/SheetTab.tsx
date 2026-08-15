@@ -13,6 +13,7 @@ import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
 import { DiceTray } from './DiceTray'
+import { buzz, heartbeat } from '../lib/phoneSound'
 import { LevelUp } from './LevelUp'
 import type { Feature } from '../data/levels'
 import { SpellChips, SpellsSection } from './SpellsSection'
@@ -307,6 +308,19 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
       channelRef.current?.close()
     }
   }, [store])
+
+  // Dying: a heartbeat under everything, and a buzz, until healed. (Battle mode P2.)
+  const dyingNow = !!character && (() => {
+    const sh = computeSheet(character.build)
+    return !!sh && sh.hpMax - character.state.damage <= 0
+  })()
+  useEffect(() => {
+    if (!dyingNow) return
+    heartbeat()
+    buzz([80, 120, 80])
+    const t = setInterval(() => heartbeat(), 2400)
+    return () => clearInterval(t)
+  }, [dyingNow])
 
   // Auto-dismiss the roll card after a few beats.
   useEffect(() => {
@@ -677,7 +691,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
       {/* Death saves at 0 HP */}
       {dying && (
-        <Section style={{ marginTop: 12, border: `1px solid ${C.gold}` }}>
+        <Section style={{ marginTop: 12, border: `2px solid #C96A6A`, boxShadow: '0 0 28px #C96A6A44', animation: 'dyingPulse 1.6s ease-in-out infinite' }}>
           <Eyebrow>Death saving throws — hold on</Eyebrow>
           <div className="flex items-center justify-between mt-1">
             <span className="text-sm">Successes</span>

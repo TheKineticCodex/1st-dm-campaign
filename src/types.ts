@@ -221,6 +221,18 @@ export interface RollEvent {
   at: string
 }
 
+/** A phone's live vitals, broadcast so the DM's glance is instant (battle mode P2). */
+export interface VitalsEvent {
+  playerName: string
+  characterName: string
+  hp: number
+  hpMax: number
+  deathSaves: { successes: number; failures: number }
+  conditions: string[]
+  concentrating: boolean
+  at: string
+}
+
 export interface ConditionEvent {
   targetPlayer: string
   condition: string

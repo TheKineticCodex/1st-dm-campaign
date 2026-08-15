@@ -9,7 +9,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
-import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
+import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent } from '../types'
 import { MapBoard } from './MapBoard'
 import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
 
@@ -36,7 +36,7 @@ interface TableSectionProps {
 }
 
 /** Combat glance-strip: every character's HP, AC, and conditions in one line. */
-function PartyGlance({ roster }: { roster: RosterEntry[] }) {
+function PartyGlance({ roster, live }: { roster: RosterEntry[]; live: Record<string, VitalsEvent> }) {
   const chars = roster.filter((r) => r.character)
   if (chars.length === 0) return null
   return (
@@ -44,9 +44,14 @@ function PartyGlance({ roster }: { roster: RosterEntry[] }) {
       {chars.map((r) => {
         const sheet = computeSheet(r.character!.build)
         if (!sheet) return null
-        const st = r.character!.state
-        const hp = Math.max(0, sheet.hpMax - (st?.damage ?? 0))
-        const frac = hp / sheet.hpMax
+        const v = live[r.playerName]
+        // Live vitals from the phone win over the (30s-old) roster row.
+        const st = v
+          ? { damage: v.hpMax - v.hp, conditions: v.conditions, concentrating: v.concentrating, deathSaves: v.deathSaves }
+          : r.character!.state
+        const hpMax = v?.hpMax ?? sheet.hpMax
+        const hp = Math.max(0, hpMax - (st?.damage ?? 0))
+        const frac = hp / hpMax
         const barColor = hp === 0 ? '#C96A6A' : frac <= 1 / 3 ? '#E0928F' : C.sea
         return (
           <div
@@ -67,9 +72,15 @@ function PartyGlance({ roster }: { roster: RosterEntry[] }) {
                 <div style={{ width: `${frac * 100}%`, height: '100%', background: barColor, transition: 'width .3s ease' }} />
               </div>
               <p className="text-xs" style={{ color: barColor, whiteSpace: 'nowrap' }}>
-                {hp}/{sheet.hpMax}
+                {hp}/{hpMax}
               </p>
             </div>
+            {hp === 0 && (
+              <p className="text-xs mt-1" style={{ color: '#E0928F' }}>
+                dying · {'✦'.repeat(st?.deathSaves?.successes ?? 0)}{'·'.repeat(3 - (st?.deathSaves?.successes ?? 0))} saves ·{' '}
+                {'✕'.repeat(st?.deathSaves?.failures ?? 0)}{'·'.repeat(3 - (st?.deathSaves?.failures ?? 0))} fails
+              </p>
+            )}
             {((st?.conditions?.length ?? 0) > 0 || st?.concentrating) && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {st?.concentrating && (
@@ -96,6 +107,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [feed, setFeed] = useState<RollEvent[]>([])
+  const [live, setLive] = useState<Record<string, VitalsEvent>>({})
   const [race, setRace] = useState<DmRace | null>(null)
   const raceRef = useRef<DmRace | null>(null)
   raceRef.current = race
@@ -107,6 +119,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
       if (cancelled) return
       channelRef.current = joinTableChannel(channelId, {
         roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
+        vitals: (v: VitalsEvent) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
         race: (r: RaceEvent) => {
           const cur = raceRef.current
           if (!cur || r.raceId !== cur.raceId || cur.ended) return
@@ -186,7 +199,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         </HintOnce>
       </div>
 
-      <PartyGlance roster={roster} />
+      <PartyGlance roster={roster} live={live} />
 
       <div className="mt-3" />
       <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen>
