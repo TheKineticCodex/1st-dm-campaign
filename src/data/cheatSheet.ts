@@ -12,11 +12,20 @@ export interface CheatCard {
 
 /** The story, in one breath. Read this when you forget what it's about. */
 export const STORY_IN_A_BREATH = [
-  'The Sea had a song. Its heart broke, and it GAVE the song away to forget.',
-  'But a song belongs to everyone born inside it — so it could never truly be given away.',
-  'The Ones Below have spent forever gathering the missing pieces.',
+  'A song is the part of you that other people carry. It lives in everyone who loves the thing.',
+  'The Sea loved the Moon. It couldn\'t bear it, so it GAVE its song away to forget her.',
+  'But a song belongs to everyone born inside it — the Ones Below have spent forever buying up the pieces.',
   'Five people carry the last five pieces. They arrived on one tide. Now they sit at your table.',
-  'Sing the pieces together, and every song comes home — and the tide with it.',
+  'The Moon is coming near again. On the night it\'s closest, sing the pieces together — and every song comes home, and the tide with it.',
+]
+
+/** One line at every session's open. Bigger. Wronger. That's the whole clock. */
+export const MOON_CLOCK = [
+  'Session 3 — "A fingernail-paring of moon over the sand. Thin. Nothing yet."',
+  'Session 5 — "The moon is a hand\'s-breadth wider than it should be. The gulls won\'t look at it."',
+  'Session 7 — "The moon is wrong. Everyone in Saltmere has stopped saying so."',
+  'Session 9 — "The dry harbor floods for one minute at midnight, then drains. The chapel bell rang once, alone."',
+  'Finale — "The moon fills the sky. The Sea is standing up on its hind legs to reach her."',
 ]
 
 /** The only rules the players ever need. Say them out loud when asked. */
@@ -108,11 +117,21 @@ export const WHO_IS_WHO: CheatCard[] = [
     ],
   },
   {
-    title: '🌑 The Ones Below (the villain — one face, seen late)',
+    title: '🌑 The Ones Below — and the Buyer (the one face)',
     lines: [
-      'A market in the dark where fairies keep everything they were ever given. Polite. Punctual. Never lie. Always got a yes.',
+      'A market in the dark where fairies keep the SELVES of things — names, springs, faces, songs — each humming on a shelf, each something that no longer knows itself.',
+      'ONE FACE: the Buyer. Courteous, punctual, never lies, unseen until the middle. Everyone else Below is a keeper who owes him. Players hate one person, not an org chart.',
       'Their power IS the yes: they price what you think you\'ll never miss and arrive at your weakest hour.',
       'They cannot be fought. Only outlasted, out-thought, or out-sung.',
+    ],
+  },
+  {
+    title: '🌙 The Sea and the Moon (why any of this is happening)',
+    lines: [
+      'The Sea loved the Moon — the one thing it touches every day and can never reach. The tides were the Sea rising to get closer.',
+      'It couldn\'t bear it, so it gave its song away to forget her. A sea that forgets why it moves slowly stops moving: eleven feet of horizon gone in Wick\'s lifetime.',
+      'Forty years ago the Moon came near; Griff, age eight, saw the lights on the sand. Now she\'s coming near again. The night she\'s closest is the finale.',
+      'The tide isn\'t stolen — it FOLLOWED its song to the Fair, and is pressed against the fence, grieving, unable to say why.',
     ],
   },
   {

@@ -4,6 +4,7 @@
 // it out. All components at module scope (see ui.tsx header).
 
 import {
+  MOON_CLOCK,
   PANIC_LINES,
   STORY_IN_A_BREATH,
   THE_FIVE,
@@ -43,6 +44,19 @@ export function CheatSheet() {
           ))}
         </div>
       </Section>
+
+      <Fold id="cheat:moon" title="🌙 The Moon clock — read one line at every session's open">
+        <ul className="space-y-2">
+          {MOON_CLOCK.map((line, i) => (
+            <li key={i} className="text-base" style={{ color: C.parchment, lineHeight: 1.45 }}>
+              <span style={{ color: C.gold }}>·</span> {line}
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs mt-3" style={{ color: C.faint }}>
+          No rules. Bigger and wronger every time. They'll feel the clock without you counting.
+        </p>
+      </Fold>
 
       <Eyebrow>Tonight — the carnival</Eyebrow>
       <CardList prefix="beat" cards={TONIGHT_BEATS} defaultOpen />
