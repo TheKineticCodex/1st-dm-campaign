@@ -31,7 +31,7 @@ export const MOON_CLOCK = [
 /** The only rules the players ever need. Say them out loud when asked. */
 export const THREE_RULES = [
   'They never take. They get you to say yes.',
-  'What they hold, they hold on a promise. Break the promise, and it comes home.',
+  'You can only promise away what\'s yours. Promise away something others hold pieces of, and it doesn\'t hold — bring the real owners together, and it comes home.',
   'Sing the pieces together, and the song comes home.',
 ]
 

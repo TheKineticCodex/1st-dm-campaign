@@ -1,330 +1,328 @@
-# THE SONG THE SEA FORGOT — the story
-### The Lantern-Keeper's one true copy. Everything else is notes.
+# THE SONG THE SEA FORGOT — The Lantern-Keeper's Copy
+### The reference version. Formal, complete, DM's eyes only.
 
-*Written to one rule: if a nine-year-old couldn't follow a line, it was
-rewritten. No paperwork. No courtrooms. Promises, songs, and the Moon.*
-
-*Where I made a call you haven't made yet, it's marked* ⚑ *— point at it and
-it changes.*
+*Companion: `the-telling.md` — the same story told as a story, for reading
+aloud. This document is the one you plan from. Where a decision is still
+yours to make it is marked* ⚑ *and gathered in the appendix.*
 
 ---
 
-## Part I — What a song is
+## 1. What a song is
 
-Every living thing hums a little melody without knowing it. It's the sound
-of who it is. Call it a **song**.
+**A song is a thing's sense of itself.** Every living thing has one — a
+"melody" in the fiction, but functionally it is *identity*: the Sea's song
+is *I am the thing that loves the Moon and rises to reach her.* A grove's
+song is *I bloom.* A person's song is who they are underneath what they
+perform.
 
-Here is the secret the whole campaign turns on: **a song doesn't live in
-one place. It lives in everyone who loves the thing.** Your mother's song is
-in you. Your home's song is in you. The Sea's song is in every creature
-ever born inside it. That is simply what love does — it copies the tune.
+**A song is not stored in one place.** It lives in the thing itself *and*
+in everyone who loves it. A child carries a piece of their mother's song.
+Every creature born of the Sea carries a piece of the Sea's. This is the
+mechanical fact the whole campaign rests on, and it has three consequences.
+These three are the entirety of what the players ever need to understand:
 
-Which means three things, and these are the only three rules the players
-will ever need:
+### Rule 1 — They never take. They get you to say yes.
+A song cannot be stolen, because it is not kept in one place; taking it
+from one holder leaves the rest. The only way to own a song completely is
+to acquire every piece from every holder — and each acquisition requires
+that holder's genuine consent. This is why the Ones Below never rob
+anyone. It isn't ethics; it's the only method that works.
 
-1. **A song can't be stolen** — because it isn't kept in one place. To own a
-   song entirely you'd have to *buy* it back from everyone who ever loved
-   the thing, one piece at a time. So the Ones Below never take. **They get
-   you to say yes.**
-2. **What they hold, they hold on a promise.** A yes is like gravity in the
-   old places: say it truly and the thing falls out of you. But a promise
-   made for something you didn't fully own is a promise with a crack in it
-   — and **what was promised badly comes home.**
-3. **When a song is gone entirely, the thing forgets itself.** The Sea forgot
-   how to come back. A grove forgets how to bloom. A man forgets who he
-   was. That is the horror of this world — not losing something, but
-   *forgetting you ever had it.* And the cure is always the same: **sing
-   the pieces together, and the song comes home.**
+### Rule 2 — What they hold, they hold on a promise. Break the promise, and it comes home.
+In the old places, a promise is real: agree to give something and mean it,
+and it leaves you — no enforcement needed. **But you can only promise away
+what is yours.** If you promise away something that partly belongs to
+others, the promise is faulty. The Ones Below will still take it and hold
+it — but a faulty promise does not *hold* against the rightful owners. When
+the people who actually own the thing come together and claim it, it
+returns to them.
 
-The line, when a player finally asks *what IS a song?* — Grey-Gill says it:
+*Why this matters:* the Sea promised away a song that every sea-creature
+co-owned. The promise was faulty from the start. That is the loophole the
+campaign is won through — not by defeating the fairies, but by the real
+owners of the song assembling and reclaiming what was theirs. State Rule 2
+early so the finale feels earned rather than invented.
 
-> *"It's the bit of you that other people are keeping safe, dear. That's
-> why they can't just take it. They'd have to buy it back from everyone
-> who ever loved you."*
+### Rule 3 — Sing the pieces together, and the song comes home.
+When a song is fully gone, the thing forgets itself: the Sea forgets why it
+moves; a grove forgets how to bloom; a man forgets who he was. The horror
+of this world is not loss but *forgetting you ever had it.* The remedy is
+always the same: bring the remaining pieces into one place, and the whole
+reasserts itself. Two pieces near each other visibly *pull* — the mechanism
+should be shown to the players once, small, on the first road, and never
+explained.
 
----
+### How a song can be given away
+A song is given away the way a memory or a name might be — by consenting
+to stop being the one who carries it. The Sea did not sell music. It said,
+in effect, *take out of me the part that remembers her,* and the Ones
+Below did. Afterward the Sea still exists and still moves — but no longer
+knows why. **The catch is the whole story:** the Sea could only give away
+*its own* piece. Every creature born inside it still carried theirs. So the
+Ones Below have spent centuries going holder to holder, buying the rest,
+one yes at a time. Peaches's piece is the last, and she has never said yes.
 
-## Part II — The Sea and the Moon
+*In one line, if a player asks:* **giving away your song is agreeing to
+forget who you are — and it only fully works if no one who loves you
+remembers for you.**
 
-Long ago the Sea was in love with the Moon.
-
-It sang to her every night — the one thing it touches every day and can
-never reach. The tides were the Sea rising up to get closer; the song was
-what pulled them. And once in a long lifetime, the Moon came *near* — low
-and huge and close enough that the Sea could almost believe — and then she
-went away again, as she always does.
-
-After one of those nights, the Sea couldn't bear it anymore. It went to the
-only power that buys such things — **the Ones Below**, the fairies who keep
-what they are given — and it said: *take the song. I don't want to remember
-her.* And they said yes, because they always say yes.
-
-So the Sea forgot. It stopped rising to reach her. And slowly, over
-centuries, a sea that can't remember what pulled it began to *shrink* — the
-horizon creeping in, eleven feet in Wick's lifetime — because a thing that
-has forgotten why it moves eventually stops moving at all.
-
-But the sale had a crack in it. The song was never the Sea's alone. **Every
-creature born of the Sea carries a piece.** The Ones Below have spent the
-centuries since quietly buying up the pieces — a mermaid's here, an old
-fortune-teller's there — completing what the Sea couldn't lawfully sell.
-Peaches carries the last one.
-
-**Forty years ago the Moon came near again.** Old Griff was eight. He saw
-lights on the sand where the water should be — the Ones Below come to
-collect, as they do whenever the Moon is close and the Sea half-remembers —
-and by dawn the tide had come back and taken his chalk drawing off the
-cellar wall. He tore that page out of his tide log at nine so he'd stop
-looking at it. He'll tell you if you ask him straight.
-
-**Now the Moon is coming near again.** That's why the Getting Fair stands
-on the seabed. That's why the tide left: it isn't stolen and it isn't held
-— *the Sea followed its song.* The Fair carries the stolen tune in its
-heart (the carousel organ), and when it grounded on the sand, the water
-drained toward the thing it sold and can't remember, and pressed up against
-the fence, grieving, unable to say why. The little girl on Net Row is
-right: *it went to the party. It'll come home when the party's over.*
-
-⚑ **The Moon-night** — I've written it as the **closest moon in a lifetime**:
-huge, silver, wrong, too near. (A blood moon works just as well; swap the
-color and nothing else changes.) It is coming closer every session, and
-**the night it is closest is the finale** — the only night the song can be
-sung whole, because the Sea has to be near what it lost to remember it.
-
-### The Moon clock — how it works at the table
-No rules. **One line about the moon at every session's open,** and it gets
-bigger and wronger every time. That's the whole clock; players will feel
-time running out without you ever counting for them.
-
-- Session 3: *"A fingernail-paring of moon over the sand. Thin. Nothing yet."*
-- Session 5: *"The moon is a hand's-breadth wider than it should be. The gulls won't look at it."*
-- Session 7: *"The moon is wrong. Everyone in Saltmere has stopped saying so."*
-- Session 9: *"The dry harbor floods for one minute at midnight, then drains. Nobody saw the water come. The chapel bell rang once, alone."*
-- Finale: *"The moon fills the sky. The Sea is standing up on its hind legs to reach her."*
-
-Griff's forty-year night is the story you tell them somewhere in the
-middle. When they hear it, they'll do the math themselves.
+*Grey-Gill's line, when a player asks what a song is:* "It's the bit of you
+that other people are keeping safe, dear. That's why they can't just take
+it. They'd have to buy it back from everyone who ever loved you."
 
 ---
 
-## Part III — The Ones Below
+## 2. The Sea and the Moon
 
-A market in the dark where the fairies keep everything they were ever
-given. Not gold — **the selves of things.** Names, springs, faces, laughs,
-convictions, songs. Each one humming on a shelf, each one something that no
-longer knows itself. Polite. Punctual. They never lie. They always got a
-yes.
+**The backstory.** The Sea loved the Moon — the one thing it touches every
+day and can never reach. The tides were the Sea rising toward her; the song
+was what drew them. Once in a long lifetime the Moon comes *near* — low,
+huge, close — and then withdraws. After one such night the Sea could not
+bear it and went to the Ones Below: *take the song. I don't want to remember
+her.* They agreed. The Sea forgot; it stopped rising to reach her; and over
+centuries a sea that cannot remember why it moves has begun to shrink
+(eleven feet of horizon lost in Wick's lifetime).
 
-Their power IS the yes: they price what you think you'll never miss, and
-they arrive at your weakest hour, and they put every offer inside a
-carnival so that saying yes feels like a game.
+**The flaw.** The song was never solely the Sea's. Every creature born of
+the Sea holds a piece. The Ones Below have spent the centuries since
+acquiring those pieces one at a time. Peaches's is the last.
 
-**They cannot be fought.** Kill a keeper and what she kept goes Below for
-good. They can only be outlasted, out-thought, or out-sung.
+**Forty years ago** the Moon came near again. Griff, aged eight, saw lights
+on the sand where the water should be — the Ones Below come to collect, as
+they do whenever the Moon is close and the Sea half-remembers — and by dawn
+the tide had returned and taken his chalk drawing off the cellar wall. He
+tore that page from his tide log at nine. He will say so if asked directly.
 
-⚑ **One face.** The villain has one face — **the Buyer**: courteous,
-punctual, unseen until the middle of the campaign, and he never, ever lies.
-Everyone else Below is a *keeper* who owes him — someone the party can free
-or outwit. Players should hate one person, not an org chart.
+**Now the Moon is coming near again.** This is why the Getting Fair stands
+on the seabed. This is why the tide left: it was neither stolen nor held.
+*The Sea followed its song.* The Fair carries the taken song in its heart
+(the carousel organ). When the Fair grounded, the water drained toward the
+thing it once gave away, and now presses against the fence, grieving,
+unable to say why. The child on Net Row is correct: it went to the party;
+it comes home when the party is over.
 
-The cast the players will actually meet, and nobody else until their scene:
+⚑ **The Moon-night** — written as the closest moon in a lifetime (huge,
+silver, wrong). A blood moon is an equal alternative; only the color
+changes. The night it is closest is the finale — the only night the song can
+be sung whole, because the Sea must be near what it lost in order to
+remember it.
 
-- **The Twins of the Toll — Brother Hush & Sister Hum** — the gate. Hush
-  writes 3–5 words on slate; Hum half-sings everything. Toll: one honest
-  answer each, out loud. *Write them down.* They come back once, at the
-  very end, in the players' own words.
-- **Grandmother Grey-Gill** — the heart of the Fair. Sold her own *name*
-  for her tent; when she tries to say who bought it, only bubbles come.
-  Kind, cagey, afraid. Reads their real confessions back as prophecy.
-- **The carousel operator** — hums the Sea's song with a hole in it, weeps
-  steadily, notices neither. The organ *is* the stolen song.
-- **The Appraiser** — always somewhere else. A closed tent, a coat on a
-  hook. *"He's out. Appraising."* He is the one who prices things ashore —
-  and one day he'll price Tarn's sight, and hand Billy the pen.
-- **The Buyer** — one face, seen late. See Act 2.
-- **Three keepers, one per road** — named by what they hold, not by name:
-  *the jar-woman* of the Bog, *the mirror-man* of the Hall, *the
-  market-mother* of the Under-Sea. Each owes the Buyer. Each will deal.
+**The Moon clock (procedure).** No rules. Read one line about the moon at
+every session's open; each is larger and more wrong than the last.
+
+| Session | Read aloud |
+|---|---|
+| 3 | "A fingernail-paring of moon over the sand. Thin. Nothing yet." |
+| 5 | "The moon is a hand's-breadth wider than it should be. The gulls won't look at it." |
+| 7 | "The moon is wrong. Everyone in Saltmere has stopped saying so." |
+| 9 | "The dry harbor floods for one minute at midnight, then drains. The chapel bell rang once, alone." |
+| Finale | "The moon fills the sky. The Sea is standing up on its hind legs to reach her." |
+
+Griff's forty-year story is told once, mid-campaign. The players will do
+the arithmetic themselves.
 
 ---
 
-## Part IV — The Five
+## 3. The Ones Below
+
+**What they are.** A market in the dark where fairies keep everything they
+were ever given. Not wealth — the *selves* of things: names, springs,
+faces, laughs, convictions, songs. Each hums on a shelf; each is something
+that no longer knows itself. They are polite, punctual, and never lie. They
+always obtained a yes.
+
+**How they operate.** They price what you believe you will never miss;
+they arrive at your weakest hour; they place every offer inside a carnival
+so that saying yes feels like a game.
+
+**How they are beaten.** They cannot be fought — kill a keeper and what she
+kept goes Below permanently. They can only be outlasted, out-thought, or
+out-sung.
+
+⚑ **One face.** The villain has one face: **the Buyer** — courteous,
+punctual, unseen until mid-campaign, and he never lies. Everyone else Below
+is a *keeper* who owes him and can be freed or outwitted. The players
+should hate one person, not an organization.
+
+**The cast** (no one else is introduced before their scene):
+
+| Who | Role | Notes |
+|---|---|---|
+| **The Twins of the Toll** — Brother Hush & Sister Hum | The gate | Hush writes 3–5 words on slate; Hum half-sings. Toll: one honest answer each, aloud. *Record them.* They return once, at the end, in the players' own words. |
+| **Grandmother Grey-Gill** | The heart of the Fair | Sold her own *name* for her tent; when she tries to say who bought it, only bubbles come. Reads their real confessions back as prophecy. |
+| **The carousel operator** | The missing note | Hums the Sea's song with a hole in it, weeps, notices neither. The organ *is* the taken song. |
+| **The Appraiser** | Absent | A closed tent, a coat on a hook. "He's out. Appraising." Prices things ashore; will one day price Tarn's sight and hand Billy the pen. |
+| **The Buyer** | The one face | Seen late. See Act 2. |
+| **Three keepers** | One per road | Named by what they hold: *the jar-woman* (Bog), *the mirror-man* (Hall), *the market-mother* (Under-Sea). Each owes the Buyer; each will deal. |
+
+---
+
+## 4. The Five
 
 *"Admission is sold in sets. You five arrived on one tide."* — the Twins
 
 Five strangers, each the last holder of a song that was given away. The
-Ones Below gathered them as a *collection.* They will walk out as a
-*chord.* Here is who they are — built from their players' own answers —
-and what their song is, and where the pieces are.
+Ones Below gathered them as a collection; they will leave as a chord.
 
-| | The song they carry | What it sounds like | Where the pieces are |
+| Player | The song they carry | What it sounds like | Where the pieces are |
 |---|---|---|---|
 | **Peaches** | The **Sea's** — the last note | The carousel tune with the hole in it | Every sea-creature: the seal-pup, Pookie, Grey-Gill's gills, the organ |
 | **Freya Moon** | The **Grove's** — the last blossom | Elowen's flower-speaking hum under the willow | Her sister, the moths, the pendant |
 | **Billy** | **William's own** — his true name | The songs he secretly writes about his friends. *Those are him.* | Wren's handwriting — and the people he writes about |
-| **Philip** | **His mother's** | A tune she hummed in her garden; he can't quite remember it | His convictions ARE that tune. The false teacher wants him to forget it |
-| **Freya Sun** | Hers is **whole** — untouched | The whole table laughing. Her favorite sound. | Peaches, Philip, everyone she protects — they carry her |
+| **Philip** | **His mother's** | A tune she hummed in her garden; he can't quite recall it | His convictions *are* that tune. The false teacher wants him to forget it |
+| **Freya Sun** | Hers is **whole** — untouched | The whole table laughing — her favorite sound | Peaches, Philip, everyone she protects — they carry her |
 
-### 🐊 Peaches — the one the Sea listens to
-Aasimar Druid, mermaid on borrowed feet. She never said yes: the Sea's
-first bargain named every unsold piece as its "keeping," and when the Ones
-Below came to secure theirs, she woke on the shore with legs. **Pookie** the
-alligator saw it happen; he followed her out of the water and has never
-left. He runs away when he's worried — *that is your tell.* She misses her
-coral house. If she got her tail back, she'd go home. (Winning may cost
-the party her. Let it hang, unspoken, until the end.)
+### Peaches — the one the Sea listens to
+Aasimar Druid; mermaid on borrowed feet. **She never said yes.** The Sea's
+original bargain named every outstanding piece as its "keeping"; when the
+Ones Below came to secure theirs, she woke on the shore with legs. Pookie
+the alligator witnessed it, followed her out of the water, and has never
+left. *Pookie runs away when worried* — use it as a tell before anything
+bad. She misses her coral house; if she got her tail back she would go
+home. (Winning may cost the party her. Leave it unspoken until the end.)
+Her function: she is the note the Sea is waiting for. The Ones Below do not
+yet know she is the one.
 
-Her job in the story: she's the note the Sea itself is waiting for. When
-she sings, places listen — and the Ones Below don't yet know she's the one.
-
-### 🎩 Billy — the one who can read the bargains
-Three layers: **William Blackwood** the scholar (INT 17, stays up reading,
-secretly writes songs about his companions and never shows them) →
-**Blue-Chew Billy** the show (sapphire coat, lozenges, a joke whenever
-things get uncomfortable) → and under both, **the Feywild took his true
-name.** It sits Below, on a shelf, humming, like Grey-Gill's. He fears that
-the person everyone loves isn't really him.
-
-His mentor, **Professor Elias Wren** — *"Never confuse being clever with
-being right"* — was the last person to see William with no mask on. The
-spellbook matters for the *handwriting*: proof someone knew him before.
-Every page the Ones Below un-write is a page of Wren.
+### Billy — the one who can read the bargains
+Three layers: **William Blackwood**, scholar (secretly writes songs about
+his companions and never shows them) → **Blue-Chew Billy**, the show →
+beneath both, **the Feywild took his true name**; it sits Below on a shelf,
+like Grey-Gill's. His fear: that the person everyone loves isn't really
+him. Mentor **Professor Elias Wren** — "Never confuse being clever with
+being right" — was the last person to see William unmasked. The spellbook
+matters for its *handwriting*: proof someone knew him before. Each page the
+Ones Below un-write is a page of Wren.
 
 ⚑ **His name comes home when his friends sing it.** His true name lives in
-the songs he wrote about the party — and the party, the people he wrote
-about, are already carrying pieces of him. He doesn't lose his magic in
-the finale; he stops being afraid of it. (His player pitched "hearing it
-strips his magic" — this is the gentler answer; check it with him.)
+the songs he wrote about the party; the party already carry pieces of him.
+He does not lose his magic — he stops being afraid of it. (His player
+pitched "hearing it strips his magic"; this is the gentler reading. Confirm
+with him.)
 
-Table rules his player asked for: **the more serious it gets, the funnier
-he gets; no joke means something is truly wrong.** He silently checks the
-chain on his book when scared — never explain it — until the day he
-reaches for it on the Mirror road and it isn't there.
+Player-requested table rules: *the more serious it gets, the funnier he
+gets; no joke means something is truly wrong.* He silently checks the chain
+on his book when frightened — never explained — until the day on the Mirror
+road when he reaches for it and it is gone.
 
-### 🛡 Philip — the one who won't kill
-Halfling Fighter, trained from childhood to end things, gentle anyway. He
-was following **a false teacher — someone who claims peace but teaches
-against it, knowingly.** ⚑ *That is what a person looks like after they've
-sold their convictions to the Ones Below*: the shape of a principle with
-nothing inside. Philip has been tracking a warning of his own future. The
-teacher is meetable, on the Bog road, and can be freed.
+### Philip — the one who won't kill
+Halfling Fighter; trained from childhood to kill, gentle by choice. He was
+following **a false teacher — someone who claims peace but teaches against
+it, knowingly.** ⚑ *This is what a person looks like after selling their
+convictions to the Ones Below*: the shape of a principle with nothing
+inside. Philip has been tracking a warning of his own future. The teacher
+is meetable on the Bog road and can be freed. His rule: **he will not
+kill** — "I refuse to close the door on someone's salvation." His function:
+the Ones Below cannot be fought, only outlasted; the gentle blade is the
+only fighter built for this. What he fears losing: his **mother** — "a
+garden, blooming with life and hope." The same words as Freya Moon's grove;
+neither knows yet.
 
-His rule: **he will not kill** — *"I refuse to close the door on someone's
-salvation."* He'll get close. His job in the story: the Ones Below can't
-be fought, only outlasted — the gentle blade is the only fighter built for
-this war. What he fears losing is his **mother** — *"a garden, blooming with
-life and hope."* Same words as Freya Moon's grove. Neither knows yet.
+### Freya Sun — the one they haven't got yet
+Fairy Fighter; black wings, twin swords, armor worn outside so no one
+checks for the wound. Protects, at all costs, **Peaches and Philip.** What
+makes her laugh: **Pookie.** The wound (on-screen only with her permission;
+the Ones Below were *not* responsible — that grief stays hers): her cat,
+whom she loved more than anything, was murdered.
 
-### ⚔ Freya Sun — the one they haven't got yet
-Fairy Fighter, black wings, twin swords, armor worn on the outside so
-nobody checks for the wound. She protects, at all costs, **Peaches and
-Philip.** What makes her laugh: **Pookie.** The wound (on-screen only with
-her permission; the Ones Below were *not* behind it — that grief stays
-hers): her cat, whom she loved more than anything, was murdered.
+⚑ Her song is whole — the last untouched, and the one they want most.
+**They come for her list, never for her.** They move on Peaches or Philip
+and let her vow do the rest; she will offer herself. The party's job is to
+talk her out of the yes. Her arc: learning she can be protected too.
 
-Her song is whole. It's the last one they haven't touched, and they want
-it most. ⚑ **They come for her list, never for her.** They'll move on
-Peaches or Philip and let her vow do the rest — she'll offer herself to
-save them. The party's job is to talk her out of the yes. Her arc: learning
-she can be protected too.
-
-### 🌸 Freya Moon — the one who can feel where songs are held
-Fairy Druid, rose-gold hair full of flowers, wings like sunrise glass. She
-carries the last blossom of the Heartbloom Grove in a crystal pendant. **The
-pendant stirs near anything taken** — she is the party's compass, and it
-will lead them straight to her sister.
-
-Her perfect memory: under the oldest willow at dusk, glowing moths in her
-hair, family laughing nearby. Her lost one: **Elowen Moon**, her older
-sister — taught her to speak to flowers, first to say *kindness could be
-stronger than magic.* Never found. Her hope refills when life grows where
-it shouldn't — a flower through stone, an animal back on its feet, kindness
-where cruelty was easier. *Give her one of those every session.*
+### Freya Moon — the one who can feel where songs are held
+Fairy Druid; carries the last blossom of the Heartbloom Grove in a crystal
+pendant. **The pendant stirs near anything taken** — she is the party's
+compass, and it will lead to her sister. Perfect memory: beneath the oldest
+willow at dusk, glowing moths in her hair, family laughing nearby. Lost:
+**Elowen Moon**, her older sister — taught her to speak to flowers; first to
+say kindness could be stronger than magic; never found. Her hope refills
+when life grows where it shouldn't. *Give her one such thing every session.*
 
 ⚑ **Elowen is alive, Below, keeping the Grove's song.** How she got there
-is sealed — decide it late, when you know your table, or ask her player
-privately which she'd rather find: a sister who made a terrible choice, or
-a sister who was taken and can be brought home whole. Both endings are
-prepared.
+is left sealed — decide late, once you know the table, or ask her player
+privately which she would rather find: a sister who made a terrible
+choice, or one who was taken and can be brought home whole. Both endings
+are prepared.
 
 ---
 
-## Part V — The shape of the whole thing
+## 5. Structure
 
-**Act 1 — the Fair and the Three Gates** *(sessions 1–3)*
-Saltmere, the tide gone, the lanterns, the Fair. The Gate takes an honest
-answer from each. The Midway pays Billy in Wren's handwriting. Grey-Gill
-reads them their own confessions. The carousel plays the song with the hole
-— and if Peaches hums along, every lantern in the Fair turns to look, and
-the hunt begins because of a choice she made at your table. Whispers in the
-dark. Then the back fence is three gates, and *"ONE OPENS TONIGHT. THE
-OTHERS REMEMBER BEING CHOSEN LAST."* Level 2 at the crossing.
+**Act 1 — the Fair and the Three Gates** (sessions 1–3). Saltmere; the
+tide gone; the lanterns; the Fair. The Gate takes an honest answer from
+each. The Midway pays Billy in Wren's handwriting. Grey-Gill reads them
+their own confessions. The carousel plays the song with the hole — and if
+Peaches hums along, every lantern turns toward her, and the hunt begins
+because of a choice made at your table. Whispers in the dark. Then three
+gates: *"ONE OPENS TONIGHT. THE OTHERS REMEMBER BEING CHOSEN LAST."* Level 2
+at the crossing.
 
-**Act 2 — the Three Roads** *(all three, ~2–3 sessions each)*
-Each road: one keeper to outwit, one piece of the song to bring home, and
-**two players whose threads live there.** The unchosen gates wait, stranger
-each time. Level 3 the first time they cost the Ones Below something real.
+**Act 2 — the Three Roads** (all three; ~2–3 sessions each). Each road:
+one keeper to outwit, one piece of the song to recover, and **two players
+whose threads live there.** Level 3 the first time the party costs the Ones
+Below something real.
 
-- 🟢 **The Bog** — *the jar-woman*, who keeps voices in green jars, behind
-  on her rent to the Buyer. Threads: **Freya Sun** (a jar holds a voice she
-  knows — someone from her list) · **Philip** (the false teacher is here,
-  hollow, preaching to the reeds — and can be freed).
-- 🪞 **The Hall of Mirrors** — *the mirror-man*, who keeps everyone's best
-  moment on loop. Threads: **Billy** (Wren's laugh, disassembled on velvet;
-  the day the chain is empty) · **Philip** (one mirror loops his finest hour
-  — the day he chose not to kill; the Ones Below have already priced it).
-- 🔵 **The Under-Sea** — *the market-mother*, who runs the drowned market
-  where large things are sold. Threads: **Peaches** (her tail, in a window,
-  priced "one song, already paid") · **Freya Moon** (a sealed lot: *ONE
-  SPRING, GROVE-CUT* — and the pendant burns; Elowen is close).
+| Road | Keeper | Threads |
+|---|---|---|
+| 🟢 **The Bog** | the jar-woman — keeps voices in green jars; behind on her rent to the Buyer | **Freya Sun:** a jar holds a voice from her list · **Philip:** the false teacher is here, hollow, and can be freed |
+| 🪞 **The Hall of Mirrors** | the mirror-man — keeps everyone's best moment on loop | **Billy:** Wren's laugh, disassembled; the day the chain is empty · **Philip:** one mirror loops the day he chose not to kill — already priced |
+| 🔵 **The Under-Sea** | the market-mother — runs the drowned market | **Peaches:** her tail, in a window, "one song, already paid" · **Freya Moon:** a sealed lot, *ONE SPRING, GROVE-CUT*; the pendant burns; Elowen is close |
 
-**The proof, on the first road** — small, never explained: two pieces of
-a song near each other *pull.* A jar hums back at Peaches. The pendant
-warms near the seal-pup. Something small unlatches on its own. The players
-build the theory of the finale themselves. That's better than any clue.
+**The proof (first road, once, unexplained):** two pieces of a song near
+each other pull. A jar hums back at Peaches; the pendant warms near the
+seal-pup; something small unlatches on its own. The players build the
+finale's theory themselves.
 
-**Act 2's heart — the Buyer's one honest sentence.** ⚑ Midway through the
-roads, the Buyer finally appears — politely, with tea — and tells them
-the truth: *"The Sea wasn't robbed. It asked us. It wanted to forget her.
-Who are you to give it back its grief?"* And then he leaves. What the
-players do with that is theirs. (This is the moment the story gets a heart
-— you asked to think about it; here is what it looks like. Cut it and the
-Sea was simply tricked; keep it and someone at your table will side with
-the Sea, and that's the best night of the campaign.)
+⚑ **Act 2's heart — the Buyer's honest sentence.** Mid-roads, the Buyer
+appears — politely, with tea — and tells them the truth: *"The Sea wasn't
+robbed. It asked us. It wanted to forget her. Who are you to give it back
+its grief?"* Then he leaves. What the players do with it is theirs. (You
+asked to explore this before deciding. Cut it and the Sea was simply
+tricked; keep it and someone at the table will side with the Sea — likely
+the best night of the campaign.)
 
-**Act 3 — Below, on the Moon-night** *(2 sessions)*
-The moon fills the sky. The Fair's biggest stage. Everyone the party freed
-or gathered — the seal-pup, the jarred voices, the mirror-moments, the
-organ turned to their side, Pookie — stands in one place. The Twins read
-the five honest answers from the Gate, in the players' own words, one last
-time. And then **all five sing** — in the fiction, described, not performed
-— each their own song, and the five songs are one chord.
+**Act 3 — Below, on the Moon-night** (2 sessions). The moon fills the sky.
+The Fair's largest stage. Everyone the party freed or gathered — the
+seal-pup, the jarred voices, the mirror-moments, the organ turned, Pookie —
+in one place. The Twins read the five Gate answers, in the players' own
+words, once more. Then **all five sing** — described in the fiction, not
+performed — each their own song, and the five are one chord. The Sea
+remembers her, and chooses to keep the memory. **The tide comes home up
+Saltmere harbor at dawn**; the chapel bell rings alone; the horizon steps
+back eleven feet.
 
-The Sea remembers her. It chooses to keep the memory, grief and all. **The
-tide comes home up Saltmere harbor at dawn** — "when the party's over" —
-the chapel bell rings on its own, the horizon steps back eleven feet.
+⚑ **Everything comes home; not everyone stays.** The Grove blooms
+(whether Elowen returns or only her hum does — see above). Wren's pages
+rewrite in his own hand, one new page addressed to Billy. Philip's mother's
+tune returns whole. Freya Sun's list is safe because she never said yes.
+Peaches gets her tail back — and goes home to the coral house, as she said
+she would; Pookie speaks for the first and only time, to the party she
+leaves: *"She sang to me first."*
 
-⚑ **Everything comes home; not everyone stays.** The Grove blooms —
-whether Elowen walks out of the dark or only her hum does is the choice
-above. Wren's pages rewrite themselves in his own hand, with one new page
-addressed to Billy. Philip's mother's tune comes back to him whole. Freya
-Sun's list is safe because she never said yes. And Peaches gets her tail
-back — and goes home to the coral house, because she said she would, and
-Pookie speaks for the first and only time in the campaign, to the party
-she leaves behind: *"She sang to me first."*
-
-The Buyer survives. He always does. He keeps everything that was freely
-given, files the loss under *instructive*, and leaves whichever player
-out-sang him a card and a genuine compliment: *"The Court will be watching
-your career with interest."*
+The Buyer survives. He keeps everything freely given, files the loss under
+*instructive*, and leaves the player who out-sang him a card and a genuine
+compliment: *"The Court will be watching your career with interest."*
 
 ---
 
-## Part VI — Reading it at the table
+## 6. At the table
 
-- **The three rules** are the players' whole rulebook. Say them when asked.
-- **The Moon line** opens every session. Bigger. Wronger.
-- **Pookie runs away when worried.** Use it before anything bad.
-- **Never explain a song.** Let them see two pieces pull, once, and shut up.
-- **Nothing is ever taken at the Fair.** If a player says "wait, I thought
-  they can't take things" — *smile.* They've understood the campaign.
+- The three rules are the players' whole rulebook. State them when asked.
+- The Moon line opens every session. Larger. More wrong.
+- Pookie runs away when worried. Use it before anything bad.
+- Never explain a song. Show two pieces pull, once, and stop.
+- Nothing is ever taken at the Fair. If a player says "wait, I thought
+  they can't take things" — they have understood the campaign.
+
+---
+
+## Appendix — the ⚑ list (yours to change)
+
+1. **Moon-night:** closest moon in a lifetime. *Alt:* blood moon.
+2. **One face:** the Buyer; all others are keepers.
+3. **Billy's name** comes home gently when his friends sing it. *Alt (his player's pitch):* hearing it strips his magic.
+4. **Philip's false teacher** sold their convictions; meetable and freeable on the Bog road.
+5. **Freya Sun:** they come for her list, never for her.
+6. **Elowen** is alive Below; how she got there is sealed until you know the table.
+7. **The Buyer's honest sentence** ("the Sea wanted to forget her") is in. The largest remaining choice.
+8. **Everything comes home; not everyone stays** — Peaches returns to the sea.
