@@ -13,6 +13,10 @@ export interface CharacterBuild {
   /** Locked until level 3 — stored now so level-up needs no migration. */
   subclass: string | null
   level: number
+  /** Level-4 (8, 12…) choices: feat names taken. 'Ability Score Improvement' counts as one. */
+  feats?: string[]
+  /** Extra ability bumps from ASIs and feats, applied on top of the origin bumps. */
+  asi?: Partial<Record<AbilityKey, number>>
   /** Aura key (see glyphs.tsx AURAS) — the light the lanterns see in you. */
   aura?: string
   /** The mirror's portrait — seed baked into the URL; once seen, final. */
@@ -32,7 +36,12 @@ export interface BagItem {
 export interface CharacterState {
   /** Damage taken (max HP is derived, so healing rules never desync). */
   damage: number
+  /** 1st-level slots used (legacy — kept in sync with slotsByLevel[1]). */
   slotsUsed: number
+  /** Slots used per spell level, once the character can cast above 1st. */
+  slotsByLevel?: Record<number, number>
+  /** Feature uses spent since the last rest, by feature name. */
+  uses?: Record<string, number>
   deathSaves: { successes: number; failures: number }
   conditions: string[]
   /** Concentration co-pilot: set when holding a concentration spell. */
@@ -182,6 +191,8 @@ export interface Handout {
   /** A1: when present, this handout is a contract offer, not a whisper. */
   bargain?: Bargain
   sentAt: string
+  /** A level-up: the whole party rises to this level. Persisted so late joiners still hear it. */
+  level?: number
 }
 
 // ---- NEXT-1: live table events (broadcast only — feed is ephemeral by

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { clearDeviceSession, type DeviceSession } from '../lib/storage'
+import { clearDeviceSession, type DeviceSession, readCache, writeCache } from '../lib/storage'
 import { getStore } from '../lib/store'
 import { keepGlassLit } from '../lib/wakeLock'
 import {
@@ -50,6 +50,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
   const [character, setCharacter] = useState<SavedCharacter | null>(null)
   const [draftBuild, setDraftBuild] = useState<CharacterBuild>(EMPTY_BUILD)
   const [quiz, setQuiz] = useState<QuizResult | null>(null)
+  const [announcedLevel, setAnnouncedLevel] = useState<number>(() => readCache<number>('announced-level') ?? 0)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => keepGlassLit(), [])
@@ -178,6 +179,13 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         onBargainOffer={offerBargain}
         onBargainSign={signBargain}
         onBargainResolve={resolveBargain}
+        onLevel={(level) => {
+          setAnnouncedLevel((cur) => {
+            const next = Math.max(cur, level)
+            writeCache('announced-level', next)
+            return next
+          })
+        }}
       />
       <div className="w-full" style={{ maxWidth: 560 }}>
         <div className="flex items-center justify-between mb-4">
@@ -240,6 +248,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 onGoFortune={() => setTab('fortune')}
                 store={store}
                 playerName={session.playerName}
+                announcedLevel={announcedLevel}
               />
             )}
             {tab === 'ledger' && (

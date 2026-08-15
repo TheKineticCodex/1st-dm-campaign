@@ -18,6 +18,8 @@ interface PlayerLiveProps {
   playerName: string
   /** DM applied/cleared a condition on this player (co-pilot A4). */
   onCondition: (condition: string, active: boolean) => void
+  /** DM announced a party level (rides on a handout so late joiners hear it). */
+  onLevel?: (level: number) => void
   /** A1: a contract offer arrived — record it as 'offered'. */
   onBargainOffer: (b: Bargain) => void
   /** A1: the player signed — seal it with their hand. */
@@ -40,6 +42,7 @@ export function PlayerLive({
   onBargainOffer,
   onBargainSign,
   onBargainResolve,
+  onLevel,
 }: PlayerLiveProps) {
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [handout, setHandout] = useState<Handout | null>(null)
@@ -57,6 +60,8 @@ export function PlayerLive({
   onBargainOfferRef.current = onBargainOffer
   const onBargainResolveRef = useRef(onBargainResolve)
   onBargainResolveRef.current = onBargainResolve
+  const onLevelRef = useRef(onLevel)
+  onLevelRef.current = onLevel
 
   useEffect(() => {
     let cancelled = false
@@ -67,6 +72,8 @@ export function PlayerLive({
 
     const enqueue = (h: Handout) => {
       if (h.target && h.target !== playerName) return
+      // Level-ups are recorded even if the envelope was already opened.
+      if (h.level) onLevelRef.current?.(h.level)
       if (seen().has(h.id)) return
       markSeen(h.id)
       // Contract offers take the illuminated-contract path, not the envelope.

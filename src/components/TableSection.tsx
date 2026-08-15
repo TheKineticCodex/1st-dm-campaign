@@ -304,6 +304,10 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         <BargainComposer store={store} roster={roster} channelRef={channelRef} />
       </Fold>
 
+      <Fold id="dm-level" title="✦ Level up the party">
+        <LevelUpComposer store={store} roster={roster} channelRef={channelRef} />
+      </Fold>
+
       <Fold id="dm-map" title="🗺 The table map">
         <MapBoard pcNames={pcRows.map((r) => r.name)} />
       </Fold>
@@ -558,6 +562,81 @@ function BargainComposer({
           </p>
         )}
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- level up
+
+/**
+ * Milestone leveling: the Lantern-Keeper announces; every phone rises. The
+ * announcement rides on a persisted handout (level field) so a phone that
+ * was asleep still hears it at next open, and it shows as an envelope too.
+ */
+function LevelUpComposer({
+  store,
+  roster,
+  channelRef,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  channelRef: { current: TableChannel | null }
+}) {
+  const current = Math.max(1, ...roster.map((r) => r.character?.build.level ?? 1))
+  const [level, setLevel] = useState<number>(current + 1)
+  const [sent, setSent] = useState<number | null>(null)
+
+  const LINES: Record<number, string> = {
+    2: 'The Feywild takes notice of you. Something in you answers.',
+    3: 'You have cost them something real. You feel your path fork under your feet — choose it.',
+    4: 'You are more yourself than you were. Grow — one way or another.',
+    5: 'The pieces are pulling toward each other. So are you.',
+  }
+
+  const send = () => {
+    const h: Handout = {
+      id: crypto.randomUUID(),
+      target: null,
+      title: `✦ Level ${level}`,
+      body: `${LINES[level] ?? 'The road has changed you.'} (Level ${level} — open your sheet.)`,
+      level,
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    setSent(level)
+    setTimeout(() => setSent(null), 3000)
+  }
+
+  return (
+    <div>
+      <p className="text-sm" style={{ color: C.faint }}>
+        Milestone leveling. The party is level {current}. Announce the new level and every phone walks its
+        player through what wakes — subclass at 3, a feat or ability boost at 4.
+      </p>
+      <div className="flex items-center gap-2 mt-2">
+        {[2, 3, 4, 5, 6].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setLevel(n)}
+            className="rounded-md px-3 py-2 text-sm"
+            style={{
+              background: level === n ? C.gold : C.night,
+              color: level === n ? C.ink : C.parchment,
+              border: `1px solid ${level === n ? C.gold : C.panelEdge}`,
+              minHeight: 44,
+              cursor: 'pointer',
+              opacity: n <= current ? 0.5 : 1,
+            }}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      <Btn onClick={send} disabled={level <= current} shimmer>
+        {sent ? `Level ${sent} announced ✦` : `Announce level ${level} to the party`}
+      </Btn>
     </div>
   )
 }

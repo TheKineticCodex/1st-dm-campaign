@@ -14,6 +14,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
+import { LevelUp } from './LevelUp'
 import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display } from './ui'
 
 interface SheetTabProps {
@@ -23,7 +24,11 @@ interface SheetTabProps {
   onGoFortune: () => void
   store: Store
   playerName: string
+  /** The level the Lantern-Keeper has announced (0 = none yet). */
+  announcedLevel?: number
 }
+
+const ordinal = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`)
 
 const BAG_EMOJI = ['🗡', '🪄', '🧭', '📜', '🍾', '🪙', '🎻', '🌸', '🗝', '🐚']
 
@@ -247,7 +252,7 @@ function SpellChips({ label, names }: { label: string; names: string[] }) {
   )
 }
 
-export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName }: SheetTabProps) {
+export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName, announcedLevel = 0 }: SheetTabProps) {
   const [rollMode, setRollMode] = useState<RollMode>('normal')
   const [quickRoll, setQuickRoll] = useState(false)
   const [roll, setRoll] = useState<RollResult | null>(null)
@@ -380,18 +385,25 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
     }
   }
 
+  const usedSlots = (lvl: number): number => (lvl === 1 ? state.slotsUsed : (state.slotsByLevel?.[lvl] ?? 0))
+
   const shortRest = () => {
     if (!window.confirm('Take a Short Rest (1 hour)? Warlock pact slots return; spend Hit Dice with your DM.')) return
-    updateState({ slotsUsed: sheet.K.caster === 'pact' ? 0 : state.slotsUsed })
+    const uses = { ...(state.uses ?? {}) }
+    for (const f of sheet.featureList) if (f.uses?.per === 'short') delete uses[f.name]
+    updateState({ slotsUsed: sheet.K.caster === 'pact' ? 0 : state.slotsUsed, uses })
   }
 
   const longRest = () => {
     if (!window.confirm('Take a Long Rest (8 hours)? HP and all spell slots return in the morning.')) return
-    updateState({ damage: 0, slotsUsed: 0, deathSaves: { successes: 0, failures: 0 } })
+    updateState({ damage: 0, slotsUsed: 0, slotsByLevel: {}, uses: {}, deathSaves: { successes: 0, failures: 0 } })
   }
 
-  const toggleSlot = (i: number) => {
-    updateState({ slotsUsed: i < state.slotsUsed ? i : i + 1 })
+  const toggleSlot = (i: number, lvl = 1) => {
+    const used = usedSlots(lvl)
+    const next = i < used ? i : i + 1
+    if (lvl === 1) updateState({ slotsUsed: next, slotsByLevel: { ...(state.slotsByLevel ?? {}), 1: next } })
+    else updateState({ slotsByLevel: { ...(state.slotsByLevel ?? {}), [lvl]: next } })
   }
 
   const deathPip = (kind: 'successes' | 'failures', i: number) => {
@@ -497,6 +509,16 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         Level {sheet.level}
         {build.subclass === null ? ` · subclass unlocks at level ${sheet.K.subclassAt} 🔒` : ` · ${build.subclass}`}
       </p>
+
+      {(announcedLevel > sheet.level || sheet.subclassDue || sheet.featDue) && (
+        <div className="mt-3">
+          <LevelUp
+            build={build}
+            targetLevel={Math.max(announcedLevel, sheet.level)}
+            onSeal={(nextBuild) => onUpdate({ ...character, build: nextBuild, updatedAt: new Date().toISOString() })}
+          />
+        </div>
+      )}
 
       {/* Advantage toggle */}
       <div className="flex gap-2 mt-3" role="group" aria-label="Roll mode">
@@ -795,28 +817,39 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               <p className="text-sm mb-1" style={{ color: C.sea }}>
                 {sheet.K.caster === 'pact' ? 'Pact slots (return on short rest)' : 'Spell slots'}
               </p>
-              <div className="flex gap-2">
-                {Array.from({ length: sheet.slotCount }, (_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    aria-label={`Spell slot ${i + 1} ${i < state.slotsUsed ? 'used' : 'available'}`}
-                    onClick={() => toggleSlot(i)}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 10,
-                      border: `2px solid ${C.gold}`,
-                      background: i < state.slotsUsed ? 'transparent' : C.gold,
-                      color: i < state.slotsUsed ? C.faint : C.ink,
-                      fontSize: 18,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {i < state.slotsUsed ? '·' : '✦'}
-                  </button>
-                ))}
-              </div>
+              {(sheet.slotsByLevel.length ? sheet.slotsByLevel : [sheet.slotCount]).map((count, li) => {
+                const lvl = li + 1
+                const used = usedSlots(lvl)
+                return (
+                  <div key={lvl} className="flex items-center gap-2 mb-2">
+                    <span className="text-xs" style={{ color: C.faint, width: 44 }}>
+                      {ordinal(lvl)}
+                    </span>
+                    <div className="flex gap-2">
+                      {Array.from({ length: count }, (_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          aria-label={`Level ${lvl} spell slot ${i + 1} ${i < used ? 'used' : 'available'}`}
+                          onClick={() => toggleSlot(i, lvl)}
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 10,
+                            border: `2px solid ${C.gold}`,
+                            background: i < used ? 'transparent' : C.gold,
+                            color: i < used ? C.faint : C.ink,
+                            fontSize: 18,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {i < used ? '·' : '✦'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </Section>
@@ -921,12 +954,19 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
       {/* Features */}
       <Section>
         <Eyebrow>Features & traits</Eyebrow>
-        {sheet.features.map((f) => (
-          <p key={f} className="text-sm mb-1">
-            • {f}
+        {sheet.featureList.map((f, i) => (
+          <p key={`${f.name}-${i}`} className="text-sm mb-1">
+            • <strong style={{ color: C.parchment }}>{f.name}</strong>
+            {f.text && <span style={{ opacity: 0.85 }}> — {f.text}</span>}
+            {f.uses && (
+              <span className="text-xs" style={{ color: C.sea }}>
+                {' '}
+                · {f.uses.n}/{f.uses.per} rest
+              </span>
+            )}
           </p>
         ))}
-        {sheet.S.traits.map((t) => (
+        {sheet.speciesTraits.map((t) => (
           <p key={t} className="text-sm mb-1">
             • {t}
           </p>
