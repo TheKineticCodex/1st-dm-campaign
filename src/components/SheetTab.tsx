@@ -5,7 +5,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
-import { SPELL_NOTES } from '../data/spells'
 import { seedBag } from '../lib/bag'
 import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
@@ -15,6 +14,7 @@ import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
 import { LevelUp } from './LevelUp'
+import { SpellChips, SpellsSection } from './SpellsSection'
 import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display } from './ui'
 
 interface SheetTabProps {
@@ -211,46 +211,6 @@ function PurseSection({ coins, onChange }: { coins: Coins; onChange: (next: Coin
 }
 
 /** Tappable spell names — tap one to unfold what it does, in plain words. */
-function SpellChips({ label, names }: { label: string; names: string[] }) {
-  const [open, setOpen] = useState<string | null>(null)
-  if (names.length === 0) return null
-  return (
-    <div className="mt-1">
-      <p className="text-sm">
-        <strong>{label}:</strong>
-      </p>
-      <div className="flex flex-wrap gap-1.5 mt-1">
-        {names.map((n) => (
-          <button
-            key={n}
-            type="button"
-            aria-expanded={open === n}
-            onClick={() => setOpen(open === n ? null : n)}
-            className="rounded-md px-2.5 py-1.5 text-sm"
-            style={{
-              background: open === n ? `${C.gold}22` : C.night,
-              border: `1px solid ${open === n ? C.gold : C.panelEdge}`,
-              color: open === n ? C.gold : C.parchment,
-              minHeight: 36,
-              cursor: 'pointer',
-            }}
-          >
-            {n}
-          </button>
-        ))}
-      </div>
-      {open && (
-        <p
-          className="text-sm mt-2 rounded-lg px-3 py-2 leading-relaxed"
-          style={{ background: C.night, border: `1px solid ${C.gold}44`, color: C.parchment }}
-        >
-          <span style={{ color: C.gold, fontStyle: 'italic' }}>{open} · </span>
-          {(SPELL_NOTES[open] ?? 'Ask the Lantern-Keeper — this one isn’t in the pocket-book yet.').replace(/\s*\/\/ VERIFY.*$/, '')}
-        </p>
-      )}
-    </div>
-  )
-}
 
 export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName, announcedLevel = 0 }: SheetTabProps) {
   const [rollMode, setRollMode] = useState<RollMode>('normal')
@@ -397,6 +357,18 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
   const longRest = () => {
     if (!window.confirm('Take a Long Rest (8 hours)? HP and all spell slots return in the morning.')) return
     updateState({ damage: 0, slotsUsed: 0, slotsByLevel: {}, uses: {}, deathSaves: { successes: 0, failures: 0 } })
+  }
+
+  /** One atomic update: spend a slot and (maybe) light concentration. */
+  const castSpell = (slotLvl: number | null, concentration: boolean) => {
+    const patch: Partial<SavedCharacter['state']> = {}
+    if (slotLvl) {
+      const next = usedSlots(slotLvl) + 1
+      patch.slotsByLevel = { ...(state.slotsByLevel ?? {}), [slotLvl]: next }
+      if (slotLvl === 1) patch.slotsUsed = next
+    }
+    if (concentration) patch.concentrating = true
+    updateState(patch)
   }
 
   const toggleSlot = (i: number, lvl = 1) => {
@@ -776,23 +748,19 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
       {/* Spells & slots */}
       {sheet.K.spells && (
+        <SpellsSection
+          build={build}
+          state={state}
+          sheet={sheet}
+          usedSlots={usedSlots}
+          castSpell={castSpell}
+          updateBuild={(patch) => update({ build: { ...build, ...patch } })}
+          onRollSpellAttack={() => doRoll('Spell attack', sheet.spellAttack ?? 0)}
+        />
+      )}
+      {sheet.K.spells && (
         <Section>
-          <Eyebrow>Spellcasting</Eyebrow>
-          <p className="text-xs" style={{ color: C.faint }}>
-            Tap a spell to see what it does.
-          </p>
-          <SpellChips label="Cantrips (always free)" names={sheet.K.spells.cantrips} />
-          <SpellChips label="Level 1 (use spell slots)" names={sheet.K.spells.leveled} />
-          <p className="text-xs mt-2" style={{ color: C.faint }}>
-            <button
-              type="button"
-              onClick={() => doRoll('Spell attack', sheet.spellAttack ?? 0)}
-              style={{ color: C.sea, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              Spell attack {fmt(sheet.spellAttack ?? 0)}
-            </button>{' '}
-            · Save DC {sheet.spellDc}
-          </p>
+          <Eyebrow>Concentration &amp; slots</Eyebrow>
           <button
             type="button"
             aria-pressed={!!state.concentrating}

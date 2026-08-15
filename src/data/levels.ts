@@ -120,6 +120,8 @@ export interface Subclass {
   /** One line for the choosing screen: who picks this. */
   fits: string
   features: Record<number, Feature[]>
+  /** Spells always prepared, by the level they arrive — they don't count against the prepared limit. */
+  grants?: Record<number, string[]>
 }
 
 export const SUBCLASSES: Record<string, Record<string, Subclass>> = {
@@ -127,6 +129,7 @@ export const SUBCLASSES: Record<string, Record<string, Subclass>> = {
     'Circle of the Land': {
       blurb: 'The old druids of hill and grove. Extra spells from the land you know, and the land pays you back.',
       fits: 'A caster who wants MORE spells and steadier magic. (SRD.)',
+      grants: { 3: ['Misty Step', 'Sleep'], 5: ['Lightning Bolt', 'Plant Growth'] }, // Temperate land // VERIFY
       features: {
         3: [
           { name: 'Circle Spells', text: 'Choose a land — Arid, Polar, Temperate, or Tropical. Its spells are always prepared for you (Temperate: Misty Step, Sleep at 3rd; Lightning Bolt, Plant Growth at 5th). // VERIFY', action: 'passive' },
@@ -137,6 +140,7 @@ export const SUBCLASSES: Record<string, Record<string, Subclass>> = {
     'Circle of the Moon': {
       blurb: 'The shapeshifters. Your beast forms are stronger, and you can heal yourself while wearing them.',
       fits: 'A druid who wants to FIGHT as an animal — bear, wolf, whatever the bog needs.',
+      grants: { 3: ['Cure Wounds', 'Moonbeam', 'Starry Wisp'] }, // VERIFY
       features: {
         3: [
           { name: 'Circle Forms', text: 'Your Wild Shape beasts are tougher: challenge rating up to a third of your level, an AC of 13 + WIS mod if better, and temporary HP equal to three times your druid level when you transform. // VERIFY', action: 'passive' },
@@ -147,6 +151,7 @@ export const SUBCLASSES: Record<string, Record<string, Subclass>> = {
     'Circle of the Sea': {
       blurb: 'Storm and tide. You carry the sea’s anger with you, and it lashes out around you.',
       fits: 'A druid who wants to stand in the middle of a fight and be the weather. (Peaches’s natural home.)',
+      grants: { 3: ['Fog Cloud', 'Gust of Wind', 'Ray of Frost', 'Shatter', 'Thunderwave'] }, // VERIFY
       features: {
         3: [
           { name: 'Wrath of the Sea', text: 'Bonus action: expend a Wild Shape use to surround yourself with a 5-ft aura of spray for 10 minutes. At the end of each of your turns, one creature in the aura you choose makes a CON save or takes d6 cold damage (dice equal to your WIS mod) and is pushed 15 ft. // VERIFY', uses: { n: 1, per: 'short' }, action: 'bonus' },
@@ -157,6 +162,7 @@ export const SUBCLASSES: Record<string, Record<string, Subclass>> = {
     'Circle of the Stars': {
       blurb: 'The sky-readers. A star map, an omen, and a form made of constellations.',
       fits: 'A druid who wants magic that looks like the night sky — and a little foresight.',
+      grants: { 3: ['Guidance', 'Guiding Bolt'] }, // VERIFY
       features: {
         3: [
           { name: 'Star Map', text: 'You hold a star chart (your druidic focus). Guidance and Guiding Bolt are always prepared, and you can cast Guiding Bolt without a slot a number of times per long rest equal to your WIS mod. // VERIFY', uses: { n: 3, per: 'long' }, action: 'passive' },

@@ -17,6 +17,12 @@ export interface CharacterBuild {
   feats?: string[]
   /** Extra ability bumps from ASIs and feats, applied on top of the origin bumps. */
   asi?: Partial<Record<AbilityKey, number>>
+  /** Cantrips known. Undefined = the class starter list. */
+  cantrips?: string[]
+  /** A wizard's spellbook (spells known). Undefined = the class starter list. */
+  spellbook?: string[]
+  /** Spells prepared for the day (leveled). Undefined = the class starter list. */
+  prepared?: string[]
   /** Aura key (see glyphs.tsx AURAS) — the light the lanterns see in you. */
   aura?: string
   /** The mirror's portrait — seed baked into the URL; once seen, final. */
