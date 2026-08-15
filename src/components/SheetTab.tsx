@@ -13,6 +13,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
+import { DiceTray } from './DiceTray'
 import { LevelUp } from './LevelUp'
 import type { Feature } from '../data/levels'
 import { SpellChips, SpellsSection } from './SpellsSection'
@@ -544,6 +545,16 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               ability checks · saves &amp; skills live below on the sheet
             </p>
           </div>
+        )}
+        {quickRoll && (
+          <DiceTray
+            mode={rollMode}
+            onD20={(r) => {
+              setDamage(null)
+              setRoll(r)
+              broadcastRoll(r)
+            }}
+          />
         )}
       </div>
 

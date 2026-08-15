@@ -56,3 +56,8 @@ export function rollDamage(notation: string, modifier: number): { rolls: number[
   const rolls = Array.from({ length: Number(n) }, () => die(Number(size)))
   return { rolls, total: rolls.reduce((s, r) => s + r, 0) + modifier }
 }
+
+/** Roll N dice of one size (any die). Uniform, secure. */
+export function rollDice(count: number, size: number): number[] {
+  return Array.from({ length: Math.max(0, count) }, () => die(size))
+}
