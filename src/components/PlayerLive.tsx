@@ -6,9 +6,10 @@ import { useEffect, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
-import type { Bargain, Encounter, Handout, RaceEvent, VitalsEvent } from '../types'
+import type { Bargain, Encounter, Handout, RaceEvent, VitalsEvent, WheelEvent } from '../types'
 import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
+import { Wheel } from './Wheel'
 import { C, display } from './ui'
 
 const RACE_GOAL = 40
@@ -39,6 +40,24 @@ interface PlayerRace {
   place?: number
 }
 
+/** The fortune, revealed after the wheel stops. */
+function WheelResult({ wedge, duration, spunBy, me }: { wedge: string; duration: number; spunBy?: string; me: string }) {
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setShown(true), duration * 1000 + 300)
+    return () => clearTimeout(t)
+  }, [duration])
+  if (!shown) return <p className="text-sm" style={{ color: C.faint }}>…</p>
+  return (
+    <div className="text-center mt-2" style={{ animation: 'cardRise .5s ease-out' }}>
+      <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+        {spunBy === me ? 'your fortune' : `${spunBy ?? 'the'}’s fortune`}
+      </p>
+      <p style={{ ...display, fontSize: 22, fontWeight: 700, color: C.gold, maxWidth: 420 }}>{wedge}</p>
+    </div>
+  )
+}
+
 export function PlayerLive({
   store,
   playerName,
@@ -53,6 +72,7 @@ export function PlayerLive({
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [handout, setHandout] = useState<Handout | null>(null)
   const [race, setRace] = useState<PlayerRace | null>(null)
+  const [wheel, setWheel] = useState<WheelEvent | null>(null)
   const [offer, setOffer] = useState<Bargain | null>(null)
   const [ceremony, setCeremony] = useState<{ outcome: 'fulfilled' | 'broken'; title: string } | null>(null)
   const queue = useRef<Handout[]>([])
@@ -113,6 +133,12 @@ export function PlayerLive({
             if (b.targetPlayer !== playerName) return
             onBargainResolveRef.current(b.bargainId, b.outcome)
             setCeremony({ outcome: b.outcome, title: b.title ?? 'The bargain' })
+          },
+          wheel: (w: WheelEvent) => {
+            if (w.phase === 'clear') setWheel(null)
+            else if (w.phase === 'arm') setWheel(w)
+            else if (w.phase === 'end') setWheel((cur) => (cur && cur.wheelId === w.wheelId ? { ...cur, ...w } : { ...w }))
+            // 'spin' is a request to the DM; phones wait for 'end'.
           },
           race: (r: RaceEvent) => {
             if (r.phase === 'start') {
@@ -226,6 +252,61 @@ export function PlayerLive({
 
       {ceremony && (
         <BargainCeremony outcome={ceremony.outcome} title={ceremony.title} onDone={() => setCeremony(null)} />
+      )}
+
+      {wheel && (
+        <div
+          className="fixed inset-0 flex flex-col items-center justify-start p-6"
+          style={{ background: `${C.night}FA`, zIndex: 75, overflowY: 'auto' }}
+          role="dialog"
+          aria-label="The Fortune Wheel"
+        >
+          <p className="text-xs uppercase tracking-widest mt-4" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+            The carnival presents
+          </p>
+          <h2 style={{ ...display, fontSize: 30, fontWeight: 700, color: C.gold, textAlign: 'center' }}>
+            🎡 The Fortune Wheel
+          </h2>
+          <div className="my-4">
+            <Wheel
+              wedges={wheel.wedges ?? []}
+              target={wheel.phase === 'end' && typeof wheel.target === 'number' ? wheel.target : null}
+              turns={wheel.turns}
+              duration={wheel.duration}
+              spinKey={`${wheel.wheelId}:${wheel.phase}`}
+              size={Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 64 : 300)}
+            />
+          </div>
+          {wheel.phase === 'arm' && (wheel.spinner === null || wheel.spinner === playerName) && (
+            <button
+              type="button"
+              onClick={() => {
+                channelRef.current?.sendWheel({ wheelId: wheel.wheelId, phase: 'spin', spunBy: playerName })
+                setWheel({ ...wheel, phase: 'spin', spunBy: playerName })
+              }}
+              className="rounded-full font-bold"
+              style={{ ...display, fontSize: 22, background: C.gold, color: C.ink, border: 'none', minHeight: 64, minWidth: 220, cursor: 'pointer', boxShadow: `0 0 30px ${C.gold}66` }}
+            >
+              Spin the wheel ✦
+            </button>
+          )}
+          {wheel.phase === 'arm' && wheel.spinner && wheel.spinner !== playerName && (
+            <p className="text-sm" style={{ color: C.faint }}>
+              {wheel.spinner} has the handle. Watch.
+            </p>
+          )}
+          {wheel.phase === 'spin' && (
+            <p className="text-sm" style={{ color: C.faint }}>
+              The wheel takes a breath…
+            </p>
+          )}
+          {wheel.phase === 'end' && typeof wheel.target === 'number' && (
+            <WheelResult wedge={wheel.wedges?.[wheel.target] ?? ''} duration={wheel.duration ?? 5.5} spunBy={wheel.spunBy} me={playerName} />
+          )}
+          <p className="text-xs mt-3" style={{ color: C.faint }}>
+            {(wheel.wedges ?? []).map((w, i) => `${i + 1}. ${w}`).join('  ·  ')}
+          </p>
+        </div>
       )}
 
       {race && (

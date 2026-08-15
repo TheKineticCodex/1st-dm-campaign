@@ -4,7 +4,7 @@
 
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from './supabase'
-import type { BargainEvent, ConditionEvent, Encounter, Handout, RaceEvent, RollEvent, StageState, VitalsEvent } from '../types'
+import type { BargainEvent, ConditionEvent, Encounter, Handout, RaceEvent, RollEvent, StageState, VitalsEvent, WheelEvent } from '../types'
 
 export interface TableEvents {
   encounter: (e: Encounter) => void
@@ -15,6 +15,7 @@ export interface TableEvents {
   bargain: (b: BargainEvent) => void
   stage: (s: StageState) => void
   vitals: (v: VitalsEvent) => void
+  wheel: (w: WheelEvent) => void
 }
 
 export interface TableChannel {
@@ -26,6 +27,7 @@ export interface TableChannel {
   sendBargain(b: BargainEvent): void
   sendStage(s: StageState): void
   sendVitals(v: VitalsEvent): void
+  sendWheel(w: WheelEvent): void
   close(): void
 }
 
@@ -47,6 +49,7 @@ export function joinTableChannel(
       sendBargain: () => {},
       sendStage: () => {},
       sendVitals: () => {},
+      sendWheel: () => {},
       close: () => {},
     }
   }
@@ -79,6 +82,9 @@ export function joinTableChannel(
   if (on.vitals) {
     channel.on('broadcast', { event: 'vitals' }, (msg) => on.vitals!(msg.payload as VitalsEvent))
   }
+  if (on.wheel) {
+    channel.on('broadcast', { event: 'wheel' }, (msg) => on.wheel!(msg.payload as WheelEvent))
+  }
   channel.subscribe()
 
   const send = (event: string, payload: unknown) =>
@@ -93,6 +99,7 @@ export function joinTableChannel(
     sendBargain: (b) => send('bargain', b),
     sendStage: (s) => send('stage', s),
     sendVitals: (v) => send('vitals', v),
+    sendWheel: (w) => send('wheel', w),
     close() {
       void supabase!.removeChannel(channel)
     },

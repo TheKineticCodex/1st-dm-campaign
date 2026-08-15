@@ -248,6 +248,25 @@ export interface RaceEvent {
   results?: string[]
 }
 
+/**
+ * 🎡 The Fortune Wheel (carnival game 1). The DM arms it (wedges + who may
+ * spin); the spinner's phone asks to spin; the DM's Book decides where it
+ * lands (fate, or a wedge pre-picked) and broadcasts 'end' so every screen
+ * animates the same spin. Prizes are fiction the DM whispers afterward.
+ */
+export interface WheelEvent {
+  wheelId: string
+  phase: 'arm' | 'spin' | 'end' | 'clear'
+  wedges?: string[]
+  /** Who may spin: a player name, or null = anyone. */
+  spinner?: string | null
+  /** Who actually spun (phase 'spin' / 'end'). */
+  spunBy?: string
+  target?: number
+  turns?: number
+  duration?: number
+}
+
 // ---- The story engine (choose-your-own-adventure timeline) ----
 
 export interface StoryBranch {

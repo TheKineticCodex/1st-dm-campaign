@@ -9,8 +9,9 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
-import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent } from '../types'
+import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
 import { MapBoard } from './MapBoard'
+import { DEFAULT_WEDGES, Wheel } from './Wheel'
 import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
 
 interface DmRace {
@@ -108,6 +109,10 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
   const [loaded, setLoaded] = useState(false)
   const [feed, setFeed] = useState<RollEvent[]>([])
   const [live, setLive] = useState<Record<string, VitalsEvent>>({})
+  const [wheel, setWheel] = useState<WheelEvent | null>(null)
+  const wheelRef = useRef<WheelEvent | null>(null)
+  wheelRef.current = wheel
+  const rigRef = useRef<number | null>(null)
   const [race, setRace] = useState<DmRace | null>(null)
   const raceRef = useRef<DmRace | null>(null)
   raceRef.current = race
@@ -120,6 +125,17 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
       channelRef.current = joinTableChannel(channelId, {
         roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
         vitals: (v: VitalsEvent) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
+        wheel: (w: WheelEvent) => {
+          const cur = wheelRef.current
+          if (w.phase === 'spin' && cur && cur.wheelId === w.wheelId && cur.phase === 'arm') {
+            // The Book decides where it lands: a pre-picked wedge, or fate.
+            const n = cur.wedges?.length ?? 1
+            const target = rigRef.current !== null && rigRef.current < n ? rigRef.current : Math.floor(Math.random() * n)
+            const end: WheelEvent = { wheelId: cur.wheelId, phase: 'end', wedges: cur.wedges, spinner: cur.spinner, spunBy: w.spunBy, target, turns: 5 + Math.floor(Math.random() * 3), duration: 5.5 }
+            setWheel(end)
+            channelRef.current?.sendWheel(end)
+          }
+        },
         race: (r: RaceEvent) => {
           const cur = raceRef.current
           if (!cur || r.raceId !== cur.raceId || cur.ended) return
@@ -325,6 +341,25 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
 
       <Fold id="dm-song" title="🎵 A piece comes home">
         <SongComposer store={store} channelRef={channelRef} />
+      </Fold>
+
+      <Fold id="dm-wheel" title="🎡 The Fortune Wheel" forceOpen={!!wheel}>
+        <WheelPanel
+          store={store}
+          roster={roster}
+          channelRef={channelRef}
+          wheel={wheel}
+          onArm={(w, rig) => {
+            rigRef.current = rig
+            setWheel(w)
+            channelRef.current?.sendWheel(w)
+          }}
+          onClear={() => {
+            const id = wheel?.wheelId ?? 'none'
+            setWheel(null)
+            channelRef.current?.sendWheel({ wheelId: id, phase: 'clear' })
+          }}
+        />
       </Fold>
 
       <Fold id="dm-map" title="🗺 The table map">
@@ -656,6 +691,138 @@ function LevelUpComposer({
       <Btn onClick={send} disabled={level <= current} shimmer>
         {sent ? `Level ${sent} announced ✦` : `Announce level ${level} to the party`}
       </Btn>
+    </div>
+  )
+}
+
+// -------------------------------------------------------------- the wheel
+
+function WheelPanel({
+  store,
+  roster,
+  channelRef,
+  wheel,
+  onArm,
+  onClear,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  channelRef: { current: TableChannel | null }
+  wheel: WheelEvent | null
+  onArm: (w: WheelEvent, rig: number | null) => void
+  onClear: () => void
+}) {
+  const [wedges, setWedges] = useState<string[]>(() => readCache<string[]>('wheel-wedges') ?? DEFAULT_WEDGES)
+  const [spinner, setSpinner] = useState<string>('') // '' = anyone
+  const [rig, setRig] = useState<number>(-1) // -1 = fate
+  const [sent, setSent] = useState(false)
+
+  const setWedge = (i: number, v: string) => {
+    const next = wedges.map((w, j) => (j === i ? v : w))
+    setWedges(next)
+    writeCache('wheel-wedges', next)
+  }
+  const arm = () => {
+    onArm({ wheelId: crypto.randomUUID(), phase: 'arm', wedges: wedges.filter((w) => w.trim()), spinner: spinner || null }, rig >= 0 ? rig : null)
+  }
+  const whisper = () => {
+    if (!wheel || typeof wheel.target !== 'number') return
+    const h: Handout = {
+      id: crypto.randomUUID(),
+      target: wheel.spunBy ?? null,
+      title: '🎡 Your fortune',
+      body: wheel.wedges?.[wheel.target] ?? '',
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    setSent(true)
+    setTimeout(() => setSent(false), 2500)
+  }
+
+  if (wheel) {
+    return (
+      <div>
+        <p className="text-sm mb-2" style={{ color: C.faint }}>
+          {wheel.phase === 'arm' && `Armed. ${wheel.spinner ? `${wheel.spinner} has the handle` : 'Anyone may spin'}. ${rig >= 0 ? `It will land on ${rig + 1}.` : 'Fate decides.'}`}
+          {wheel.phase === 'spin' && 'Spinning…'}
+          {wheel.phase === 'end' && typeof wheel.target === 'number' && `Landed on ${wheel.target + 1}: “${wheel.wedges?.[wheel.target]}” — spun by ${wheel.spunBy ?? '?'}.`}
+        </p>
+        <Wheel
+          wedges={wheel.wedges ?? []}
+          target={wheel.phase === 'end' && typeof wheel.target === 'number' ? wheel.target : null}
+          turns={wheel.turns}
+          duration={wheel.duration}
+          spinKey={`${wheel.wheelId}:${wheel.phase}`}
+          size={260}
+        />
+        <div className="flex gap-2 mt-3">
+          {wheel.phase === 'end' && (
+            <Btn onClick={whisper} shimmer>
+              {sent ? 'Fortune whispered ✦' : `Whisper the fortune to ${wheel.spunBy ?? 'them'}`}
+            </Btn>
+          )}
+          <Btn secondary onClick={onClear}>
+            Return to the story
+          </Btn>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <p className="text-sm" style={{ color: C.faint }}>
+        Eight fortunes with a cold edge. Edit them, choose who holds the handle, decide whether fate or you picks the wedge — then arm it. Every phone sees the wheel; the spinner gets the button; every screen watches the same spin.
+      </p>
+      <div className="grid gap-1 mt-2">
+        {wedges.map((w, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="text-xs" style={{ color: C.gold, width: 18, textAlign: 'right' }}>
+              {i + 1}
+            </span>
+            <TextInput value={w} onChange={(v) => setWedge(i, v)} placeholder={`Fortune ${i + 1}`} />
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-2 mt-3">
+        <select
+          aria-label="Who spins"
+          value={spinner}
+          onChange={(e) => setSpinner(e.target.value)}
+          className="rounded-md px-3 py-2"
+          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+        >
+          <option value="">Anyone may spin</option>
+          {roster.map((r) => (
+            <option key={r.playerId} value={r.playerName}>
+              {r.playerName} spins
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Where it lands"
+          value={rig}
+          onChange={(e) => setRig(Number(e.target.value))}
+          className="rounded-md px-3 py-2"
+          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+        >
+          <option value={-1}>Fate decides</option>
+          {wedges.map((_, i) => (
+            <option key={i} value={i}>
+              Lands on {i + 1}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Btn onClick={arm} disabled={!store.shared || roster.length === 0} shimmer>
+        Arm the wheel 🎡
+      </Btn>
+      {!store.shared && (
+        <p className="text-xs mt-1" style={{ color: C.faint }}>
+          Needs the campaign lantern (Supabase) to reach the phones.
+        </p>
+      )}
     </div>
   )
 }
