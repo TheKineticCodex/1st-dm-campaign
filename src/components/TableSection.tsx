@@ -9,11 +9,14 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
-import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
+import type { Bargain, Encounter, FinaleEvent, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
 import { MapBoard } from './MapBoard'
 import { createHost, type Host } from '../lib/gameHost'
 import type { GameEvent, GameState } from '../lib/games'
 import { GamesPanel } from './games/GamesPanel'
+import { FinalePanel } from './Finale'
+import { playWhole } from '../lib/song'
+import { duck } from '../lib/ambience'
 import { DEFAULT_WEDGES, Wheel } from './Wheel'
 import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
 
@@ -121,6 +124,10 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
   raceRef.current = race
   const hostRef = useRef<Host | null>(null)
   const [game, setGame] = useState<GameState | null>(null)
+  const [finale, setFinale] = useState<FinaleEvent | null>(null)
+  const finaleRef = useRef<FinaleEvent | null>(null)
+  finaleRef.current = finale
+  const [finaleReady, setFinaleReady] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     let cancelled = false
@@ -130,6 +137,11 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
       channelRef.current = joinTableChannel(channelId, {
         roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
         game: (g: GameEvent) => hostRef.current?.input(g),
+        finale: (f: FinaleEvent) => {
+          if (f.phase === 'ready' && f.from && finaleRef.current && f.finaleId === finaleRef.current.finaleId) {
+            setFinaleReady((cur) => new Set(cur).add(f.from!))
+          }
+        },
         vitals: (v: VitalsEvent) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
         wheel: (w: WheelEvent) => {
           const cur = wheelRef.current
@@ -380,6 +392,34 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
           onWhisper={(h) => {
             void store.sendHandout(h)
             channelRef.current?.sendHandout(h)
+          }}
+        />
+      </Fold>
+
+      <Fold id="dm-finale" title="🌕 The finale — the song on every phone" forceOpen={!!finale}>
+        <FinalePanel
+          players={roster.map((r) => r.playerName)}
+          ready={finaleReady}
+          event={finale}
+          onArm={() => {
+            const f: FinaleEvent = { finaleId: crypto.randomUUID(), phase: 'arm' }
+            setFinaleReady(new Set())
+            setFinale(f)
+            channelRef.current?.sendFinale(f)
+          }}
+          onStart={(inMs) => {
+            if (!finale) return
+            const f: FinaleEvent = { finaleId: finale.finaleId, phase: 'start', inMs }
+            setFinale(f)
+            channelRef.current?.sendFinale(f)
+            duck(14, 0.12)
+            setTimeout(() => playWhole(), inMs)
+          }}
+          onClear={() => {
+            const id = finale?.finaleId ?? 'none'
+            setFinale(null)
+            setFinaleReady(new Set())
+            channelRef.current?.sendFinale({ finaleId: id, phase: 'clear' })
           }}
         />
       </Fold>

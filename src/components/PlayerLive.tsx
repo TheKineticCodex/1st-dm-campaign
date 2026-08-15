@@ -7,7 +7,7 @@ import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { GameEvent, GameInput, GameState } from '../lib/games'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
-import type { Bargain, Encounter, Handout, RaceEvent, VitalsEvent, WheelEvent } from '../types'
+import type { Bargain, Encounter, FinaleEvent, Handout, RaceEvent, VitalsEvent, WheelEvent } from '../types'
 import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
 import { Wheel } from './Wheel'
@@ -15,6 +15,7 @@ import { C, display } from './ui'
 
 const RACE_GOAL = 40
 const GamePhoneOverlay = lazy(() => import('./games/GameShell'))
+const FinalePhone = lazy(() => import('./Finale').then((m) => ({ default: m.FinalePhone })))
 
 interface PlayerLiveProps {
   store: Store
@@ -76,6 +77,7 @@ export function PlayerLive({
   const [race, setRace] = useState<PlayerRace | null>(null)
   const [wheel, setWheel] = useState<WheelEvent | null>(null)
   const [game, setGame] = useState<GameState | null>(null)
+  const [finale, setFinale] = useState<FinaleEvent | null>(null)
   const [offer, setOffer] = useState<Bargain | null>(null)
   const [ceremony, setCeremony] = useState<{ outcome: 'fulfilled' | 'broken'; title: string } | null>(null)
   const queue = useRef<Handout[]>([])
@@ -136,6 +138,12 @@ export function PlayerLive({
             if (b.targetPlayer !== playerName) return
             onBargainResolveRef.current(b.bargainId, b.outcome)
             setCeremony({ outcome: b.outcome, title: b.title ?? 'The bargain' })
+          },
+          finale: (f: FinaleEvent) => {
+            if (f.phase === 'clear') setFinale(null)
+            else if (f.phase === 'arm') setFinale(f)
+            else if (f.phase === 'start') setFinale((cur) => (cur && cur.finaleId === f.finaleId ? f : cur))
+            // 'ready' is a phone → Book message
           },
           game: (g: GameEvent) => {
             if (g.kind === 'clear') setGame(null)
@@ -325,6 +333,12 @@ export function PlayerLive({
       {game && (
         <Suspense fallback={null}>
           <GamePhoneOverlay state={game} me={playerName} send={sendGameInput} />
+        </Suspense>
+      )}
+
+      {finale && (
+        <Suspense fallback={null}>
+          <FinalePhone event={finale} me={playerName} send={(f) => channelRef.current?.sendFinale(f)} />
         </Suspense>
       )}
 

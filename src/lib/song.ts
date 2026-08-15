@@ -435,6 +435,25 @@ export function playFragment(which: Fragment): void {
     })
 }
 
+/**
+ * Wake the phone's voice inside a tap (iOS): create + resume the context and
+ * play a moment of silence so the finale can start later without a gesture.
+ */
+export function armSong(): Promise<boolean> {
+  const a = ctx()
+  return a
+    .resume()
+    .then(() => {
+      const buf = a.createBuffer(1, 1, a.sampleRate)
+      const src = a.createBufferSource()
+      src.buffer = buf
+      src.connect(a.destination)
+      src.start()
+      return a.state === 'running'
+    })
+    .catch(() => false)
+}
+
 /** True while the whole song is still sounding (for UI). */
 export function isWholeSounding(): boolean {
   return !!AC && AC.currentTime < stopAt

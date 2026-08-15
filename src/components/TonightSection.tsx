@@ -14,11 +14,17 @@ import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscr
 import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
+import { FogOverlay, TINTS, TintOverlay } from './Battlefield'
 import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, display } from './ui'
 
 const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', '#C96A6A', '#8BB8E0']
 
 const EMPTY_STAGE: StageState = { mode: 'ambient', mapUrl: null, tokens: [] }
+const FOG_SIZES: [number, string][] = [
+  [0.08, 'small'],
+  [0.14, 'lantern'],
+  [0.24, 'wide'],
+]
 
 export function TonightSection({
   store,
@@ -801,6 +807,7 @@ function StageControls({
 }) {
   const [stage, setStage] = useState<StageState>(EMPTY_STAGE)
   const [uploading, setUploading] = useState(false)
+  const [fogRadius, setFogRadius] = useState(0.14)
   const fileRef = useRef<HTMLInputElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const dragging = useRef<string | null>(null)
@@ -836,6 +843,8 @@ function StageControls({
       .map((r, i) => ({
         id: `pc-${r.playerId}`,
         label: (r.character!.build.name || r.playerName).slice(0, 2),
+        name: r.character!.build.name || r.playerName,
+        playerName: r.playerName,
         color: TOKEN_COLORS[(stage.tokens.length + i) % TOKEN_COLORS.length],
         x: 0.12 + i * 0.08,
         y: 0.88,
@@ -908,6 +917,15 @@ function StageControls({
             style={{ border: `1px solid ${C.panelEdge}`, touchAction: 'none' }}
           >
             <img src={stage.mapUrl} alt="Stage map" className="w-full block" draggable={false} />
+            <TintOverlay tint={stage.tint} tokens={stage.tokens} />
+            <FogOverlay
+              fog={stage.fog}
+              opacity={0.55}
+              onReveal={(x, y) => {
+                const fog = stage.fog ?? { on: true, reveals: [] }
+                push({ ...stage, fog: { ...fog, reveals: [...fog.reveals, { x, y, r: fogRadius }] } })
+              }}
+            />
             {stage.tokens.map((t) => (
               <button
                 key={t.id}
@@ -945,7 +963,8 @@ function StageControls({
               secondary
               onClick={() => {
                 const n = stage.tokens.filter((t) => t.id.startsWith('foe-')).length + 1
-                push({ ...stage, tokens: [...stage.tokens, { id: `foe-${crypto.randomUUID()}`, label: `E${n}`, color: '#C96A6A', x: 0.5, y: 0.12 }] })
+                const name = (window.prompt('Name this enemy (as it appears in initiative):', `Enemy ${n}`) ?? '').trim() || `Enemy ${n}`
+                push({ ...stage, tokens: [...stage.tokens, { id: `foe-${crypto.randomUUID()}`, label: name.slice(0, 2), name, color: '#C96A6A', x: 0.5, y: 0.12 }] })
               }}
             >
               + enemy
@@ -961,9 +980,70 @@ function StageControls({
           </div>
         </>
       )}
+      {stage.mapUrl && (
+        <>
+          <p className="text-xs mt-3 mb-1" style={{ color: C.faint }}>
+            the light
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {TINTS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                title={t.hint}
+                aria-pressed={(stage.tint ?? 'none') === t.id}
+                onClick={() => push({ ...stage, tint: t.id })}
+                className="text-xs rounded-full px-2 py-1"
+                style={{ background: (stage.tint ?? 'none') === t.id ? `${C.gold}22` : 'transparent', border: `1px solid ${(stage.tint ?? 'none') === t.id ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs mt-3 mb-1" style={{ color: C.faint }}>
+            fog of war — when it’s on, tap the map above to reveal a circle
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={!!stage.fog?.on}
+              onClick={() => push({ ...stage, fog: { on: !stage.fog?.on, reveals: stage.fog?.reveals ?? [] } })}
+              className="text-xs rounded-full px-3 py-1"
+              style={{ background: stage.fog?.on ? `${C.gold}22` : 'transparent', border: `1px solid ${stage.fog?.on ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
+            >
+              🌫 fog {stage.fog?.on ? 'on' : 'off'}
+            </button>
+            {stage.fog?.on && (
+              <>
+                {FOG_SIZES.map(([r, label]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-pressed={fogRadius === r}
+                    onClick={() => setFogRadius(r)}
+                    className="text-xs rounded-full px-2 py-1"
+                    style={{ background: fogRadius === r ? `${C.sea}22` : 'transparent', border: `1px solid ${fogRadius === r ? C.sea : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
+                  >
+                    {label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => push({ ...stage, fog: { on: true, reveals: [] } })}
+                  className="text-xs rounded-full px-2 py-1"
+                  style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.faint, cursor: 'pointer', minHeight: 32 }}
+                >
+                  re-fog everything
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
       <p className="text-xs mt-2" style={{ color: C.faint }}>
         Every move you make here appears on the iPad within a breath. On the iPad, tap 🎭 in the
-        header to enter stage mode.
+        header to enter stage mode. In a fight the iPad shows the order, whose turn it is, and
+        who’s bloodied — enemy tokens light up when their name matches the initiative row.
       </p>
     </div>
   )

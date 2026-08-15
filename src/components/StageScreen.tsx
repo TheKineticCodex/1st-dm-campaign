@@ -1,16 +1,20 @@
 // 🎭 The stage — what the iPad shows the table. A live listener: ambient
-// title scene until the MacBook pushes a map; then the map with the party's
-// tokens, moving as the DM moves them. When the DM starts a carnival game,
-// the stage becomes the game board. A small ✕ returns to the Book.
+// title scene until the MacBook pushes a map; then the living battlefield —
+// the map with the party's tokens moving as the DM moves them, the light the
+// DM chose, fog the DM reveals, whose turn it is, who's bloodied or down.
+// When the DM starts a carnival game, the stage becomes the game board; at
+// the finale it becomes the Moon. A small ✕ returns to the Book.
 
 import { useEffect, useRef, useState } from 'react'
 import { joinTableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
-import type { StageState } from '../types'
+import type { Encounter, FinaleEvent, StageState, VitalsEvent } from '../types'
 import type { GameState } from '../lib/games'
-import { GameStageBoard } from './games/GameShell'
 import { AmbientMode } from './AmbientMode'
-import { C } from './ui'
+import { FogOverlay, InitiativeRail, StageTokenView, TintOverlay, activeTokenId, vitalsFor } from './Battlefield'
+import { GameStageBoard } from './games/GameShell'
+import { FinaleStage } from './Finale'
+import { C, display } from './ui'
 
 interface StageScreenProps {
   store: Store
@@ -21,19 +25,29 @@ interface StageScreenProps {
 export function StageScreen({ store, roster, onClose }: StageScreenProps) {
   const [stage, setStage] = useState<StageState>({ mode: 'ambient', mapUrl: null, tokens: [] })
   const [game, setGame] = useState<GameState | null>(null)
+  const [enc, setEnc] = useState<Encounter | null>(null)
+  const [live, setLive] = useState<Record<string, VitalsEvent>>({})
+  const [finale, setFinale] = useState<FinaleEvent | null>(null)
   const closeRef = useRef(() => {})
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const [channelId, current] = await Promise.all([store.getChannelId(), store.getStage()])
+      const [channelId, current, active] = await Promise.all([store.getChannelId(), store.getStage(), store.getActiveEncounter()])
       if (cancelled) return
       if (current && current.mode) setStage(current)
+      if (active) setEnc(active)
       const channel = joinTableChannel(channelId, {
         stage: (s) => setStage(s),
+        encounter: (e) => setEnc(e.active ? e : null),
+        vitals: (v) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
         game: (g) => {
           if (g.kind === 'clear') setGame(null)
           else if (g.kind === 'state' && g.state) setGame(g.state)
+        },
+        finale: (f) => {
+          if (f.phase === 'clear') setFinale(null)
+          else if (f.phase === 'arm' || f.phase === 'start') setFinale(f)
         },
       })
       closeRef.current = channel.close
@@ -60,11 +74,21 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
         border: `1px solid ${C.panelEdge}`,
         cursor: 'pointer',
         fontSize: 16,
+        zIndex: 5,
       }}
     >
       ✕
     </button>
   )
+
+  if (finale) {
+    return (
+      <div className="fixed inset-0" style={{ background: '#05040F', zIndex: 90 }}>
+        <FinaleStage event={finale} />
+        {closeButton}
+      </div>
+    )
+  }
 
   if (game) {
     return (
@@ -75,47 +99,44 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
     )
   }
 
+  const rail = enc && enc.active && enc.order.length > 0 ? <InitiativeRail enc={enc} live={live} roster={roster} /> : null
+
   if (stage.mode !== 'map' || !stage.mapUrl) {
     return (
       <div>
         <AmbientMode roster={roster} onClose={onClose} />
+        {rail && (
+          <div className="fixed inset-0" style={{ zIndex: 91, pointerEvents: 'none' }}>
+            {rail}
+          </div>
+        )}
       </div>
     )
   }
 
+  const activeId = activeTokenId(stage, enc)
+  const activeRow = enc?.active ? enc.order[enc.activeIndex] : null
+
   return (
-    <div className="fixed inset-0" style={{ background: '#0D0820', zIndex: 90 }}>
+    <div className="fixed inset-0 stage-fx" style={{ background: '#0D0820', zIndex: 90 }}>
       <div className="w-full h-full flex items-center justify-center">
         <div className="relative" style={{ maxWidth: '100%', maxHeight: '100%' }}>
-          <img
-            src={stage.mapUrl}
-            alt="The table map"
-            style={{ maxWidth: '100vw', maxHeight: '100vh', display: 'block' }}
-          />
+          <img src={stage.mapUrl} alt="The table map" style={{ maxWidth: '100vw', maxHeight: '100vh', display: 'block' }} />
+          <TintOverlay tint={stage.tint} tokens={stage.tokens} />
+          <FogOverlay fog={stage.fog} />
           {stage.tokens.map((t) => (
-            <span
-              key={t.id}
-              className="absolute rounded-full font-bold flex items-center justify-center"
-              style={{
-                left: `${t.x * 100}%`,
-                top: `${t.y * 100}%`,
-                transform: 'translate(-50%, -50%)',
-                width: 44,
-                height: 44,
-                background: t.color,
-                color: C.ink,
-                border: `2.5px solid ${C.night}`,
-                boxShadow: `0 0 14px ${t.color}88`,
-                fontSize: 15,
-                transition: 'left .25s ease, top .25s ease',
-              }}
-              aria-label={`Token ${t.label}`}
-            >
-              {t.label}
-            </span>
+            <StageTokenView key={t.id} t={t} size={46} active={t.id === activeId} vital={vitalsFor(t.playerName, live, roster)} />
           ))}
         </div>
       </div>
+      {activeRow && (
+        <div className="absolute left-0 right-0 text-center" style={{ top: 'calc(12px + env(safe-area-inset-top))', pointerEvents: 'none', zIndex: 3 }} role="status">
+          <span className="inline-block rounded-full px-5 py-2" style={{ ...display, fontSize: 24, fontWeight: 700, background: `${C.night}D9`, border: `1px solid ${C.gold}`, color: C.gold, backdropFilter: 'blur(8px)' }}>
+            ⚔ {activeRow.name}’s turn
+          </span>
+        </div>
+      )}
+      {rail}
       {closeButton}
     </div>
   )

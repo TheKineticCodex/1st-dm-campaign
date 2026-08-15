@@ -292,12 +292,36 @@ export interface StageToken {
   color: string
   x: number
   y: number
+  /** Full name (character or enemy) — matched against the initiative order. */
+  name?: string
+  /** For party tokens: the player, so live vitals can ring the token. */
+  playerName?: string
+}
+
+/** The light on the battlefield. */
+export type StageTint = 'none' | 'dusk' | 'night' | 'lantern' | 'moon' | 'storm' | 'underwater'
+
+export interface StageFog {
+  on: boolean
+  /** Revealed circles, as fractions of the map (x, y, radius). */
+  reveals: { x: number; y: number; r: number }[]
 }
 
 export interface StageState {
   mode: 'ambient' | 'map'
   mapUrl: string | null
   tokens: StageToken[]
+  tint?: StageTint
+  fog?: StageFog
+}
+
+/** The finale — the song, whole, on every phone at once. */
+export interface FinaleEvent {
+  finaleId: string
+  /** arm: phones wake their voice · ready: a phone is armed · start: play in `inMs` · clear: done. */
+  phase: 'arm' | 'ready' | 'start' | 'clear'
+  from?: string
+  inMs?: number
 }
 
 export interface SessionNote {
