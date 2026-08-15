@@ -2,8 +2,9 @@
 // and incoming handouts (including the secret single-target channel).
 // Renders nothing in offline mode.
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import type { GameEvent, GameInput, GameState } from '../lib/games'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
 import type { Bargain, Encounter, Handout, RaceEvent, VitalsEvent, WheelEvent } from '../types'
@@ -13,6 +14,7 @@ import { Wheel } from './Wheel'
 import { C, display } from './ui'
 
 const RACE_GOAL = 40
+const GamePhoneOverlay = lazy(() => import('./games/GameShell'))
 
 interface PlayerLiveProps {
   store: Store
@@ -73,6 +75,7 @@ export function PlayerLive({
   const [handout, setHandout] = useState<Handout | null>(null)
   const [race, setRace] = useState<PlayerRace | null>(null)
   const [wheel, setWheel] = useState<WheelEvent | null>(null)
+  const [game, setGame] = useState<GameState | null>(null)
   const [offer, setOffer] = useState<Bargain | null>(null)
   const [ceremony, setCeremony] = useState<{ outcome: 'fulfilled' | 'broken'; title: string } | null>(null)
   const queue = useRef<Handout[]>([])
@@ -134,6 +137,11 @@ export function PlayerLive({
             onBargainResolveRef.current(b.bargainId, b.outcome)
             setCeremony({ outcome: b.outcome, title: b.title ?? 'The bargain' })
           },
+          game: (g: GameEvent) => {
+            if (g.kind === 'clear') setGame(null)
+            else if (g.kind === 'state' && g.state) setGame(g.state)
+            // 'input' comes from other phones; the host reduces it.
+          },
           wheel: (w: WheelEvent) => {
             if (w.phase === 'clear') setWheel(null)
             else if (w.phase === 'arm') setWheel(w)
@@ -174,6 +182,11 @@ export function PlayerLive({
   }, [store, playerName])
 
   const dismissHandout = () => setHandout(queue.current.shift() ?? null)
+
+  const sendGameInput = (input: GameInput) => {
+    if (!game) return
+    channelRef.current?.sendGame({ gameId: game.gameId, kind: 'input', from: playerName, input, at: new Date().toISOString() })
+  }
 
   // Snail sprint: taps buffer locally; broadcasts throttled to 5Hz
   // (engineering law 8.3: ≤10Hz batched).
@@ -307,6 +320,12 @@ export function PlayerLive({
             {(wheel.wedges ?? []).map((w, i) => `${i + 1}. ${w}`).join('  ·  ')}
           </p>
         </div>
+      )}
+
+      {game && (
+        <Suspense fallback={null}>
+          <GamePhoneOverlay state={game} me={playerName} send={sendGameInput} />
+        </Suspense>
       )}
 
       {race && (

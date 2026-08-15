@@ -11,6 +11,9 @@ import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
 import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
 import { MapBoard } from './MapBoard'
+import { createHost, type Host } from '../lib/gameHost'
+import type { GameEvent, GameState } from '../lib/games'
+import { GamesPanel } from './games/GamesPanel'
 import { DEFAULT_WEDGES, Wheel } from './Wheel'
 import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
 
@@ -116,6 +119,8 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
   const [race, setRace] = useState<DmRace | null>(null)
   const raceRef = useRef<DmRace | null>(null)
   raceRef.current = race
+  const hostRef = useRef<Host | null>(null)
+  const [game, setGame] = useState<GameState | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -124,6 +129,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
       if (cancelled) return
       channelRef.current = joinTableChannel(channelId, {
         roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
+        game: (g: GameEvent) => hostRef.current?.input(g),
         vitals: (v: VitalsEvent) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
         wheel: (w: WheelEvent) => {
           const cur = wheelRef.current
@@ -150,11 +156,14 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
           }
         },
       })
+      hostRef.current = createHost((ev) => channelRef.current?.sendGame(ev), setGame)
       if (active) setEncounter(active)
       setLoaded(true)
     })()
     return () => {
       cancelled = true
+      hostRef.current?.stop()
+      hostRef.current = null
       channelRef.current?.close()
     }
   }, [store])
@@ -358,6 +367,19 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
             const id = wheel?.wheelId ?? 'none'
             setWheel(null)
             channelRef.current?.sendWheel({ wheelId: id, phase: 'clear' })
+          }}
+        />
+      </Fold>
+
+      <Fold id="dm-games" title="🎪 The game booth — Draw · Hold the Note · The Toll" forceOpen={!!game}>
+        <GamesPanel
+          store={store}
+          roster={roster}
+          host={hostRef.current}
+          game={game}
+          onWhisper={(h) => {
+            void store.sendHandout(h)
+            channelRef.current?.sendHandout(h)
           }}
         />
       </Fold>

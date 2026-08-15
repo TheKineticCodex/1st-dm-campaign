@@ -7,5 +7,12 @@ realtime channel — the DM's Book in one, a phone in the other.
     npm run build && npx vite preview --port 4173 --strictPort &
     npx playwright test -c live-e2e/playwright.live.config.ts
 
-They create a throwaway player (`_wheeltest`) in the live campaign. **Delete it after**
-(`delete from players where name = '_wheeltest';` — cascades its rows).
+They create throwaway players (`_wheeltest`, `_gametest`) in the live campaign. **Delete them after**
+(`delete from players where name in ('_wheeltest','_gametest');` — cascades their rows) and any
+prize handouts (`delete from handouts where content::text like '%the prize%';`).
+
+Set `LIVE_URL=http://localhost:4174/` to point the specs at a different preview port.
+
+Note: the ordinary phone-flow suite (`npx playwright test`) builds with `--mode e2e`, which
+blanks the Supabase keys (`.env.e2e`) so it never touches the live campaign even when
+`.env.local` exists.

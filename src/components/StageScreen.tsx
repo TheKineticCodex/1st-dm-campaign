@@ -1,11 +1,14 @@
 // 🎭 The stage — what the iPad shows the table. A live listener: ambient
 // title scene until the MacBook pushes a map; then the map with the party's
-// tokens, moving as the DM moves them. A small ✕ returns to the Book.
+// tokens, moving as the DM moves them. When the DM starts a carnival game,
+// the stage becomes the game board. A small ✕ returns to the Book.
 
 import { useEffect, useRef, useState } from 'react'
 import { joinTableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import type { StageState } from '../types'
+import type { GameState } from '../lib/games'
+import { GameStageBoard } from './games/GameShell'
 import { AmbientMode } from './AmbientMode'
 import { C } from './ui'
 
@@ -17,6 +20,7 @@ interface StageScreenProps {
 
 export function StageScreen({ store, roster, onClose }: StageScreenProps) {
   const [stage, setStage] = useState<StageState>({ mode: 'ambient', mapUrl: null, tokens: [] })
+  const [game, setGame] = useState<GameState | null>(null)
   const closeRef = useRef(() => {})
 
   useEffect(() => {
@@ -27,6 +31,10 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
       if (current && current.mode) setStage(current)
       const channel = joinTableChannel(channelId, {
         stage: (s) => setStage(s),
+        game: (g) => {
+          if (g.kind === 'clear') setGame(null)
+          else if (g.kind === 'state' && g.state) setGame(g.state)
+        },
       })
       closeRef.current = channel.close
     })()
@@ -35,6 +43,37 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
       closeRef.current()
     }
   }, [store])
+
+  const closeButton = (
+    <button
+      type="button"
+      onClick={onClose}
+      aria-label="Leave the stage"
+      className="absolute rounded-full"
+      style={{
+        top: 'calc(10px + env(safe-area-inset-top))',
+        right: 12,
+        width: 40,
+        height: 40,
+        background: `${C.night}CC`,
+        color: C.faint,
+        border: `1px solid ${C.panelEdge}`,
+        cursor: 'pointer',
+        fontSize: 16,
+      }}
+    >
+      ✕
+    </button>
+  )
+
+  if (game) {
+    return (
+      <div className="fixed inset-0" style={{ background: C.night, zIndex: 90 }}>
+        <GameStageBoard state={game} />
+        {closeButton}
+      </div>
+    )
+  }
 
   if (stage.mode !== 'map' || !stage.mapUrl) {
     return (
@@ -77,25 +116,7 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
           ))}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Leave the stage"
-        className="absolute rounded-full"
-        style={{
-          top: 'calc(10px + env(safe-area-inset-top))',
-          right: 12,
-          width: 40,
-          height: 40,
-          background: `${C.night}CC`,
-          color: C.faint,
-          border: `1px solid ${C.panelEdge}`,
-          cursor: 'pointer',
-          fontSize: 16,
-        }}
-      >
-        ✕
-      </button>
+      {closeButton}
     </div>
   )
 }
