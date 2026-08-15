@@ -1,6 +1,12 @@
 # THE WHOLE STORY — for the Lantern-Keeper's eyes only
 ### Everything, from the bottom of the sea to the last note
 
+> **SUPERSEDED (2026-08-15).** The story was rewritten — see `the-story.md`
+> (the Lantern-Keeper's Copy) and `the-telling.md`. This file is kept for
+> history only. Where it disagrees with `the-story.md`, `the-story.md` wins.
+> Key differences: the villain is "the Ones Below" with one face (the Buyer);
+> the Sea gave its song away to forget the MOON; Peaches never sang at Talent
+> Night; the ending is five doors, not a courtroom.
 ## ⭐ START HERE — the story in plain words
 
 1. **Magic carnival fairies buy things you can't touch** — names, voices,

@@ -2,6 +2,12 @@
 ### Everything that can happen, already written down. DM's eyes only.
 *Executes `act1-design-prompt.md`. Sources: the story bible, the live Vault (Peaches, Billy; two woven slots open), SRD 5.2 creatures only. All encounter math uses the 2024 encounter-building budgets — every budget line carries `// VERIFY` per the iron rule; check once against your rules source and strike the flags.*
 
+> **NOTE (2026-08-15).** The story canon moved to `the-story.md`. The scene
+> mechanics, encounter math, and Run-the-Night procedure below are still
+> good — but read any story language here through `the-story.md`: "the Court
+> of Kept Things" → the Ones Below (one face: the Buyer) · Cassia / Vetrine /
+> Naretha → the jar-woman / the mirror-man / the market-mother · manifests,
+> proxy-seals and depositions → pieces of the song and the crack in a promise.
 **Encounter budget reference used throughout** *(XP per character; ×4 for the party)* `// VERIFY`
 Level 1: Low 50 · Moderate 75 · High 100 — Level 2: Low 100 · Moderate 150 · High 200 — Level 3: Low 150 · Moderate 225 · High 400
 CR→XP: ⅛=25 · ¼=50 · ½=100 · 1=200 · 2=450 · 3=700

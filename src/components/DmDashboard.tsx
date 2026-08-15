@@ -232,7 +232,7 @@ function HomeSection({
 
   const seedBook = async () => {
     setSeeding(true)
-    const { SEED_CLUES, SEED_NPCS } = await import('../data/witchlightSeeds')
+    const { SEED_CLUES, SEED_NPCS } = await import('../data/campaignSeeds')
     for (const c of SEED_CLUES) await store.saveClue({ ...c, id: crypto.randomUUID() })
     for (const n of SEED_NPCS) await store.saveNpc({ ...n, id: crypto.randomUUID() })
     setSeeding(false)
@@ -343,12 +343,12 @@ function HomeSection({
         <Section style={{ marginTop: 12, border: `1px solid ${C.sea}55` }}>
           <Eyebrow>Before the first night</Eyebrow>
           <p className="text-sm" style={{ color: C.parchment }}>
-            The book can pre-thread the Witchlight long game for you: three clue paths worth
-            tracking from Session 1 (the carnival's true power, the wording of wishes, who
-            collects Lost Things) and four NPC cards including your homebrew merchant slot.
+            The book can lay the campaign's threads for you: the cast (the Twins, Grey-Gill,
+            the Buyer, the three keepers, Saltmere) and four clue cards that track the pieces
+            of the song, the proof, the Ones Below, and the Moon.
           </p>
           <Btn onClick={() => void seedBook()} disabled={seeding}>
-            {seeding ? 'Threading the needle…' : 'Lay the Witchlight threads ✦'}
+            {seeding ? 'Threading the needle…' : 'Lay the threads ✦ (cast + clues)'}
           </Btn>
         </Section>
       )}

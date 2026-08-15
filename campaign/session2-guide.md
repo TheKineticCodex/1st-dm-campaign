@@ -1,6 +1,12 @@
 # SESSION 2 — THE MORNING AFTER & THE NIGHT OF LANTERNS
 ### The Lantern-Keeper's plain-words run guide
 
+> **NOTE (2026-08-15).** The story canon moved to `the-story.md`. The scene
+> mechanics, encounter math, and Run-the-Night procedure below are still
+> good — but read any story language here through `the-story.md`: "the Court
+> of Kept Things" → the Ones Below (one face: the Buyer) · Cassia / Vetrine /
+> Naretha → the jar-woman / the mirror-man / the market-mother · manifests,
+> proxy-seals and depositions → pieces of the song and the crack in a promise.
 Read this once before the session. During the session, trust your Run the
 Night screen — this guide is the *why* behind every button.
 

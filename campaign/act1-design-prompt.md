@@ -2,6 +2,12 @@
 ### The directive for designing Act 1 of "The Song the Sea Forgot" — complete, branch-proof, and battle-ready
 *Companion to `story-bible.md` (the world's truth) and `PROMPT-V2.md` (the app's law). This document governs how Act 1 gets designed. Execute it and the output replaces guesswork with a playbook: every scene, every fight that must happen, every fight that might, every reward, every level-up, every app cue — so the DM never improvises structure, only performance.*
 
+> **NOTE (2026-08-15).** The story canon moved to `the-story.md`. The scene
+> mechanics, encounter math, and Run-the-Night procedure below are still
+> good — but read any story language here through `the-story.md`: "the Court
+> of Kept Things" → the Ones Below (one face: the Buyer) · Cassia / Vetrine /
+> Naretha → the jar-woman / the mirror-man / the market-mother · manifests,
+> proxy-seals and depositions → pieces of the song and the crack in a promise.
 ---
 
 ## 0. The one sentence

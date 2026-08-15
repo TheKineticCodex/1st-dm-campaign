@@ -302,7 +302,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'Three nights ago the tide went out of Saltmere and forgot to come back. Now, a mile out on the wet sand, stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink. The lanterns you each carry tug toward it like dogs on a lead.',
     truth:
-      'The toll — one honest answer each — is Court paperwork. Write every answer down; they return in Act 3.',
+      'The toll — one honest answer each. WRITE THEM DOWN — they come back once, at the very end, in the players’ own words. Slate: ADMISSION IS SOLD IN SETS. YOU FIVE ARRIVED ON ONE TIDE.',
     doors: {
       fight: 'The Twins don’t resist; the lanterns dim around violence until it stops. Toll doubles.',
       talk: 'The toll, asked warmly. Ask each player at the table, out loud.',
@@ -320,15 +320,15 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'Everything glitters, nothing has a price tag, and every stall-keeper knows your name before you say it.',
     truth:
-      'Prizes are skimmed things. The prize stall pays Billy in a page of his mentor’s handwriting — the keeper doesn’t know its worth.',
+      'Every prize here was somebody’s once. The stall pays Billy in a page of Wren’s handwriting — the keeper doesn’t know its worth.',
     doors: {
       fight: 'Minors m1/m2, or interfere with the Empty Costumes → battle CARN-A.',
       talk: 'Gossip: "the Toll-Twins never sleep" · "don’t hum near the carousel."',
-      sneak: 'Behind the stall: crates addressed THE COURT OF KEPT THINGS, BELOW. First written clue.',
+      sneak: 'Behind the stall: crates stencilled BELOW — the same glass as Tarn’s bottle. First sign the Ones Below are real.',
       bargain: 'Anything can be bought — for teeth, memories, birthdays. Quill for anything serious.',
       insane: 'What-ifs 4, 13, 14.',
     },
-    npcs: ['The Bog Merchant'],
+    npcs: [],
     cues: [
       { label: '🐌 Run the Snail Derby →', kind: 'go-table' },
       {
@@ -347,13 +347,13 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'The tent smells of salt and low tide. The woman inside has a shawl pinned high at the neck, and eyes like the last hour before a storm.',
     truth:
-      'She sold her name — she literally cannot speak the Court’s (only bubbles come; show this once). She recognizes Peaches instantly.',
+      'She gave away her own NAME for the tent — when she tries to say who has it, only bubbles come (show this once). She recognizes Peaches instantly. She and Billy share the same wound; don’t say it.',
     doors: {
       fight: 'She yields at once; the tent weeps salt water until they leave. One fortune lost forever.',
       talk: 'Her readings are their REAL vault answers — use the ✉ buttons below.',
-      sneak: 'Her lockbox: a receipt — RECEIVED: one name (GREY-GILL). Second written clue.',
+      sneak: 'Her lockbox: a slip of paper — ONE NAME (GREY-GILL). KEPT. What they hold, they hold on a promise.',
       bargain: 'A true answer for a kindness done on the road ahead.',
-      insane: 'What-if 12: freeing her name is an Act 2–3 sidequest, seeded now.',
+      insane: 'If they ask what a song IS: “It’s the bit of you other people are keeping safe, dear. That’s why they can’t just take it.”',
     },
     npcs: ['Grandmother Grey-Gill'],
     cues: [
@@ -390,7 +390,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: FREYA,
           title: 'Grey-Gill reads your blades',
-          body: '“Two swords, and daggers besides — armor worn on the outside so nobody checks for the wound underneath. You told the lanterns you would risk everything so your people never suffer what you suffered. The Court heard that too, love. To them that is not a vow. It is a PRICE.”',
+          body: '“Two swords, and daggers besides — armor worn on the outside so nobody checks for the wound underneath. You told the lanterns you would risk everything so your people never suffer what you suffered. The ones Below heard that too, love. They will never come for you. They will come for your list.”',
         },
       },
       {
@@ -399,7 +399,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: FREYA_MOON,
           title: 'Grey-Gill reads your pendant',
-          body: '“May I see it? …No — keep it closed. A last blossom from a grove gone quiet. Child, blights do not keep receipts. But somewhere BELOW, something does. If the spring of your Heartbloom was taken and not killed, then somewhere it is still filed. And what is filed can be found.”',
+          body: '“May I see it? …No — keep it closed. A last blossom from a grove gone quiet. Child, a blight doesn’t leave a blossom behind. Someone did. If the spring of your Heartbloom was GIVEN and not killed, then somewhere Below it is still humming — and something that hums can be found. That pendant will know the way.”',
         },
       },
       { label: '🌊 The sea breathes', kind: 'sfx', sfx: 'ocean' },
@@ -410,11 +410,11 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'The carousel turns. The organ plays a sea-song. And every few bars — a hole, the same hole, where a note should be. The horses’ glass eyes are all turned toward the water.',
     truth:
-      'The organ was built around the Sea’s stolen song; the missing note is the one the Court could not buy — it belongs to Peaches.',
+      'The organ IS the Sea’s song — the piece the Sea gave away to forget the Moon. The hole is Peaches’s note: the last piece the Ones Below never got a yes for. If she hums along, every lantern turns to look. Do not warn her.',
     doors: {
       fight: 'Stealing the organ triggers CARN-A with double costumes (What-if 4 — let them keep it if they win).',
       talk: 'The operator hums along and weeps without noticing.',
-      sneak: 'Inside: a brass cylinder — PROPERTY OF THE COURT OF KEPT THINGS. Third written clue.',
+      sneak: 'Inside the organ: a brass cylinder, etched BELOW — UNFINISHED. The Sea’s song, missing one note.',
       bargain: 'The ride stops for a song sung live. If Peaches sings, every lantern turns toward her.',
       insane: 'If anyone hums the missing note: hold three seconds of REAL silence at the table.',
     },
@@ -492,7 +492,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: FREYA,
           title: 'Between the lanterns',
-          body: 'The people you protect, asleep and safe. Beside them, an open ledger and a patient quill, itemizing — line by line — exactly what keeping them that way would cost. The quill pauses. It is waiting for you to look.',
+          body: 'The people you protect, asleep and safe. Beside them, a polite man with a small book, writing down — line by line — exactly what keeping them that way would cost you. He pauses. He is waiting for you to look.',
           ephemeral: true,
         },
       },
@@ -502,7 +502,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: FREYA_MOON,
           title: 'Between the lanterns',
-          body: 'The Heartbloom Grove in full spring — every blossom open, every spirit laughing. And on every single flower, a small paper tag, tied with string, printed in the same careful hand: SOLD.',
+          body: 'The Heartbloom Grove in full spring — every blossom open, every spirit laughing. And on every single flower, a small paper tag, tied with string, in the same careful hand: KEPT. And under the oldest willow, a shape you almost know, humming.',
           ephemeral: true,
         },
       },
@@ -539,37 +539,57 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
   'The Whispering Causeway (Bog road)': {
     readAloud:
       'A road of floating lanterns crosses black water. The water is full of voices. They are all very polite, and they all want something.',
-    truth: 'The voices are Cassia’s leaking inventory. One knows the finale-flaw clue (route 2).',
+    truth:
+      'The voices are the jar-woman’s leaking shelves. One knows a story: “the sea gave its song away — but a mermaid was born holding a piece of it, after.” Two threads live here: Freya Sun hears a voice she KNOWS. Philip hears preaching from the reeds.',
     doors: {
-      fight: 'Minors b-m1/2/3; BOG-A (the Hedge) at the causeway’s end.',
-      talk: 'A voice tells it: a mermaid was born holding one note AFTER the sale.',
+      fight: 'Bog things at the causeway’s end — a hedge that hushes. It wants a toll, not lives.',
+      talk: 'To the voices: one tells the mermaid story. One says a name from Freya Sun’s list.',
       sneak: 'Wading = crocodile + everything smells them.',
       bargain: 'A voice guides them — from inside someone’s mouth. One-time DM-controlled alarm.',
       insane: 'Drinking bog water: 1 exhaustion, one true dream of the Under-Sea.',
     },
-    npcs: ['Old Cassia', 'The Bog Merchant'],
+    npcs: ['The jar-woman (Bog road)'],
     cues: [
       { label: '🌊 Bog ambience', kind: 'sfx', sfx: 'ocean' },
       { label: '⛈ Thunder over the marsh', kind: 'sfx', sfx: 'thunder' },
-      { label: '💧 Something surfaces', kind: 'sfx', sfx: 'splash' },
+      {
+        label: '✉ Freya Sun: a voice you know',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA,
+          title: 'From the black water',
+          body: 'One of the voices under the lanterns says your name. Not the way strangers say it. The way someone says it who is on your list.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Philip: the preaching in the reeds',
+        kind: 'whisper',
+        whisper: {
+          target: PHILIP,
+          title: 'You know that voice',
+          body: 'Somewhere off the causeway, in the reeds, someone is preaching peace to nobody. You know the cadence. You followed it once. It is exactly the same — and there is nothing inside it anymore.',
+          ephemeral: true,
+        },
+      },
     ],
   },
-  "Cassia's Jar-House ✦ LEVEL 3": {
+  'The Jar-House ✦ LEVEL 3': {
     readAloud:
       'A house on stilts wearing other houses’ shutters. Inside, shelves to the ceiling: green jars, each humming, each labeled in a shaking hand.',
     truth:
-      'Cassia is drowning in tithe-debt. She keeps ONE jar she will never sell: her sister’s laugh. The note-jar is the fragment — it is IN THE ROOM.',
+      'The jar-woman is behind on her rent to the Buyer. She hates him and fears him more; she will deal. A jarred PIECE OF THE SEA’S SONG is in the room. THE PROOF: bring Peaches near it and the jar hums back and unlatches on its own. Show it. Never explain it.',
     doors: {
-      fight: 'Every broken jar frees a Shadow. Winning loses the guide.',
-      talk: 'The Barge’s route for a kindness: carry her sister’s laugh somewhere safe.',
-      sneak: 'The ledger under the mattress: ONE NOTE OF THE SEA’S SONG — jarred, awaiting collection.',
-      bargain: 'Quill: the note-jar for assuming ONE tithe payment. The fine print does not say whose.',
-      insane: 'Opening the note-jar: the note sings itself home to Peaches — forever audible. Beautiful; also a beacon.',
+      fight: 'Every broken jar frees something grieving. Winning loses the guide.',
+      talk: 'She names the barge’s hour for a kindness: carry her sister’s laugh somewhere safe.',
+      sneak: 'The ledger under the mattress: ONE PIECE OF THE SEA’S SONG — jarred, awaiting collection.',
+      bargain: 'Quill: the piece-jar for taking on ONE rent payment. The fine print does not say whose.',
+      insane: 'Opening the piece-jar: it sings itself home to Peaches — forever audible. Beautiful; also a beacon.',
     },
-    npcs: ['Old Cassia'],
+    npcs: ['The jar-woman (Bog road)'],
     cues: [
       { label: '✨ A jar opens', kind: 'sfx', sfx: 'sparkle' },
-      { label: '🔔 The Barge horn (end the session)', kind: 'sfx', sfx: 'bell' },
+      { label: '🔔 The barge horn (end the session)', kind: 'sfx', sfx: 'bell' },
       {
         label: '✉ ALL: Level 3 — the bog goes silent',
         kind: 'whisper',
@@ -581,40 +601,41 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       },
     ],
   },
-  'The Tithe Barge (climax)': {
+  'The Rent Comes Due (Bog climax)': {
     readAloud:
-      'It arrives without a wake. A barge of grey wood, stacked with crates that hum, poled by something wearing a ferryman’s coat — and the coat is the most alive thing about it.',
-    truth: 'BOG-B setpiece. The barge leaves ON THE HOUR regardless — the fight has a clock. Manifest on the mast.',
+      'It arrives without a wake. A barge of grey wood, stacked with crates that hum, poled by something wearing a ferryman’s coat — and the coat is the most alive thing about it. On the deck, a man is pouring tea.',
+    truth:
+      'The barge leaves ON THE HOUR regardless — the fight has a clock. Win: the jarred piece of the Sea’s song · Freya Sun’s voice freed · the false teacher, freed or refused (his choice — he gave it away; he can ask for it back). THE BUYER is on the deck: first sighting. Courteous. He does not fight. He watches, and leaves with the barge.',
     doors: {
-      fight: 'Water Weird + drowned debtors. Crates freed = voices that distract the zombies.',
-      talk: 'The Ferryman hands negotiators a receipt for one dignity. The schedule is not negotiable.',
-      sneak: 'The manifest is laminated in wax, in plain sight — bold theft is very possible.',
-      bargain: 'Cassia’s assumed-tithe contract (if signed) comes due HERE. Read it aloud.',
-      insane: 'Boarding as it departs: Act 2 begins on the barge. Terrifying. Allowed.',
+      fight: 'Something in the water bound to the barge + drowned debtors. Broken crates free voices that distract them.',
+      talk: 'The coat hands negotiators a receipt for one dignity. The hour is not negotiable. The Buyer will answer exactly one question, truthfully.',
+      sneak: 'The crates. The piece-jar is aboard if not already taken.',
+      bargain: 'Any rent the party took on comes due HERE. Read it aloud.',
+      insane: 'Boarding as it departs: Act 2 continues on the barge. Terrifying. Allowed.',
     },
-    npcs: ['The Ferryman of Receipts', 'The Buyer'],
+    npcs: ['The jar-woman (Bog road)', 'The Buyer'],
     cues: [
       { label: '🔔 The hour tolls', kind: 'sfx', sfx: 'bell' },
-      { label: '⛈ The Weird rises', kind: 'sfx', sfx: 'thunder' },
-      { label: '🎺 A debtor fumbles', kind: 'sfx', sfx: 'trombone' },
+      { label: '⛈ The water rises', kind: 'sfx', sfx: 'thunder' },
+      { label: '🕳 The Buyer looks up', kind: 'sfx', sfx: 'ominous' },
     ],
   },
   'The Gallery of Best Faces (Mirror road)': {
     readAloud:
       'A palace of standing mirrors with no walls holding them up. None of them show you. All of them show someone’s finest hour, on loop.',
     truth:
-      'Bought performances. One mirror: Billy’s mentor mid-laugh. One covered: Billy, unsmiling — ACQUISITION PENDING.',
+      'Kept moments. One mirror: Wren mid-laugh. One covered: Billy, unsmiling — PENDING. One loops the day PHILIP chose not to kill — already priced. And somewhere in this hall Billy reaches for the chain on his book and it is EMPTY. Do not announce it. Let him find it.',
     doors: {
-      fight: 'Minors m-m1/2/3. FAC-A (the Understudy) at the covered mirror.',
-      talk: 'Mirrors answer with their one moment; sequences spell messages. The mentor teaches.',
-      sneak: 'The catalog: the journal is IN TRANSIT. It is HERE.',
+      fight: 'A performance with no performer — Billy’s shape, gestures perfect, face absent. A genuinely honest sentence from Billy staggers it.',
+      talk: 'Mirrors answer with their one moment. Watched in sequence, Wren’s mirrors teach.',
+      sneak: 'The mirror-man’s catalog: WREN, FINAL VOLUME — IN TRANSIT. The book is HERE.',
       bargain: 'Reflections for memories.',
       insane: 'Breaking one frees its moment forever — its owner, wherever they are, feels it return.',
     },
-    npcs: ['Master Vetrine, Curator of Faces'],
+    npcs: ['The mirror-man (Mirror road)'],
     cues: [
       { label: '✨ Mirror shimmer', kind: 'sfx', sfx: 'sparkle' },
-      { label: '🕳 The Understudy steps out', kind: 'sfx', sfx: 'ominous' },
+      { label: '🕳 The understudy steps out', kind: 'sfx', sfx: 'ominous' },
       {
         label: '✉ Billy: the covered mirror',
         kind: 'whisper',
@@ -625,21 +646,40 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           ephemeral: true,
         },
       },
+      {
+        label: '✉ Philip: your finest hour, on loop',
+        kind: 'whisper',
+        whisper: {
+          target: PHILIP,
+          title: 'A mirror you did not want to find',
+          body: 'One mirror shows a room you remember. A blade you remember. And you — young — lowering it. It plays again. And again. There is a small card on the frame with a number on it. Someone has already decided what that moment is worth.',
+          ephemeral: true,
+        },
+      },
+      {
+        label: '✉ Billy: the chain',
+        kind: 'whisper',
+        whisper: {
+          target: BILLY,
+          title: '—',
+          body: 'You reach down, the way you always do, and check the chain on the book. The chain is there. The book is not.',
+        },
+      },
     ],
   },
-  'The Restoration Room ✦ LEVEL 3': {
+  'The Back Room ✦ LEVEL 3': {
     readAloud:
       'Behind the gallery: a workshop. Faces in clamps. Smiles being polished. A laugh, disassembled on velvet, each note pinned like a butterfly.',
     truth:
-      'The laugh is the mentor’s — the fragment. Vetrine believes preservation is love: let him SAY the thesis: “In here, nothing is ever lost.”',
+      'The laugh is Wren’s. The mirror-man believes keeping is love — let him SAY it: “In here, nothing is ever lost.” Reassembling the laugh (group effort, three skills, players propose which) frees it: it flies home into Billy’s book — which is on the workbench, being un-written. Level 3.',
     doors: {
-      fight: 'He defends with the room; FAC-B early and harder. Warn with the environment first.',
+      fight: 'He defends with the room. Warn with the environment first.',
       talk: 'He shows Billy the pending file. Price: “the moments you smile when no one is watching.”',
-      sneak: 'Reassemble the laugh — group DC 13, three different skills, players propose which.',
+      sneak: 'Reassemble the laugh — DC 13 group effort, three different skills.',
       bargain: 'The laugh for “one hour of the party at their very best, to keep.”',
       insane: 'Wearing a clamped face: one scene as someone else. The face remembers being worn.',
     },
-    npcs: ['Master Vetrine, Curator of Faces'],
+    npcs: ['The mirror-man (Mirror road)'],
     cues: [
       {
         label: '✉ ALL: Level 3 — the mirrors ripple',
@@ -651,21 +691,22 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         },
       },
       { label: '✨ The laugh reassembles', kind: 'sfx', sfx: 'sparkle' },
-      { label: '🕳 Vetrine notices', kind: 'sfx', sfx: 'ominous' },
+      { label: '🕳 The mirror-man notices', kind: 'sfx', sfx: 'ominous' },
     ],
   },
-  'Opening Night (climax)': {
+  'Opening Night (Mirror climax)': {
     readAloud:
-      'The gallery has become a theatre. The mirrors are the audience. Every seat reflects someone the Court has bought, applauding on loop, and the stage is waiting for its final acquisition.',
-    truth: 'FAC-B setpiece. Broken mirrors free moments that CHEER the party — first break each = Inspiration.',
+      'The gallery has become a theatre. The mirrors are the audience. Every seat reflects someone the Ones Below have kept, applauding on loop, and the stage is waiting for its final acquisition. In the front row, a man with a cup of tea.',
+    truth:
+      'The mirror-man narrates the fight as a review, aloud. Broken mirrors free moments that CHEER the party — first break each = Inspiration. Win: Wren’s book, un-writing halted · Philip’s finest hour un-priced (the card goes blank). The Buyer applauds politely whoever wins, and leaves.',
     doors: {
-      fight: 'Vetrine + Shadows. He narrates the fight as a review, aloud. Do the voice.',
-      talk: 'Mid-fight, at Billy’s lowest, Vetrine offers the smile-bargain, generously.',
-      sneak: 'The props crate holds the journal. Grabbing it takes an action and ALL his attention.',
+      fight: 'The mirror-man + stage-hands who only touch anyone holding kept things.',
+      talk: 'Mid-fight, at Billy’s lowest, the mirror-man offers the smile-bargain, generously.',
+      sneak: 'The props crate holds the book. Grabbing it takes an action and ALL his attention.',
       bargain: 'Threaten the catalog with ink and he parleys instantly.',
-      insane: 'Applauding the Understudy (if it survived) makes it bow, helpless, mid-battle.',
+      insane: 'Applauding the understudy makes it bow, helpless, mid-battle.',
     },
-    npcs: ['Master Vetrine, Curator of Faces', 'The Buyer'],
+    npcs: ['The mirror-man (Mirror road)', 'The Buyer'],
     cues: [
       { label: '🔨 Curtain up', kind: 'sfx', sfx: 'gavel' },
       { label: '✨ A mirror breaks (cheer!)', kind: 'sfx', sfx: 'sparkle' },
@@ -675,15 +716,16 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
   'The Stairs Below (Under-Sea road)': {
     readAloud:
       'The stairs go down into water that doesn’t ask you to hold your breath. It asks you to trust it. Peaches doesn’t have to be asked at all.',
-    truth: 'Breathing toll: one small truth spoken into the water per traveler. Peaches breathes free.',
+    truth:
+      'Breathing toll: one small truth spoken into the water per traveler. Peaches breathes free. Freya Moon’s pendant WARMS the deeper they go — she is the compass now. Drowned commuters gossip: “the tail lot,” not looking at Peaches.',
     doors: {
-      fight: 'Minors u-m1/2/3; MAR-A security escorts, not executioners — they grapple, never kill.',
-      talk: 'Drowned commuters: auction tonight. “The tail lot,” they say, not looking at Peaches.',
+      fight: 'Market security escorts, not executioners — they grapple, never kill.',
+      talk: 'Drowned commuters: a sale tonight. “The tail lot.” And a smaller lot: “grove-cut, one spring.”',
       sneak: 'The back-current bypasses security (group Stealth; failure = surrounded start).',
       bargain: 'Lantern-jellies rented “for a hum.” Peaches’ hum makes them burst into harmony.',
-      insane: 'Peaches announces herself: skip to the auction, on the Court’s terms. Allowed!',
+      insane: 'Peaches announces herself: skip to the sale, on their terms. Allowed!',
     },
-    npcs: ['Salt-Mother Naretha', 'The Bog Merchant'],
+    npcs: ['The market-mother (Under-Sea road)'],
     cues: [
       { label: '🌊 Descent', kind: 'sfx', sfx: 'ocean' },
       { label: '💧 The market murmurs', kind: 'sfx', sfx: 'splash' },
@@ -697,59 +739,99 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
           ephemeral: true,
         },
       },
+      {
+        label: '✉ Freya Moon: the pendant warms',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'Against your collarbone, warm',
+          body: 'The blossom is warm. Not stirring — WARM, the way a hand is warm. Every step deeper, warmer. Something down here is humming the same tune your grove used to. You would know that hum anywhere. It taught you to speak to flowers.',
+          ephemeral: true,
+        },
+      },
     ],
   },
-  "The Collector's Window ✦ LEVEL 3": {
+  "The Market-Mother's Window ✦ LEVEL 3": {
     readAloud:
-      'The shop window is the size of a cathedral door. In it, on black velvet, lit by patient blue light: a mermaid’s tail. The card reads: PAID IN FULL — ONE SONG.',
+      'The shop window is the size of a cathedral door. In it, on black velvet, lit by patient blue light: a mermaid’s tail. The card reads: ONE SONG, ALREADY PAID.',
     truth:
-      'The consignment is signed THE SEA (BY PROXY) — and the proxy seal is BLANK. The smoking gun. The scale is the fragment.',
+      'PEACHES NEVER SAID YES — that is the crack in this promise, and a player should be the one to say it out loud. Beside the tail, a sealed lot: ONE SPRING, GROVE-CUT — the pendant BURNS. Elowen is close (her fate is the one open decision — see the story). The market-mother sells “one scale, for sentiment,” smiling. Level 3 fires the moment they crack any sale: every price-card in the market flickers, uncertain.',
     doors: {
-      fight: 'The window fights back — the Water Weird lives in the glass.',
-      talk: 'Naretha answers three questions honestly if Peaches agrees to APPEAR at the auction.',
-      sneak: 'The consignment papers. Blank seal. Let a player notice it themselves if humanly possible.',
-      bargain: 'Buy back “one scale, for sentiment” — she sells smiling. The scale is the fragment.',
-      insane: 'Smash-and-grab: the auction begins immediately, alarm variant.',
+      fight: 'The window fights back — something lives in the glass.',
+      talk: 'The market-mother answers three questions honestly if Peaches agrees to APPEAR at the sale. Hags love a technicality.',
+      sneak: 'The tail’s papers. No one signed for Peaches. Let a player notice it themselves if humanly possible.',
+      bargain: 'Buy back “one scale, for sentiment” — she sells smiling. The scale is a piece.',
+      insane: 'Smash-and-grab: the sale begins immediately, alarm variant.',
     },
-    npcs: ['Salt-Mother Naretha'],
+    npcs: ['The market-mother (Under-Sea road)'],
     cues: [
       { label: '🕳 The tail, lit blue', kind: 'sfx', sfx: 'ominous' },
+      {
+        label: '✉ Freya Moon: the sealed lot',
+        kind: 'whisper',
+        whisper: {
+          target: FREYA_MOON,
+          title: 'ONE SPRING, GROVE-CUT',
+          body: 'A crate, sealed, on the shelf beside the tail. Small. Humming. The blossom in your pendant is not warm anymore — it is burning, and it is leaning toward the crate so hard the chain bites your neck. Whatever is in there was under the willow with you.',
+          ephemeral: true,
+        },
+      },
       {
         label: '✉ ALL: Level 3 — the prices flicker',
         kind: 'whisper',
         whisper: {
           target: null,
-          title: 'A crack in the ledger',
+          title: 'A crack in the promise',
           body: 'For one breath, every price-card in the drowned market flickers — uncertain, as if the numbers themselves just remembered they could be wrong. (Level 3.)',
         },
       },
-      { label: '💧 The Weird stirs in the glass', kind: 'sfx', sfx: 'splash' },
+      { label: '💧 Something stirs in the glass', kind: 'sfx', sfx: 'splash' },
     ],
   },
-  'The Auction of the Tail (climax)': {
+  'The Sale of the Tail (Under-Sea climax)': {
     readAloud:
-      'The auction floor is an amphitheater of shells. The audience breathes water and wears pearls that used to be wishes. Lot the first: one mermaid’s tail, provenance impeccable.',
+      'The sale floor is an amphitheater of shells. The audience breathes water and wears pearls that used to be wishes. Lot the first: one mermaid’s tail. Lot the second, small: one spring, grove-cut. In the highest seat, a man with a cup of tea raises one finger.',
     truth:
-      'SEA-B setpiece. Naretha must be beaten PROCEDURALLY — gavel, papers, or outbid. Killing her forfeits the lot.',
+      'The market-mother must be beaten by the RULES — the gavel, the crack in the promise (nobody signed for Peaches), or out-bid. Killing her forfeits everything to the Buyer. If Peaches sings her note: the tail glows and the whole room forgets to breathe, one round. Win: the tail (wrapped, waiting for the song to be whole) · the grove-lot opened. The Buyer bids exactly once, and loses politely.',
     doors: {
       fight: 'The audience bids on the combat. The gavel is the real objective.',
-      talk: 'Any legal challenge (the blank seal!) suspends everything. Hags love a technicality.',
+      talk: 'Any crack in the promise, said aloud, suspends everything. Hags love a technicality.',
       sneak: 'The case answers only to the gavel.',
-      bargain: 'Outbid the Buyer — with what? The table will discover what they’re willing to sell. Let them.',
-      insane: 'Peaches sings the missing note: the tail glows and the audience forgets to breathe. One round of silence.',
+      bargain: 'Outbid the Buyer — with what? The table will discover what they’re willing to give. Let them.',
+      insane: 'Peaches sings the missing note: the tail glows and the room forgets to breathe.',
     },
-    npcs: ['Salt-Mother Naretha', 'The Buyer'],
+    npcs: ['The market-mother (Under-Sea road)', 'The Buyer'],
     cues: [
       { label: '🔨 The gavel', kind: 'sfx', sfx: 'gavel' },
-      { label: '🔔 The auction bell', kind: 'sfx', sfx: 'bell' },
+      { label: '🔔 The sale bell', kind: 'sfx', sfx: 'bell' },
       { label: '🕳 The Buyer raises a hand', kind: 'sfx', sfx: 'ominous' },
     ],
   },
-  'The Court of Kept Things': {
-    readAloud: '(Act 3 — not tonight. But when you get here: they signed nothing. That is the whole key.)',
-    truth: 'The finale engine. Their Session-1 honest answers return as evidence. See the playbook.',
-    doors: { fight: '—', talk: '—', sneak: '—', bargain: '—', insane: '—' },
-    npcs: ['The Buyer'],
-    cues: [],
+  'The Moon-Night': {
+    readAloud:
+      'The moon fills the sky. The Sea is standing up on its hind legs to reach her. Every lantern in the Fair is lit, and the biggest stage is empty, and everyone you ever freed is standing behind you.',
+    truth:
+      'THE FINALE. The Twins read the five Gate answers, in the players’ own words. Then all five sing — described, not performed — each their own song; five songs, one chord. The Sea remembers her. Dawn: the tide comes home up Saltmere harbor; the chapel bell rings alone; the horizon steps back eleven feet. THEN FIVE DOORS. Ask each player, in turn: “The tide is in. Where do you go?” If Peaches chooses the water, Pookie speaks, once: “She sang to me first.”',
+    doors: {
+      fight: 'The Ones Below make it FEEL like a battle. It is not one. Nothing here can be fought.',
+      talk: 'The Buyer, one last time, courteous: “You could keep it all as it is. Nothing lost. Nothing changed.” Let them answer.',
+      sneak: '—',
+      bargain: 'He will offer each of them, individually, the thing they want most, for the piece they carry. This is the last temptation. Freya Sun’s is the hardest.',
+      insane: 'They sing.',
+    },
+    npcs: ['Brother Hush & Sister Hum', 'The Buyer'],
+    cues: [
+      { label: '🌊 The Sea rises', kind: 'sfx', sfx: 'ocean' },
+      { label: '🔔 The chapel bell, alone', kind: 'sfx', sfx: 'bell' },
+      {
+        label: '✉ ALL: the song, whole',
+        kind: 'whisper',
+        whisper: {
+          target: null,
+          title: 'You know this tune',
+          body: 'You have heard it a hundred times with a hole in it. Tonight the hole closes. Somewhere under your feet, something very old remembers what it loved — and decides to keep remembering.',
+        },
+      },
+    ],
   },
 }

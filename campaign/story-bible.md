@@ -1,6 +1,12 @@
 # The Song the Sea Forgot — Story Bible
 ### An original campaign. DM's eyes only. (No published-adventure content — this is ours.)
 
+> **SUPERSEDED (2026-08-15).** The story was rewritten — see `the-story.md`
+> (the Lantern-Keeper's Copy) and `the-telling.md`. This file is kept for
+> history only. Where it disagrees with `the-story.md`, `the-story.md` wins.
+> Key differences: the villain is "the Ones Below" with one face (the Buyer);
+> the Sea gave its song away to forget the MOON; Peaches never sang at Talent
+> Night; the ending is five doors, not a courtroom.
 ## The truth at the bottom of everything
 
 Long ago the **Sea had a song** — the melody that made tides turn, storms end,
