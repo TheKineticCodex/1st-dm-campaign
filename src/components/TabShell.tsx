@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { clearDeviceSession, type DeviceSession, readCache, writeCache } from '../lib/storage'
+import { CLASSES } from '../data/rules'
 import { getStore } from '../lib/store'
 import { keepGlassLit } from '../lib/wakeLock'
 import {
@@ -18,9 +19,11 @@ import { GuideTab } from './GuideTab'
 import { LedgerTab } from './LedgerTab'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
+import { SpellsTab } from './SpellsTab'
+import { BagTab } from './BagTab'
 import { C, CalmToggle, body } from './ui'
 
-export type TabId = 'fortune' | 'build' | 'sheet' | 'ledger' | 'guide'
+export type TabId = 'fortune' | 'build' | 'sheet' | 'spells' | 'bag' | 'ledger' | 'guide'
 
 // Quiet Interface law 2: the tab bar shows only the current chapter of a
 // player's story. Before the forge seals: the path to a character. After:
@@ -34,6 +37,8 @@ const TABS_CREATION: [TabId, string, string][] = [
 
 const TABS_PLAY: [TabId, string, string][] = [
   ['sheet', '❖', 'Sheet'],
+  ['spells', '✦', 'Spells'],
+  ['bag', '🎒', 'Bag'],
   ['ledger', '⚖', 'Ledger'],
   ['guide', '✧', 'Guide'],
 ]
@@ -41,6 +46,11 @@ const TABS_PLAY: [TabId, string, string][] = [
 interface TabShellProps {
   session: DeviceSession
   onLeave: () => void
+}
+
+const isCaster = (c: SavedCharacter): boolean => {
+  const k = c.build.klass ? CLASSES[c.build.klass] : null
+  return !!k?.spells || c.build.species === 'Fairy ✦'
 }
 
 export function TabShell({ session, onLeave }: TabShellProps) {
@@ -251,6 +261,10 @@ export function TabShell({ session, onLeave }: TabShellProps) {
                 announcedLevel={announcedLevel}
               />
             )}
+            {tab === 'spells' && (
+              <SpellsTab character={character} onUpdate={persistCharacter} />
+            )}
+            {tab === 'bag' && <BagTab character={character} onUpdate={persistCharacter} />}
             {tab === 'ledger' && (
               <LedgerTab bargains={character?.notes.bargains ?? []} onSign={signBargain} />
             )}
@@ -329,7 +343,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         aria-label="Sections"
       >
         <div className="flex w-full" style={{ maxWidth: 560 }}>
-          {(character ? TABS_PLAY : TABS_CREATION).map(([id, icon, label]) => (
+          {(character ? TABS_PLAY.filter(([id]) => id !== 'spells' || isCaster(character)) : TABS_CREATION).map(([id, icon, label]) => (
             <button
               key={id}
               type="button"

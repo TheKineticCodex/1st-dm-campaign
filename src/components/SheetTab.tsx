@@ -5,7 +5,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
-import { seedBag } from '../lib/bag'
 import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
@@ -35,7 +34,7 @@ const ordinal = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3
 const BAG_EMOJI = ['🗡', '🪄', '🧭', '📜', '🍾', '🪙', '🎻', '🌸', '🗝', '🐚']
 
 /** The Bag: tile inventory. Weapons toggle equipped; trinkets ride along. */
-function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next: BagItem[]) => void }) {
+export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next: BagItem[]) => void }) {
   const [newName, setNewName] = useState('')
   const [newIcon, setNewIcon] = useState(BAG_EMOJI[0])
   const [note, setNote] = useState<string | null>(null)
@@ -155,7 +154,7 @@ function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next: BagIte
   )
 }
 
-type Coins = { gp: number; sp: number; cp: number }
+export type Coins = { gp: number; sp: number; cp: number }
 const COIN_META: { key: keyof Coins; name: string; glyph: string; tint: string }[] = [
   { key: 'gp', name: 'Gold', glyph: '🪙', tint: '#E8B84B' },
   { key: 'sp', name: 'Silver', glyph: '⚪', tint: '#C6CCD8' },
@@ -163,7 +162,7 @@ const COIN_META: { key: keyof Coins; name: string; glyph: string; tint: string }
 ]
 
 /** The Purse: gold / silver / copper with big ± taps. 10 sp = 1 gp, 10 cp = 1 sp. */
-function PurseSection({ coins, onChange }: { coins: Coins; onChange: (next: Coins) => void }) {
+export function PurseSection({ coins, onChange }: { coins: Coins; onChange: (next: Coins) => void }) {
   const bump = (key: keyof Coins, delta: number) =>
     onChange({ ...coins, [key]: Math.max(0, (coins[key] ?? 0) + delta) })
   return (
@@ -1045,20 +1044,6 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           })}
         </div>
       </Section>
-
-      </Fold>
-      <Fold id="sheet-bag" title="🎒 The bag & the purse">
-      {/* The Bag */}
-      <BagSection
-        bag={state.bag ?? seedBag(sheet.K.weapon.name, sheet.ac.note ?? '')}
-        onChange={(next) => updateState({ bag: next })}
-      />
-
-      {/* The Purse — starting sum is a house default; the Keeper adjusts. */}
-      <PurseSection
-        coins={state.coins ?? { gp: 10, sp: 0, cp: 0 }}
-        onChange={(next) => updateState({ coins: next })}
-      />
 
       </Fold>
       <Fold id="sheet-features" title="✦ Features, traits & equipment">
