@@ -12,17 +12,19 @@ import { keepGlassLit } from '../lib/wakeLock'
 import { PARTY_SIZE, partyWord } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
+import { CheatSheet } from './CheatSheet'
 import { NightOne } from './NightOne'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
 import { TonightSection } from './TonightSection'
 import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display } from './ui'
 
-type DmSection = 'home' | 'tonight' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
+type DmSection = 'home' | 'tonight' | 'cheat' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
 const SECTIONS: [DmSection, string, string][] = [
   ['home', '✦', 'Book'],
   ['tonight', '⚑', 'Tonight'],
+  ['cheat', '📜', 'Cheat'],
   ['roster', '❖', 'Roster'],
   ['vault', '☾', 'Vault'],
   ['lost', '🔒', 'Lost'],
@@ -142,6 +144,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
             {section === 'tonight' && (
               <TonightSection store={store} roster={roster} onGo={(s) => setSection(s as DmSection)} />
             )}
+            {section === 'cheat' && <CheatSheet />}
             {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
             {section === 'vault' && <VaultSection roster={roster} onForgeWhisper={forgeWhisper} />}
             {section === 'lost' && <LostSection store={store} roster={roster} />}
