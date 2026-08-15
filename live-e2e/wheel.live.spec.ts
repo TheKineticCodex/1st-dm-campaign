@@ -10,13 +10,13 @@ test('DM arms → player spins → both land on the same wedge', async () => {
   const dm = await dmCtx.newPage()
   const pl = await plCtx.newPage()
 
-  await dm.goto('http://localhost:4173/')
+  await dm.goto('' + (process.env.LIVE_URL ?? 'http://localhost:4173/') + '')
   await dm.evaluate(() => { localStorage.clear(); localStorage.setItem('seaforgot:session', JSON.stringify({ campaignCode: 'LANTERNKEEPER', playerName: 'Lantern-Keeper', deviceToken: 'dm-e2e', role: 'dm' })) })
   await dm.reload()
   await expect(dm.getByText('campaign-wide')).toBeVisible({ timeout: 15000 })
 
   // player joins for real (creates the _wheeltest row)
-  await pl.goto('http://localhost:4173/')
+  await pl.goto('' + (process.env.LIVE_URL ?? 'http://localhost:4173/') + '')
   await pl.evaluate(() => localStorage.clear())
   await pl.reload()
   await pl.getByPlaceholder('SEAFORGOT').fill('SEAFORGOT')

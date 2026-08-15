@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { QUIZ } from '../data/quiz'
 import { CONDITIONS, fmt, mod } from '../data/rules'
 import { computeSheet, skillMod } from '../lib/compute'
-import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { keepGlassLit } from '../lib/wakeLock'
 import { PARTY_SIZE, partyWord } from '../data/campaign'
@@ -377,13 +377,8 @@ function RosterSection({
   const [sentNote, setSentNote] = useState<string | null>(null)
 
   useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      const id = await store.getChannelId()
-      if (!cancelled) channelRef.current = joinTableChannel(id, {})
-    })()
+    channelRef.current = joinTableChannelLazy(store.getChannelId(), {})
     return () => {
-      cancelled = true
       channelRef.current?.close()
     }
   }, [store])

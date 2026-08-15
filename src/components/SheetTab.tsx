@@ -9,7 +9,7 @@ import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
 import { clearDice3d, rollDice3d, type DiceSpec } from '../lib/dice3d'
 import { rollD20, rollDamage, type RollMode, type RollResult } from '../lib/dice'
-import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
@@ -325,13 +325,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
   // Send-only channel: rolls stream to the table's feed (A5).
   useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      const id = await store.getChannelId()
-      if (!cancelled) channelRef.current = joinTableChannel(id, {})
-    })()
+    channelRef.current = joinTableChannelLazy(store.getChannelId(), {})
     return () => {
-      cancelled = true
       channelRef.current?.close()
     }
   }, [store])

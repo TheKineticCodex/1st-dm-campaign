@@ -8,7 +8,7 @@ import { DM_BASICS, SESSION1_RUN_SHEET } from '../data/dmBasics'
 import { seedStory } from '../data/storySeeds'
 import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
-import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
 import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
 import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
@@ -39,13 +39,8 @@ export function TonightSection({
   const [running, setRunning] = useState(false)
 
   useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      const id = await store.getChannelId()
-      if (!cancelled) channelRef.current = joinTableChannel(id, {})
-    })()
+    channelRef.current = joinTableChannelLazy(store.getChannelId(), {})
     return () => {
-      cancelled = true
       channelRef.current?.close()
     }
   }, [store])

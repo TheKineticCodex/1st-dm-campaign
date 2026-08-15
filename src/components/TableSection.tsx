@@ -5,7 +5,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { computeSheet } from '../lib/compute'
-import { joinTableChannel, type TableChannel } from '../lib/realtime'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
@@ -131,10 +131,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
 
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
-      const [channelId, active] = await Promise.all([store.getChannelId(), store.getActiveEncounter()])
-      if (cancelled) return
-      channelRef.current = joinTableChannel(channelId, {
+    channelRef.current = joinTableChannelLazy(store.getChannelId(), {
         roll: (r: RollEvent) => setFeed((f) => [r, ...f].slice(0, 14)),
         game: (g: GameEvent) => hostRef.current?.input(g),
         finale: (f: FinaleEvent) => {
@@ -167,8 +164,11 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
             })
           }
         },
-      })
-      hostRef.current = createHost((ev) => channelRef.current?.sendGame(ev), setGame)
+    })
+    hostRef.current = createHost((ev) => channelRef.current?.sendGame(ev), setGame)
+    ;(async () => {
+      const active = await store.getActiveEncounter()
+      if (cancelled) return
       if (active) setEncounter(active)
       setLoaded(true)
     })()
