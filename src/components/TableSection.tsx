@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
+import { SONGS } from '../data/songPieces'
+import { readCache, writeCache } from '../lib/storage'
 import type { Bargain, Encounter, Handout, InitiativeRow, RaceEvent, RollEvent } from '../types'
 import { MapBoard } from './MapBoard'
 import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
@@ -306,6 +308,10 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
 
       <Fold id="dm-level" title="✦ Level up the party">
         <LevelUpComposer store={store} roster={roster} channelRef={channelRef} />
+      </Fold>
+
+      <Fold id="dm-song" title="🎵 A piece comes home">
+        <SongComposer store={store} channelRef={channelRef} />
       </Fold>
 
       <Fold id="dm-map" title="🗺 The table map">
@@ -637,6 +643,90 @@ function LevelUpComposer({
       <Btn onClick={send} disabled={level <= current} shimmer>
         {sent ? `Level ${sent} announced ✦` : `Announce level ${level} to the party`}
       </Btn>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------- the song
+
+/**
+ * Light a piece of one of the five songs on every phone. Travels as a
+ * persisted handout with a `song` field (like level-ups), so it survives a
+ * sleeping phone. The Story tab on each phone shows the same lit pieces.
+ */
+function SongComposer({ store, channelRef }: { store: Store; channelRef: { current: TableChannel | null } }) {
+  const [lit, setLit] = useState<Set<string>>(new Set())
+  const [sent, setSent] = useState<string | null>(null)
+  useEffect(() => {
+    // The DM has no player token; read what's lit from the DM's own device cache of sent pieces.
+    setLit(new Set(readCache<string[]>('song-lit') ?? []))
+  }, [])
+
+  const light = (songKey: string, pieceKey: string, label: string, songName: string) => {
+    const key = `${songKey}:${pieceKey}`
+    const h: Handout = {
+      id: crypto.randomUUID(),
+      target: null,
+      title: '🎵 A piece comes home',
+      body: `${songName}: ${label}. Somewhere, something that had forgotten itself remembers a little.`,
+      song: key,
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    const next = new Set(lit)
+    next.add(key)
+    setLit(next)
+    writeCache('song-lit', [...next])
+    setSent(key)
+    setTimeout(() => setSent(null), 2500)
+  }
+
+  return (
+    <div>
+      <p className="text-sm mb-2" style={{ color: C.faint }}>
+        Tap a piece when the party brings it home. It lights on every phone’s Story tab — the campaign’s progress, visible.
+      </p>
+      {SONGS.map((song) => (
+        <div key={song.key} className="mb-3">
+          <p className="text-sm">
+            <strong style={{ ...display, fontSize: 16, color: C.parchment }}>{song.name}</strong>{' '}
+            <span className="text-xs" style={{ color: C.faint }}>
+              {song.holder}
+            </span>
+          </p>
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {song.pieces.map((p) => {
+              const on = lit.has(`${song.key}:${p.key}`)
+              return (
+                <button
+                  key={p.key}
+                  type="button"
+                  disabled={on}
+                  title={p.where}
+                  onClick={() => light(song.key, p.key, p.label, song.name)}
+                  className="rounded-md px-2.5 py-1.5 text-xs text-left"
+                  style={{
+                    background: on ? `${C.gold}33` : C.night,
+                    color: on ? C.gold : C.parchment,
+                    border: `1px solid ${on ? C.gold : C.panelEdge}`,
+                    minHeight: 40,
+                    cursor: on ? 'default' : 'pointer',
+                  }}
+                >
+                  {on ? '✦ ' : '· '}
+                  {p.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+      {sent && (
+        <p className="text-xs" style={{ color: C.sea }}>
+          Lit on every phone ✦
+        </p>
+      )}
     </div>
   )
 }

@@ -16,14 +16,14 @@ import { BuildTab } from './BuildTab'
 import { CharacterCard } from './CharacterCard'
 import { FortuneTab } from './FortuneTab'
 import { GuideTab } from './GuideTab'
-import { LedgerTab } from './LedgerTab'
+import { StoryTab } from './StoryTab'
 import { PlayerLive } from './PlayerLive'
 import { SheetTab } from './SheetTab'
 import { SpellsTab } from './SpellsTab'
 import { BagTab } from './BagTab'
 import { C, CalmToggle, body } from './ui'
 
-export type TabId = 'fortune' | 'build' | 'sheet' | 'spells' | 'bag' | 'ledger' | 'guide'
+export type TabId = 'fortune' | 'build' | 'sheet' | 'spells' | 'bag' | 'story' | 'guide'
 
 // Quiet Interface law 2: the tab bar shows only the current chapter of a
 // player's story. Before the forge seals: the path to a character. After:
@@ -39,7 +39,7 @@ const TABS_PLAY: [TabId, string, string][] = [
   ['sheet', '❖', 'Sheet'],
   ['spells', '✦', 'Spells'],
   ['bag', '🎒', 'Bag'],
-  ['ledger', '⚖', 'Ledger'],
+  ['story', '📖', 'Story'],
   ['guide', '✧', 'Guide'],
 ]
 
@@ -265,8 +265,14 @@ export function TabShell({ session, onLeave }: TabShellProps) {
               <SpellsTab character={character} onUpdate={persistCharacter} />
             )}
             {tab === 'bag' && <BagTab character={character} onUpdate={persistCharacter} />}
-            {tab === 'ledger' && (
-              <LedgerTab bargains={character?.notes.bargains ?? []} onSign={signBargain} />
+            {tab === 'story' && (
+              <StoryTab
+                store={store}
+                character={character}
+                onUpdate={persistCharacter}
+                bargains={character?.notes.bargains ?? []}
+                onSign={signBargain}
+              />
             )}
             {tab === 'guide' && <GuideTab />}
           </>

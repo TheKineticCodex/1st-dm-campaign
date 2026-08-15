@@ -66,6 +66,8 @@ export interface CharacterNotes {
   notes: string
   /** A1 Bargain Ledger — the player's device is the authority (DECISIONS 17/19). */
   bargains?: Bargain[]
+  /** The player's own journal — the story so far, in their words. */
+  journal?: string
 }
 
 // ---- A1: the Bargain Ledger ----
@@ -199,6 +201,8 @@ export interface Handout {
   sentAt: string
   /** A level-up: the whole party rises to this level. Persisted so late joiners still hear it. */
   level?: number
+  /** A piece of a song came home: "sea:seal-pup" (see data/songPieces.ts). Lights on every phone. */
+  song?: string
 }
 
 // ---- NEXT-1: live table events (broadcast only — feed is ephemeral by
