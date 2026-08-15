@@ -95,7 +95,8 @@ export function computeSheet(build: CharacterBuild): ComputedSheet | null {
   const featureList: Feature[] = []
   for (let l = 1; l <= level; l++) {
     for (const f of K.levels[l]?.features ?? []) featureList.push(toFeature(f))
-    for (const f of CLASS_LEVELS[build.klass]?.[l] ?? []) featureList.push(f)
+    // The level-4 "choose an ASI or feat" prompt belongs to the ceremony, not the permanent sheet.
+    for (const f of CLASS_LEVELS[build.klass]?.[l] ?? []) if (f.name !== 'Ability Score Improvement') featureList.push(f)
     if (build.subclass) {
       for (const f of SUBCLASSES[build.klass]?.[build.subclass]?.features[l] ?? []) featureList.push(f)
     }
