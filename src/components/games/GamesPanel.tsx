@@ -3,9 +3,9 @@
 // small controls (reveal, whisper the prize, return to the story).
 
 import { useState } from 'react'
-import { GAME_TITLES, TOLL_QUESTIONS, type GameKind, type GameState } from '../../lib/games'
+import { BARGAIN_OFFERS, COINS, GAME_TITLES, TOLL_QUESTIONS, type GameKind, type GameState } from '../../lib/games'
 import type { Host } from '../../lib/gameHost'
-import { newDraw, newNote, newToll } from '../../lib/gameHost'
+import { newBargain, newDraw, newNote, newToll } from '../../lib/gameHost'
 import type { RosterEntry, Store } from '../../lib/store'
 import type { Handout } from '../../types'
 import { Btn, C, TextArea, TextInput, display } from '../ui'
@@ -15,12 +15,14 @@ const BLURB: Record<GameKind, string> = {
   draw: 'One phone draws, the rest guess, the iPad shows the picture forming. Everyone takes a turn with the charcoal. Party score.',
   note: 'Every phone holds one note of the tune. Hold together and the chord builds on the iPad; let go and it falls. The Fair whispers distractions to one phone at a time.',
   toll: 'The Twins ask a question. Everyone answers, sealed. Answers go up on the iPad without names — the table argues who said what; you reveal one by one.',
+  bargain: 'The Buyer puts something on the table. Every phone bids what they’d give — a memory, a name, a promise — sealed. The iPad shows the envelopes (coin only). You open what you like and take ONE. The rest he keeps.',
 }
 
 const PRIZE_DEFAULT: Record<GameKind, string> = {
   draw: 'The stall-keeper hands you a paper lantern with something folded inside.',
   note: 'For a moment the whole tune was almost there. You each remember one more bar of it than you did.',
   toll: 'Brother Hush writes something in his book, and tears out a page for you.',
+  bargain: 'The Buyer folds your bid into his coat. What was on the table is yours — the way he says it makes it sound like a debt.',
 }
 
 export function GamesPanel({
@@ -41,6 +43,7 @@ export function GamesPanel({
   const [drawSeconds, setDrawSeconds] = useState<number>(45)
   const [noteSeconds, setNoteSeconds] = useState<number>(25)
   const [tollQ, setTollQ] = useState<string>(TOLL_QUESTIONS[0])
+  const [offer, setOffer] = useState<string>(BARGAIN_OFFERS[0])
   const [prizeTo, setPrizeTo] = useState<string>('') // '' = everyone
   const [prize, setPrize] = useState<string>('')
   const [sent, setSent] = useState(false)
@@ -55,13 +58,14 @@ export function GamesPanel({
     if (pick === 'draw') host.start(newDraw(players, { rounds: drawRounds, seconds: drawSeconds }))
     if (pick === 'note') host.start(newNote(players, { seconds: noteSeconds }))
     if (pick === 'toll') host.start(newToll(players, tollQ.trim() || TOLL_QUESTIONS[0]))
+    if (pick === 'bargain') host.start(newBargain(players, offer.trim() || BARGAIN_OFFERS[0]))
   }
 
   const whisper = () => {
     if (!game) return
     const h: Handout = {
       id: crypto.randomUUID(),
-      target: prizeTo || null,
+      target: prizeTo || (game.kind === 'bargain' ? game.accepted : null) || null,
       title: `${GAME_TITLES[game.kind]} · the prize`,
       body: prize.trim() || PRIZE_DEFAULT[game.kind],
       sentAt: new Date().toISOString(),
@@ -153,6 +157,58 @@ export function GamesPanel({
           </div>
         )}
 
+        {game.kind === 'bargain' && (
+          <div className="text-sm mt-2" style={{ color: C.parchment }}>
+            <p style={{ ...display, fontSize: 18 }}>“{game.offer}”</p>
+            <p>
+              {game.bids.length}/{game.players.length} sealed
+              {game.phase === 'closed' ? ' · bids closed — open what you like, take one' : ''}
+              {game.phase === 'end' ? (game.accepted ? ` · you took ${game.accepted}’s` : ' · you took nothing') : ''}
+            </p>
+            <ul className="text-xs mt-1" style={{ color: C.faint }}>
+              {game.bids.map((b) => {
+                const open = game.opened.includes(b.by)
+                const taken = game.accepted === b.by
+                const coin = COINS.find((c) => c.id === b.coin)
+                return (
+                  <li key={b.by} className="flex flex-wrap items-center gap-2 mb-1">
+                    <span>
+                      {coin?.glyph} <strong style={{ color: taken ? C.gold : C.parchment }}>{b.by}</strong> · {coin?.label}: “{b.text}”
+                    </span>
+                    {game.phase === 'closed' && !open && (
+                      <button type="button" onClick={() => host.act({ type: 'open', by: b.by })} className="rounded px-2 py-1" style={{ background: C.night, border: `1px solid ${C.sea}`, color: C.sea, cursor: 'pointer', minHeight: 32 }}>
+                        open
+                      </button>
+                    )}
+                    {game.phase === 'closed' && (
+                      <button type="button" onClick={() => host.act({ type: 'accept', by: b.by })} className="rounded px-2 py-1" style={{ background: `${C.gold}22`, border: `1px solid ${C.gold}`, color: C.gold, cursor: 'pointer', minHeight: 32 }}>
+                        take this one
+                      </button>
+                    )}
+                    {open && <span style={{ color: C.sea }}>opened</span>}
+                    {taken && <span style={{ color: C.gold }}>taken</span>}
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="text-xs" style={{ color: C.faint }}>
+              Only you can read the words until you open an envelope. The Buyer’s honest sentence is yours to say.
+            </p>
+            <div className="mt-2 flex gap-2">
+              {game.phase === 'bid' && (
+                <Btn onClick={() => host.advance()} disabled={game.bids.length === 0} shimmer>
+                  Close the bids
+                </Btn>
+              )}
+              {game.phase === 'closed' && (
+                <Btn secondary onClick={() => host.advance()}>
+                  Take nothing — keep them all
+                </Btn>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${C.panelEdge}` }}>
           <p className="text-xs mb-1" style={{ color: C.faint }}>
             Whisper the prize (rides on a sealed envelope; survives a sleeping phone)
@@ -230,6 +286,18 @@ export function GamesPanel({
             seconds{' '}
             <input type="number" min={10} max={90} value={noteSeconds} onChange={(e) => setNoteSeconds(Math.max(10, Math.min(90, Number(e.target.value) || 25)))} className="rounded-md px-2 py-1 ml-1" style={{ width: 72, background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40 }} />
           </label>
+        )}
+        {pick === 'bargain' && (
+          <div className="w-full">
+            <div className="flex flex-wrap gap-1 mb-2">
+              {BARGAIN_OFFERS.map((o) => (
+                <button key={o} type="button" onClick={() => setOffer(o)} className="text-xs rounded-full px-2 py-1" style={{ background: offer === o ? `${C.gold}22` : 'transparent', border: `1px solid ${offer === o ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer' }}>
+                  {o}
+                </button>
+              ))}
+            </div>
+            <TextInput value={offer} onChange={setOffer} placeholder="Or put your own thing on the table…" />
+          </div>
         )}
         {pick === 'toll' && (
           <div className="w-full">

@@ -10,7 +10,7 @@
 // (phone / stage / DM panel) in components/games/. The transport, the
 // overlay chrome, the heartbeat, and "return to the story" are shared.
 
-export type GameKind = 'draw' | 'note' | 'toll'
+export type GameKind = 'draw' | 'note' | 'toll' | 'bargain'
 
 // ------------------------------------------------------------ Draw the Missing Piece
 export interface Stroke {
@@ -78,8 +78,37 @@ export interface TollState {
 }
 export type TollInput = { type: 'answer'; text: string }
 
-export type GameState = DrawState | NoteState | TollState
-export type GameInput = DrawInput | NoteInput | TollInput
+// ------------------------------------------------------------ The Bargain
+/** What a bid is made of. The stage shows the coin, never the words, until opened. */
+export type Coin = 'memory' | 'name' | 'promise' | 'favor' | 'secret' | 'song'
+export const COINS: { id: Coin; glyph: string; label: string }[] = [
+  { id: 'memory', glyph: '✧', label: 'a memory' },
+  { id: 'name', glyph: '✒', label: 'a name' },
+  { id: 'promise', glyph: '⚓', label: 'a promise' },
+  { id: 'favor', glyph: '🤝', label: 'a favour, owed' },
+  { id: 'secret', glyph: '🔒', label: 'a secret' },
+  { id: 'song', glyph: '♪', label: 'a piece of a song' },
+]
+export interface BargainState {
+  kind: 'bargain'
+  gameId: string
+  phase: 'bid' | 'closed' | 'end'
+  players: string[]
+  /** What the Buyer puts on the table. */
+  offer: string
+  bids: { by: string; coin: Coin; text: string }[]
+  /** Bidders whose envelope the Buyer has opened (words + name shown). */
+  opened: string[]
+  /** The one bid the Buyer took. Everyone else's stays sealed — he keeps them. */
+  accepted: string | null
+}
+export type BargainInput = { type: 'bid'; coin: Coin; text: string }
+
+export type GameState = DrawState | NoteState | TollState | BargainState
+export type GameInput = DrawInput | NoteInput | TollInput | BargainInput
+
+/** Host-side actions the DM takes from the Book (never from a phone). */
+export type DmAction = { type: 'advance' } | { type: 'open'; by: string } | { type: 'accept'; by: string }
 
 /** What travels on the channel. */
 export interface GameEvent {
@@ -96,6 +125,7 @@ export const GAME_TITLES: Record<GameKind, string> = {
   draw: '🎨 Draw the Missing Piece',
   note: '🎵 Hold the Note',
   toll: '🕯 The Toll',
+  bargain: '⚖ The Bargain',
 }
 
 // ------------------------------------------------------------ Draw words
@@ -151,6 +181,15 @@ export const TOLL_QUESTIONS = [
   'What would you never, ever sell?',
   'What do you hum when you think no one can hear?',
   'What did you leave behind to be here tonight?',
+]
+
+// ------------------------------------------------------------ Bargain offers
+export const BARGAIN_OFFERS = [
+  'A way through the gate tonight — for one of you.',
+  'The name of the one who signed the tide away.',
+  'One thing that was lost, brought back to the table. He won’t say which.',
+  'A door that opens home. Once.',
+  'The missing note, hummed in your ear — and then forgotten again.',
 ]
 
 /** Fisher–Yates, seeded by nothing — the host shuffles once and broadcasts the order. */

@@ -8,6 +8,7 @@ import { C, display } from '../ui'
 import { DrawPhone, DrawStage } from './DrawGame'
 import { NotePhone, NoteStage } from './NoteGame'
 import { TollPhone, TollStage } from './TollGame'
+import { BargainPhone, BargainStage } from './BargainGame'
 
 export function GamePhoneOverlay({ state, me, send }: { state: GameState; me: string; send: (i: GameInput) => void }) {
   return (
@@ -25,6 +26,7 @@ export function GamePhoneOverlay({ state, me, send }: { state: GameState; me: st
         {state.kind === 'draw' && <DrawPhone state={state} me={me} send={send} />}
         {state.kind === 'note' && <NotePhone state={state} me={me} send={send} />}
         {state.kind === 'toll' && <TollPhone state={state} me={me} send={send} />}
+        {state.kind === 'bargain' && <BargainPhone state={state} me={me} send={send} />}
       </div>
       <p className="text-xs mt-6" style={{ color: C.faint }}>
         the stall-keeper will say when it’s done
@@ -39,6 +41,7 @@ export function GameStageBoard({ state }: { state: GameState }) {
       {state.kind === 'draw' && <DrawStage state={state} />}
       {state.kind === 'note' && <NoteStage state={state} />}
       {state.kind === 'toll' && <TollStage state={state} />}
+      {state.kind === 'bargain' && <BargainStage state={state} />}
     </div>
   )
 }

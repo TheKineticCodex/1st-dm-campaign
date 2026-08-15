@@ -371,7 +371,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         />
       </Fold>
 
-      <Fold id="dm-games" title="🎪 The game booth — Draw · Hold the Note · The Toll" forceOpen={!!game}>
+      <Fold id="dm-games" title="🎪 The game booth — Draw · Hold the Note · The Toll · The Bargain" forceOpen={!!game}>
         <GamesPanel
           store={store}
           roster={roster}

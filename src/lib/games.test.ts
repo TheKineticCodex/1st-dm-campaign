@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { guessMatches, normGuess, NOTE_POOL } from './games'
-import { newDraw, newNote, newToll, reduceDraw, reduceNote, reduceToll, tickDraw, tickNote, tollReveal } from './gameHost'
+import { bargainAct, newBargain, newDraw, newNote, newToll, reduceBargain, reduceDraw, reduceNote, reduceToll, tickDraw, tickNote, tollReveal } from './gameHost'
 
 const P = ['Peaches', 'Billy', 'Philip', 'Freya Sun', 'Freya Moon']
 
@@ -113,5 +113,37 @@ describe('The Toll', () => {
     s = tollReveal(s)
     expect(s.revealed).toBe(2)
     expect(s.phase).toBe('end')
+  })
+})
+
+describe('The Bargain', () => {
+  it('seals one bid per player, closes, opens, and takes exactly one', () => {
+    let s = newBargain(P.slice(0, 3), 'A door that opens home. Once.')
+    s = reduceBargain(s, 'Peaches', { type: 'bid', coin: 'memory', text: 'the coral house at dusk' })
+    s = reduceBargain(s, 'Peaches', { type: 'bid', coin: 'promise', text: 'I will go home' })
+    s = reduceBargain(s, 'Billy', { type: 'bid', coin: 'name', text: 'the gentle one' })
+    s = reduceBargain(s, 'Billy', { type: 'bid', coin: 'name', text: '   ' }) // blank ignored
+    s = reduceBargain(s, 'Stranger', { type: 'bid', coin: 'secret', text: 'nope' })
+    expect(s.bids.map((b) => `${b.by}:${b.coin}`)).toEqual(['Peaches:promise', 'Billy:name'])
+    // DM cannot open/accept before closing
+    expect(bargainAct(s, { type: 'open', by: 'Billy' })).toBe(s)
+    s = bargainAct(s, { type: 'advance' })
+    expect(s.phase).toBe('closed')
+    // no late bids
+    expect(reduceBargain(s, 'Philip', { type: 'bid', coin: 'favor', text: 'late' })).toBe(s)
+    s = bargainAct(s, { type: 'open', by: 'Billy' })
+    expect(s.opened).toEqual(['Billy'])
+    expect(bargainAct(s, { type: 'open', by: 'Nobody' })).toBe(s)
+    s = bargainAct(s, { type: 'accept', by: 'Peaches' })
+    expect(s.phase).toBe('end')
+    expect(s.accepted).toBe('Peaches')
+    expect(s.opened).toEqual(['Billy', 'Peaches'])
+  })
+  it('the Buyer may take nothing', () => {
+    let s = newBargain(P.slice(0, 2), 'x')
+    s = reduceBargain(s, 'Peaches', { type: 'bid', coin: 'song', text: 'three notes' })
+    s = bargainAct(bargainAct(s, { type: 'advance' }), { type: 'advance' })
+    expect(s.phase).toBe('end')
+    expect(s.accepted).toBeNull()
   })
 })

@@ -7,6 +7,9 @@ import {
   NOTE_POOL,
   guessMatches,
   shuffle,
+  type BargainInput,
+  type BargainState,
+  type DmAction,
   type DrawInput,
   type DrawState,
   type GameEvent,
@@ -65,6 +68,10 @@ export function newNote(players: string[], opts?: { seconds?: number }): NoteSta
 
 export function newToll(players: string[], question: string): TollState {
   return { kind: 'toll', gameId: crypto.randomUUID(), phase: 'answer', players, question, answers: [], order: [], revealed: 0 }
+}
+
+export function newBargain(players: string[], offer: string): BargainState {
+  return { kind: 'bargain', gameId: crypto.randomUUID(), phase: 'bid', players, offer, bids: [], opened: [], accepted: null }
 }
 
 // ------------------------------------------------------------ reducers
@@ -168,10 +175,32 @@ export function tollReveal(s: TollState): TollState {
   return s
 }
 
+export function reduceBargain(s: BargainState, from: string, input: BargainInput): BargainState {
+  if (s.phase !== 'bid' || input.type !== 'bid' || !s.players.includes(from)) return s
+  const text = input.text.trim().slice(0, 240)
+  if (!text) return s
+  const bids = s.bids.filter((b) => b.by !== from).concat({ by: from, coin: input.coin, text })
+  return { ...s, bids }
+}
+/** DM actions on the Bargain: close the bids, open one envelope, accept one bid. */
+export function bargainAct(s: BargainState, a: DmAction): BargainState {
+  if (a.type === 'advance') {
+    if (s.phase === 'bid') return { ...s, phase: 'closed' }
+    if (s.phase === 'closed') return { ...s, phase: 'end' }
+    return s
+  }
+  if (s.phase !== 'closed') return s
+  if (!s.bids.some((b) => b.by === a.by)) return s
+  if (a.type === 'open') return s.opened.includes(a.by) ? s : { ...s, opened: [...s.opened, a.by] }
+  if (a.type === 'accept') return { ...s, accepted: a.by, opened: s.opened.includes(a.by) ? s.opened : [...s.opened, a.by], phase: 'end' }
+  return s
+}
+
 export function reduce(s: GameState, from: string, input: GameInput): GameState {
   if (s.kind === 'draw') return reduceDraw(s, from, input as DrawInput)
   if (s.kind === 'note') return reduceNote(s, from, input as NoteInput)
-  return reduceToll(s, from, input as TollInput)
+  if (s.kind === 'toll') return reduceToll(s, from, input as TollInput)
+  return reduceBargain(s, from, input as BargainInput)
 }
 
 // ------------------------------------------------------------ the host loop
@@ -180,8 +209,10 @@ export interface Host {
   get(): GameState | null
   start(s: GameState): void
   input(ev: GameEvent): void
-  /** Host-side manual advance (Toll reveal, etc.). */
+  /** Host-side manual advance (Toll reveal, Bargain close, etc.). */
   advance(): void
+  /** Any DM action (open / accept an envelope, advance). */
+  act(a: DmAction): void
   stop(): void
 }
 
@@ -240,7 +271,12 @@ export function createHost(send: (ev: GameEvent) => void, onChange: (s: GameStat
       if (next !== state) set(next)
     },
     advance() {
+      this.act({ type: 'advance' })
+    },
+    act(a) {
       if (!state) return
+      if (state.kind === 'bargain') return set(bargainAct(state, a), true)
+      if (a.type !== 'advance') return
       if (state.kind === 'toll') set(tollReveal(state), true)
       if (state.kind === 'draw' && state.phase === 'intro') set(tickDraw(state), true)
     },
