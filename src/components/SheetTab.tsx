@@ -14,8 +14,9 @@ import type { Store } from '../lib/store'
 import type { SavedCharacter } from '../types'
 import { CharacterCard } from './CharacterCard'
 import { LevelUp } from './LevelUp'
+import type { Feature } from '../data/levels'
 import { SpellChips, SpellsSection } from './SpellsSection'
-import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display } from './ui'
+import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display, Fold } from './ui'
 
 interface SheetTabProps {
   character: SavedCharacter | null
@@ -212,9 +213,81 @@ function PurseSection({ coins, onChange }: { coins: Coins; onChange: (next: Coin
 
 /** Tappable spell names — tap one to unfold what it does, in plain words. */
 
+/** Class abilities with a number of uses per rest — pips you tap as you spend them. */
+function FeatureUses({
+  features,
+  uses,
+  onChange,
+}: {
+  features: Feature[]
+  uses: Record<string, number>
+  onChange: (name: string, spent: number) => void
+}) {
+  const tracked = features.filter((f) => f.uses && f.uses.n > 0)
+  if (tracked.length === 0) return null
+  const tag = (a?: Feature['action']) =>
+    a === 'action' ? 'action' : a === 'bonus' ? 'bonus action' : a === 'reaction' ? 'reaction' : a === 'free' ? 'free' : null
+  return (
+    <Section style={{ marginTop: 16 }}>
+      <Eyebrow>Abilities — tap a pip when you use one</Eyebrow>
+      {tracked.map((f) => {
+        const n = f.uses!.n
+        const spent = Math.min(n, uses[f.name] ?? 0)
+        const t = tag(f.action)
+        return (
+          <div key={f.name} className="mb-3">
+            <div className="flex items-center justify-between">
+              <strong className="text-sm" style={{ color: C.parchment }}>
+                {f.name}
+                {t && (
+                  <span className="text-xs ml-2 rounded-full px-2" style={{ background: `${C.sea}22`, color: C.sea, border: `1px solid ${C.sea}55` }}>
+                    {t}
+                  </span>
+                )}
+              </strong>
+              <span className="text-xs" style={{ color: C.faint }}>
+                {n - spent} of {n} · {f.uses!.per} rest
+              </span>
+            </div>
+            <div className="flex gap-2 mt-1">
+              {Array.from({ length: n }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`${f.name} use ${i + 1} ${i < spent ? 'spent' : 'available'}`}
+                  onClick={() => onChange(f.name, i < spent ? i : i + 1)}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    border: `2px solid ${C.gold}`,
+                    background: i < spent ? 'transparent' : C.gold,
+                    color: i < spent ? C.faint : C.ink,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {i < spent ? '·' : '✦'}
+                </button>
+              ))}
+            </div>
+            {f.text && (
+              <p className="text-xs mt-1" style={{ color: C.parchment, opacity: 0.8 }}>
+                {f.text.replace(/\s*\/\/ VERIFY.*$/, '')}
+              </p>
+            )}
+          </div>
+        )
+      })}
+    </Section>
+  )
+}
+
 export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, playerName, announcedLevel = 0 }: SheetTabProps) {
   const [rollMode, setRollMode] = useState<RollMode>('normal')
   const [quickRoll, setQuickRoll] = useState(false)
+  const [hpAmt, setHpAmt] = useState<string>('')
+  const [hpMore, setHpMore] = useState(false)
   const [roll, setRoll] = useState<RollResult | null>(null)
   const [damage, setDamage] = useState<{ rolls: number[]; total: number } | null>(null)
   const [showConditionPicker, setShowConditionPicker] = useState(false)
@@ -492,62 +565,6 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </div>
       )}
 
-      {/* Advantage toggle */}
-      <div className="flex gap-2 mt-3" role="group" aria-label="Roll mode">
-        {(['disadvantage', 'normal', 'advantage'] as RollMode[]).map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => setRollMode(m)}
-            className="flex-1 rounded-md py-2 text-sm"
-            style={{
-              background: rollMode === m ? (m === 'advantage' ? C.sea : m === 'disadvantage' ? '#B36B6B' : C.gold) : C.panel,
-              color: rollMode === m ? C.ink : C.faint,
-              border: `1px solid ${C.panelEdge}`,
-              minHeight: 44,
-              cursor: 'pointer',
-            }}
-          >
-            {m === 'normal' ? 'Normal' : m === 'advantage' ? 'Advantage' : 'Disadvantage'}
-          </button>
-        ))}
-      </div>
-      <div className="mt-2">
-        <HintOnce id="sheet-tap-to-roll">
-          Your sheet rolls for you — tap any ability, skill, or the attack, and the dice answer.
-        </HintOnce>
-      </div>
-
-      {/* Abilities (tap = save roll) */}
-      <div className="grid grid-cols-3 gap-2 mt-3">
-        {ABILITIES.map((a) => (
-          <button
-            key={a}
-            type="button"
-            onClick={() => doRoll(`${a} save`, saveMod(sheet, a as AbilityKey))}
-            className="rounded-lg py-3 text-center"
-            style={{
-              background: C.panel,
-              border: `1px solid ${sheet.K.saves.includes(a) ? C.gold : C.panelEdge}`,
-              color: C.parchment,
-              cursor: 'pointer',
-            }}
-          >
-            <p className="text-xs" style={{ color: C.faint }}>
-              {a}
-              {sheet.K.saves.includes(a) ? ' ◈' : ''}
-            </p>
-            <p style={{ ...display, fontSize: 24, fontWeight: 700 }}>{fmt(mod(sheet.A[a]))}</p>
-            <p className="text-xs" style={{ color: C.faint }}>
-              {sheet.A[a]}
-            </p>
-          </button>
-        ))}
-      </div>
-      <p className="text-xs mt-1" style={{ color: C.faint }}>
-        ◈ = proficient saving throw (add +{sheet.prof}) · tap to roll a save
-      </p>
-
       {/* HP / AC / Speed */}
       <div className="grid grid-cols-3 gap-2 mt-3">
         <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink }}>
@@ -577,6 +594,14 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               +
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setHpMore(!hpMore)}
+            className="text-xs mt-1 underline"
+            style={{ color: C.goldDim, background: 'none', border: 'none', cursor: 'pointer', minHeight: 24 }}
+          >
+            {hpMore ? 'less' : 'more…'}
+          </button>
         </div>
         <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink }}>
           <p className="text-xs" style={{ color: C.goldDim }}>
@@ -601,6 +626,44 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           Initiative {fmt(mod(sheet.A.DEX))}
         </button>
       </p>
+      {hpMore && (
+        <div className="flex items-center gap-2 mt-2 rounded-lg p-2" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+          <input
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={hpAmt}
+            onChange={(e) => setHpAmt(e.target.value.replace(/[^0-9]/g, ''))}
+            placeholder="how much?"
+            aria-label="Amount of damage or healing"
+            className="rounded-md px-3 py-2 text-base"
+            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44, width: 110 }}
+          />
+          <button
+            type="button"
+            disabled={!hpAmt}
+            onClick={() => {
+              changeHp(-Number(hpAmt))
+              setHpAmt('')
+            }}
+            className="flex-1 rounded-md px-3 py-2 text-sm font-semibold"
+            style={{ background: '#4a2a35', color: '#E0928F', border: '1px solid #C96A6A66', minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.5 }}
+          >
+            − hurt
+          </button>
+          <button
+            type="button"
+            disabled={!hpAmt}
+            onClick={() => {
+              changeHp(Number(hpAmt))
+              setHpAmt('')
+            }}
+            className="flex-1 rounded-md px-3 py-2 text-sm font-semibold"
+            style={{ background: `${C.sea}1a`, color: C.sea, border: `1px solid ${C.sea}55`, minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.5 }}
+          >
+            + heal
+          </button>
+        </div>
+      )}
 
       {/* Death saves at 0 HP */}
       {dying && (
@@ -687,9 +750,96 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </p>
       )}
 
+      {/* Conditions */}
+      <Section style={{ marginTop: 12 }}>
+        <Eyebrow>Conditions</Eyebrow>
+        {state.conditions.length === 0 && (
+          <p className="text-sm" style={{ color: C.faint }}>
+            None — may it stay that way.
+          </p>
+        )}
+        {state.conditions.map((c) => (
+          <div key={c} className="mb-2">
+            <div className="flex items-center justify-between">
+              <strong className="text-sm" style={{ color: C.gold }}>
+                {c}
+              </strong>
+              <button
+                type="button"
+                onClick={() => updateState({ conditions: state.conditions.filter((x) => x !== c) })}
+                className="text-xs"
+                style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              >
+                clear ✕
+              </button>
+            </div>
+            <p className="text-xs" style={{ color: C.parchment, opacity: 0.85 }}>
+              {CONDITIONS[c]}
+            </p>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => setShowConditionPicker(!showConditionPicker)}
+          className="text-sm underline"
+          style={{ color: C.sea, background: 'none', border: 'none', padding: 0, minHeight: 44, cursor: 'pointer' }}
+        >
+          {showConditionPicker ? 'close' : '+ add a condition'}
+        </button>
+        {showConditionPicker && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {Object.keys(CONDITIONS)
+              .filter((c) => !state.conditions.includes(c))
+              .map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    updateState({ conditions: [...state.conditions, c] })
+                    setShowConditionPicker(false)
+                  }}
+                  className="text-xs rounded-md px-3 py-2"
+                  style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40, cursor: 'pointer' }}
+                >
+                  {c}
+                </button>
+              ))}
+          </div>
+        )}
+      </Section>
+
+      <p className="uppercase text-xs tracking-widest mt-5 mb-1" style={{ color: C.gold, letterSpacing: '0.25em' }}>
+        on your turn
+      </p>
+      {/* Advantage toggle */}
+      <div className="flex gap-2 mt-3" role="group" aria-label="Roll mode">
+        {(['disadvantage', 'normal', 'advantage'] as RollMode[]).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => setRollMode(m)}
+            className="flex-1 rounded-md py-2 text-sm"
+            style={{
+              background: rollMode === m ? (m === 'advantage' ? C.sea : m === 'disadvantage' ? '#B36B6B' : C.gold) : C.panel,
+              color: rollMode === m ? C.ink : C.faint,
+              border: `1px solid ${C.panelEdge}`,
+              minHeight: 44,
+              cursor: 'pointer',
+            }}
+          >
+            {m === 'normal' ? 'Normal' : m === 'advantage' ? 'Advantage' : 'Disadvantage'}
+          </button>
+        ))}
+      </div>
+      <div className="mt-2">
+        <HintOnce id="sheet-tap-to-roll">
+          Your sheet rolls for you — tap any ability, skill, or the attack, and the dice answer.
+        </HintOnce>
+      </div>
+
       {/* Attack */}
       <Section style={{ marginTop: 16 }}>
-        <Eyebrow>Attack — tap to roll</Eyebrow>
+        <Eyebrow>Attack — tap to roll{sheet.attacks > 1 ? ` · ×${sheet.attacks} per Attack action` : ''}</Eyebrow>
         <button
           type="button"
           onClick={rollAttack}
@@ -715,18 +865,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         )}
       </Section>
 
-      {/* The Bag */}
-      <BagSection
-        bag={state.bag ?? seedBag(sheet.K.weapon.name, sheet.ac.note ?? '')}
-        onChange={(next) => updateState({ bag: next })}
-      />
-
-      {/* The Purse — starting sum is a house default; the Keeper adjusts. */}
-      <PurseSection
-        coins={state.coins ?? { gp: 10, sp: 0, cp: 0 }}
-        onChange={(next) => updateState({ coins: next })}
-      />
-
+      {/* Class abilities with uses — tap a pip when you spend one */}
+      <FeatureUses features={sheet.featureList} uses={state.uses ?? {}} onChange={(name, spent) => updateState({ uses: { ...(state.uses ?? {}), [name]: spent } })} />
       {/* Fairy Magic — species-born, no class required. Faerie Fire arrives at level 3. VERIFY Witchlight fairy */}
       {character.build.species === 'Fairy ✦' && (
         <Section>
@@ -833,63 +973,39 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </Btn>
       </div>
 
-      {/* Conditions */}
-      <Section style={{ marginTop: 16 }}>
-        <Eyebrow>Conditions</Eyebrow>
-        {state.conditions.length === 0 && (
-          <p className="text-sm" style={{ color: C.faint }}>
-            None — may it stay that way.
-          </p>
-        )}
-        {state.conditions.map((c) => (
-          <div key={c} className="mb-2">
-            <div className="flex items-center justify-between">
-              <strong className="text-sm" style={{ color: C.gold }}>
-                {c}
-              </strong>
-              <button
-                type="button"
-                onClick={() => updateState({ conditions: state.conditions.filter((x) => x !== c) })}
-                className="text-xs"
-                style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
-              >
-                clear ✕
-              </button>
-            </div>
-            <p className="text-xs" style={{ color: C.parchment, opacity: 0.85 }}>
-              {CONDITIONS[c]}
+      <p className="uppercase text-xs tracking-widest mt-5 mb-1" style={{ color: C.gold, letterSpacing: '0.25em' }}>
+        the rest of the sheet
+      </p>
+      <Fold id="sheet-rolls" title="🎯 Abilities, saves & skills" defaultOpen>
+      {/* Abilities (tap = save roll) */}
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        {ABILITIES.map((a) => (
+          <button
+            key={a}
+            type="button"
+            onClick={() => doRoll(`${a} save`, saveMod(sheet, a as AbilityKey))}
+            className="rounded-lg py-3 text-center"
+            style={{
+              background: C.panel,
+              border: `1px solid ${sheet.K.saves.includes(a) ? C.gold : C.panelEdge}`,
+              color: C.parchment,
+              cursor: 'pointer',
+            }}
+          >
+            <p className="text-xs" style={{ color: C.faint }}>
+              {a}
+              {sheet.K.saves.includes(a) ? ' ◈' : ''}
             </p>
-          </div>
+            <p style={{ ...display, fontSize: 24, fontWeight: 700 }}>{fmt(mod(sheet.A[a]))}</p>
+            <p className="text-xs" style={{ color: C.faint }}>
+              {sheet.A[a]}
+            </p>
+          </button>
         ))}
-        <button
-          type="button"
-          onClick={() => setShowConditionPicker(!showConditionPicker)}
-          className="text-sm underline"
-          style={{ color: C.sea, background: 'none', border: 'none', padding: 0, minHeight: 44, cursor: 'pointer' }}
-        >
-          {showConditionPicker ? 'close' : '+ add a condition'}
-        </button>
-        {showConditionPicker && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {Object.keys(CONDITIONS)
-              .filter((c) => !state.conditions.includes(c))
-              .map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => {
-                    updateState({ conditions: [...state.conditions, c] })
-                    setShowConditionPicker(false)
-                  }}
-                  className="text-xs rounded-md px-3 py-2"
-                  style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40, cursor: 'pointer' }}
-                >
-                  {c}
-                </button>
-              ))}
-          </div>
-        )}
-      </Section>
+      </div>
+      <p className="text-xs mt-1" style={{ color: C.faint }}>
+        ◈ = proficient saving throw (add +{sheet.prof}) · tap to roll a save
+      </p>
 
       {/* Skills (tap = check) */}
       <Section>
@@ -919,6 +1035,22 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </div>
       </Section>
 
+      </Fold>
+      <Fold id="sheet-bag" title="🎒 The bag & the purse">
+      {/* The Bag */}
+      <BagSection
+        bag={state.bag ?? seedBag(sheet.K.weapon.name, sheet.ac.note ?? '')}
+        onChange={(next) => updateState({ bag: next })}
+      />
+
+      {/* The Purse — starting sum is a house default; the Keeper adjusts. */}
+      <PurseSection
+        coins={state.coins ?? { gp: 10, sp: 0, cp: 0 }}
+        onChange={(next) => updateState({ coins: next })}
+      />
+
+      </Fold>
+      <Fold id="sheet-features" title="✦ Features, traits & equipment">
       {/* Features */}
       <Section>
         <Eyebrow>Features & traits</Eyebrow>
@@ -948,6 +1080,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <p className="text-sm">{sheet.K.kit}</p>
       </Section>
 
+      </Fold>
+      <Fold id="sheet-me" title="✎ Who I am">
       {/* Free text */}
       <Section>
         <Eyebrow>Appearance</Eyebrow>
@@ -969,6 +1103,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <TextArea rows={4} value={notes.notes} onChange={(v) => updateNotes({ notes: v })} placeholder="Anything else worth remembering…" />
       </Section>
 
+      </Fold>
       <Btn secondary onClick={onEdit}>
         Edit character
       </Btn>
