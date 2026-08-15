@@ -101,10 +101,9 @@ thing it once gave away, and now presses against the fence, grieving,
 unable to say why. The child on Net Row is correct: it went to the party;
 it comes home when the party is over.
 
-⚑ **The Moon-night** — written as the closest moon in a lifetime (huge,
-silver, wrong). A blood moon is an equal alternative; only the color
-changes. The night it is closest is the finale — the only night the song can
-be sung whole, because the Sea must be near what it lost in order to
+**The Moon-night** — the closest moon in a lifetime: huge, silver, wrong,
+too near. The night it is closest is the finale — the only night the song
+can be sung whole, because the Sea must be near what it lost in order to
 remember it.
 
 **The Moon clock (procedure).** No rules. Read one line about the moon at
@@ -139,10 +138,10 @@ so that saying yes feels like a game.
 kept goes Below permanently. They can only be outlasted, out-thought, or
 out-sung.
 
-⚑ **One face.** The villain has one face: **the Buyer** — courteous,
+**One face.** The villain has one face: **the Buyer** — courteous,
 punctual, unseen until mid-campaign, and he never lies. Everyone else Below
 is a *keeper* who owes him and can be freed or outwitted. The players
-should hate one person, not an organization.
+hate one person, not an organization.
 
 **The cast** (no one else is introduced before their scene):
 
@@ -193,11 +192,11 @@ being right" — was the last person to see William unmasked. The spellbook
 matters for its *handwriting*: proof someone knew him before. Each page the
 Ones Below un-write is a page of Wren.
 
-⚑ **His name comes home when his friends sing it.** His true name lives in
+**His name comes home when his friends sing it.** His true name lives in
 the songs he wrote about the party; the party already carry pieces of him.
 He does not lose his magic — he stops being afraid of it. (His player
-pitched "hearing it strips his magic"; this is the gentler reading. Confirm
-with him.)
+pitched "hearing it strips his magic"; the campaign takes the gentler
+reading. Worth a quiet word with him so the moment lands as a gift.)
 
 Player-requested table rules: *the more serious it gets, the funnier he
 gets; no joke means something is truly wrong.* He silently checks the chain
@@ -207,7 +206,7 @@ road when he reaches for it and it is gone.
 ### Philip — the one who won't kill
 Halfling Fighter; trained from childhood to kill, gentle by choice. He was
 following **a false teacher — someone who claims peace but teaches against
-it, knowingly.** ⚑ *This is what a person looks like after selling their
+it, knowingly.** *This is what a person looks like after selling their
 convictions to the Ones Below*: the shape of a principle with nothing
 inside. Philip has been tracking a warning of his own future. The teacher
 is meetable on the Bog road and can be freed. His rule: **he will not
@@ -224,7 +223,7 @@ makes her laugh: **Pookie.** The wound (on-screen only with her permission;
 the Ones Below were *not* responsible — that grief stays hers): her cat,
 whom she loved more than anything, was murdered.
 
-⚑ Her song is whole — the last untouched, and the one they want most.
+Her song is whole — the last untouched, and the one they want most.
 **They come for her list, never for her.** They move on Peaches or Philip
 and let her vow do the rest; she will offer herself. The party's job is to
 talk her out of the yes. Her arc: learning she can be protected too.
@@ -273,13 +272,12 @@ each other pull. A jar hums back at Peaches; the pendant warms near the
 seal-pup; something small unlatches on its own. The players build the
 finale's theory themselves.
 
-⚑ **Act 2's heart — the Buyer's honest sentence.** Mid-roads, the Buyer
+**Act 2's heart — the Buyer's honest sentence.** Mid-roads, the Buyer
 appears — politely, with tea — and tells them the truth: *"The Sea wasn't
 robbed. It asked us. It wanted to forget her. Who are you to give it back
-its grief?"* Then he leaves. What the players do with it is theirs. (You
-asked to explore this before deciding. Cut it and the Sea was simply
-tricked; keep it and someone at the table will side with the Sea — likely
-the best night of the campaign.)
+its grief?"* Then he leaves. What the players do with it is theirs. Someone
+at the table may side with the Sea. Let them. It is the night the campaign
+becomes about something.
 
 **Act 3 — Below, on the Moon-night** (2 sessions). The moon fills the sky.
 The Fair's largest stage. Everyone the party freed or gathered — the
@@ -291,13 +289,28 @@ remembers her, and chooses to keep the memory. **The tide comes home up
 Saltmere harbor at dawn**; the chapel bell rings alone; the horizon steps
 back eleven feet.
 
-⚑ **Everything comes home; not everyone stays.** The Grove blooms
-(whether Elowen returns or only her hum does — see above). Wren's pages
-rewrite in his own hand, one new page addressed to Billy. Philip's mother's
-tune returns whole. Freya Sun's list is safe because she never said yes.
-Peaches gets her tail back — and goes home to the coral house, as she said
-she would; Pookie speaks for the first and only time, to the party she
-leaves: *"She sang to me first."*
+**Everything comes home. Then everyone chooses.** The last scene of the
+campaign is not things being restored — it is five people, each with a
+door open in front of them, deciding. Winning gives every one of them
+*somewhere to go*; the campaign ends on what each of them does with it.
+Do not decide for them. Ask each player, in turn, at the table: *"The tide
+is in. Where do you go?"*
+
+| | What comes home | The door that opens | The choice |
+|---|---|---|---|
+| **Peaches** | Her tail | The coral house — the sea will take her back | Go home to the water, or stay on borrowed feet with the people who sang for her |
+| **Freya Moon** | The Grove blooms | The Heartbloom Grove, alive again — and Elowen (see the one open ⚑) | Return to the grove, or keep walking with the party her hope now belongs to |
+| **Billy** | His name; Wren's pages, rewritten in his own hand, one new page addressed to Billy | Wren's study — the life William had before | Go back to being William, or forward as whoever the party sang him into |
+| **Philip** | His mother's tune, whole | His mother's garden | Go home to her, or carry the tune onward — the false teacher's people still need someone who won't kill |
+| **Freya Sun** | Nothing was ever taken; her list is safe | She learns she can be protected — a place among people who'll stand for her | Stay with the two she protects, or go back to the rest of her list |
+
+Some will stay together. Some will go. Both are winning. Whoever leaves,
+leaves *choosing to* — that is the difference between this ending and the
+Ones Below.
+
+If Peaches goes to the water, Pookie speaks for the first and only time,
+to the party she leaves: *"She sang to me first."* Save the line for her
+choice; if she stays, he keeps it.
 
 The Buyer survives. He keeps everything freely given, files the loss under
 *instructive*, and leaves the player who out-sang him a card and a genuine
@@ -316,13 +329,16 @@ compliment: *"The Court will be watching your career with interest."*
 
 ---
 
-## Appendix — the ⚑ list (yours to change)
+## Appendix — decisions
 
-1. **Moon-night:** closest moon in a lifetime. *Alt:* blood moon.
+**Locked (2026-08-15):**
+1. **Moon-night:** the closest moon in a lifetime.
 2. **One face:** the Buyer; all others are keepers.
-3. **Billy's name** comes home gently when his friends sing it. *Alt (his player's pitch):* hearing it strips his magic.
+3. **Billy's name** comes home gently when his friends sing it.
 4. **Philip's false teacher** sold their convictions; meetable and freeable on the Bog road.
 5. **Freya Sun:** they come for her list, never for her.
-6. **Elowen** is alive Below; how she got there is sealed until you know the table.
-7. **The Buyer's honest sentence** ("the Sea wanted to forget her") is in. The largest remaining choice.
-8. **Everything comes home; not everyone stays** — Peaches returns to the sea.
+6. **The Buyer's honest sentence** ("the Sea wanted to forget her") is in.
+7. **Everything comes home; then everyone chooses** — each of the five has a door, and the last scene is their choice.
+
+**Still open:**
+- ⚑ **Elowen** — alive Below; how she got there is sealed until you know the table (or ask her player which she'd rather find).

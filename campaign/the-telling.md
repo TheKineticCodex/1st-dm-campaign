@@ -193,13 +193,23 @@ will come home up Saltmere harbor at dawn — *when the party's over* — and
 the chapel bell will ring by itself, and the horizon will step back eleven
 feet.
 
-Everything comes home. Not everyone stays. A grove blooms. A dead man's
-pages rewrite themselves in his own hand, with one new page addressed to a
-boy he knew before. A tune comes back to a gentle man whole. A woman with
-black wings finds out she can be protected too. And a girl gets her tail
-back — and goes home to her coral house, because she said she would — and
-an alligator who has never spoken says one thing, once, to the people she
-leaves behind:
+Everything comes home. A grove blooms. A dead man's pages rewrite
+themselves in his own hand, with one new page addressed to a boy he knew
+before. A tune comes back to a gentle man, whole. A woman with black wings
+finds out she can be protected too. And a girl gets her tail back.
+
+And then — this is the part the fairies never understood — every one of
+them has somewhere to go. A coral house under the water. A grove full of
+moths. A study with a dead man's chair in it. A garden. A list of people
+waiting. Five doors, standing open on the sand at dawn.
+
+Some of them walk through. Some of them stay. Nobody decides for them.
+That's the whole difference between this ending and the market in the
+dark: whoever leaves, leaves *because they chose to.*
+
+And if the girl goes to the water — if she says goodbye and walks down into
+the tide that came home for her — then an alligator who has never once
+spoken says one thing, to the people she leaves behind:
 
 *"She sang to me first."*
 
