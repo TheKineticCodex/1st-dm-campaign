@@ -10,6 +10,7 @@ import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
+import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
 import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
@@ -100,6 +101,19 @@ function RunNight({
   const [sentNote, setSentNote] = useState<string | null>(null)
   const [carouselOn, setCarouselOn] = useState(isCarouselPlaying())
   useEffect(() => subscribeSong(() => setCarouselOn(isCarouselPlaying())), [])
+  const [scene, setSceneState] = useState<SceneId>(currentScene())
+  const [vol, setVol] = useState(ambienceVolume())
+  useEffect(
+    () =>
+      subscribeAmbience(() => {
+        setSceneState(currentScene())
+        setVol(ambienceVolume())
+      }),
+    [],
+  )
+  const room = (id: SceneId) => {
+    void setScene(id).catch(() => note('The room would not load — tap again.'))
+  }
 
   const reload = async () => setNodes(await store.listStory())
 
@@ -132,19 +146,28 @@ function RunNight({
 
   const fireCue = (cue: SceneCue) => {
     if (cue.kind === 'sfx' && cue.sfx) {
+      duck(2.5)
       SFX[cue.sfx]?.play()
       return
     }
     if (cue.kind === 'song' && cue.song) {
-      if (cue.song === 'carousel') toggleCarousel()
-      else if (cue.song === 'note') playMissingNote()
-      else if (cue.song === 'whole') {
+      if (cue.song === 'carousel') {
+        if (!carouselOn) duck(60, 0.35)
+        toggleCarousel()
+      } else if (cue.song === 'note') {
+        duck(5)
+        playMissingNote()
+      } else if (cue.song === 'whole') {
         // The one thing in the app that must never sound by accident.
         if (window.confirm('This plays the Sea’s song WHOLE — the note lands, once. Are you at the end?')) {
+          duck(12, 0.15)
           playWhole()
           note('The song, whole. ✦')
         }
-      } else playFragment(cue.song)
+      } else {
+        duck(6)
+        playFragment(cue.song)
+      }
       return
     }
     if (cue.kind === 'go-table') {
@@ -296,6 +319,25 @@ function RunNight({
             </div>
           )}
 
+          {guide.ambience && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => room(scene === guide.ambience ? 'silence' : guide.ambience!)}
+                className="rounded-lg px-3 py-2 text-sm"
+                style={{
+                  background: scene === guide.ambience ? `${C.sea}22` : C.night,
+                  border: `1px solid ${scene === guide.ambience ? C.sea : C.panelEdge}`,
+                  color: scene === guide.ambience ? C.sea : C.parchment,
+                  minHeight: 44,
+                  cursor: 'pointer',
+                }}
+              >
+                {scene === guide.ambience ? '■ quiet the room' : `🌊 set the room — ${SCENES.find((x) => x.id === guide.ambience)?.label ?? guide.ambience}`}
+              </button>
+            </div>
+          )}
+
           {guide.cues.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
               {guide.cues.map((cue) => {
@@ -402,10 +444,41 @@ function RunNight({
       {/* the soundboard */}
       <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
         <Eyebrow>the soundboard — plays from this MacBook</Eyebrow>
+        <p className="text-xs mt-1" style={{ color: C.faint }}>
+          the room — a bed under the scene; crossfades when you change it, ducks under stingers and the song
+        </p>
+        <div className="flex flex-wrap items-center gap-2 mt-1 mb-3">
+          {SCENES.map((sc) => (
+            <button
+              key={sc.id}
+              type="button"
+              onClick={() => room(sc.id)}
+              title={sc.hint || undefined}
+              aria-pressed={scene === sc.id}
+              className="rounded-lg px-3 py-2 text-sm"
+              style={{
+                background: scene === sc.id ? `${C.sea}22` : C.night,
+                border: `1px solid ${scene === sc.id ? C.sea : C.panelEdge}`,
+                color: scene === sc.id ? C.sea : sc.id === 'silence' ? C.faint : C.parchment,
+                minHeight: 44,
+                cursor: 'pointer',
+              }}
+            >
+              {sc.label}
+            </button>
+          ))}
+          <label className="text-xs flex items-center gap-2" style={{ color: C.faint }}>
+            room volume
+            <input type="range" min={0} max={1} step={0.05} value={vol} onChange={(e) => setVolume(Number(e.target.value))} aria-label="Room volume" style={{ width: 120, accentColor: C.sea }} />
+          </label>
+        </div>
         <div className="flex flex-wrap gap-2 mt-1 mb-3">
           <button
             type="button"
-            onClick={toggleCarousel}
+            onClick={() => {
+              if (!carouselOn) duck(60, 0.35)
+              toggleCarousel()
+            }}
             className="rounded-lg px-3 py-2 text-sm"
             style={{
               background: carouselOn ? `${C.gold}33` : C.night,
@@ -419,7 +492,10 @@ function RunNight({
           </button>
           <button
             type="button"
-            onClick={playMissingNote}
+            onClick={() => {
+              duck(5)
+              playMissingNote()
+            }}
             className="rounded-lg px-3 py-2 text-sm"
             style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
           >
@@ -439,7 +515,10 @@ function RunNight({
             <button
               key={key}
               type="button"
-              onClick={() => s.play()}
+              onClick={() => {
+                duck(2.5)
+                s.play()
+              }}
               className="rounded-lg px-3 py-2 text-sm"
               style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
             >

@@ -51,6 +51,7 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules/react') || id.includes('node_modules/scheduler')) return 'react'
           if (id.includes('node_modules/@supabase')) return 'supabase'
+          if (id.includes('node_modules/tone/')) return 'tone'
           return undefined
         },
       },

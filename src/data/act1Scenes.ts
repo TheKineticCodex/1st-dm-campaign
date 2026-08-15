@@ -2,6 +2,8 @@
 // ON SCREEN — read-aloud, the truth, the five doors, which NPCs are here,
 // and one-tap cues. Keyed by the beat titles seeded in the live timeline.
 
+import type { SceneId } from '../lib/ambience'
+
 export interface SceneCue {
   label: string
   kind: 'whisper' | 'sfx' | 'go-table' | 'song'
@@ -27,6 +29,8 @@ export interface SceneGuide {
   cues: SceneCue[]
   /** Optional table of scene-specific moves/games — rendered as a menu the DM reads aloud. */
   moves?: SceneMove[]
+  /** The room under the scene — an ambience bed (lib/ambience.ts). One tap sets it. */
+  ambience?: SceneId
 }
 
 const PEACHES = 'Peaches capiche'
@@ -37,6 +41,7 @@ const FREYA_MOON = 'Freya Moon'
 
 export const ACT1_SCENES: Record<string, SceneGuide> = {
   'Talent Night at the Dry Anchor': {
+    ambience: 'tent',
     readAloud:
       'Saltmere smells of salt and woodsmoke, and tonight every soul in town is crammed into the Dry Anchor for Talent Night. Maddy Brine runs the bar like a ship’s deck. House rule, posted over the door and repeated to your faces: ALL WEAPONS SLEEP BEHIND THE BAR. She takes yours personally, names each one, and sets them on the shelf like sleeping cats. The stage is a pallet of fish crates. You’re on the bill.',
     truth:
@@ -75,6 +80,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Intermission Games': {
+    ambience: 'tent',
     readAloud:
       'While the judges "deliberate" — three fishermen arguing loudly over a chalkboard — Maddy declares intermission, which in the Dry Anchor means GAMES. The whole room turns competitive at once, the way only a small town can.',
     truth:
@@ -103,6 +109,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Brawl at the Dry Anchor ✦ tutorial': {
+    ambience: 'tent',
     readAloud:
       'It starts, as history’s finest disasters do, over the applause vote. A dockhand calls it rigged. A netmender calls HIM rigged. Somebody’s stew leaves somebody’s bowl at speed — and the Dry Anchor, as one, rises. Maddy bellows THE FURNITURE STAYS — which everyone correctly understands to mean the furniture is now a weapon.',
     truth:
@@ -205,6 +212,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Hum in the Cellar': {
+    ambience: 'tent',
     readAloud:
       'The brawl is over; the room is wreckage and laughter. Maddy rights a chair, looks at the five of you a long moment, and says — quieter than anyone in Saltmere has ever heard her — "You lot seem… capable. Before you sleep. My cellar. It’s been humming."',
     truth:
@@ -244,6 +252,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Tide Goes Out (cliffhanger)': {
+    ambience: 'harbour',
     readAloud:
       'You spill out of the Dry Anchor into the cold night air, ears ringing, knuckles humming. And Saltmere is silent. Wrong-silent. The harbor is EMPTY — boats lying on their sides on wet sand that shines all the way to the horizon. The sea is gone. And a mile out, where deep water was this morning, there are lights. Strings of them. Gold and green and blue. Music, very faint. A carnival, glowing where the sea should be.',
     truth:
@@ -263,6 +272,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Morning After': {
+    ambience: 'harbour',
     readAloud:
       'Morning comes grey and wrong. No gull-cries — the gulls stand in silent rows along the rooftops, all facing the sand. Where the sea should sound, there is nothing at all. And Saltmere is out in the streets, every soul of it, doing what small towns do with the impossible: sweeping up glass, pouring tea, and arguing about it.',
     truth:
@@ -302,6 +312,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Gate of Paper Lanterns': {
+    ambience: 'carnival',
     readAloud:
       'Three nights ago the tide went out of Saltmere and forgot to come back. Now, a mile out on the wet sand, stands a fence of paper lanterns, and a gate, and two figures — one humming half a song, one holding a slate that says WELCOME in wet ink. The lanterns you each carry tug toward it like dogs on a lead.',
     truth:
@@ -320,6 +331,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Games of the Midway': {
+    ambience: 'carnival',
     readAloud:
       'Everything glitters, nothing has a price tag, and every stall-keeper knows your name before you say it.',
     truth:
@@ -410,6 +422,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Missing Note': {
+    ambience: 'carnival',
     readAloud:
       'The carousel turns. The organ plays a sea-song. And every few bars — a hole, the same hole, where a note should be. The horses’ glass eyes are all turned toward the water.',
     truth:
@@ -449,6 +462,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'Whispers in the Dark': {
+    ambience: 'tent',
     readAloud: 'The lanterns dim for the midnight show. In the dark between them, your glass grows warm.',
     truth: 'The veil is thin here; their Lost Things reach for them. Fire all whispers, then let the table talk.',
     doors: {
@@ -514,6 +528,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Three Gates': {
+    ambience: 'carnival',
     readAloud:
       'The back fence isn’t a fence anymore. It’s three gates. Green lanterns, and the smell of moss. Silver lanterns, and your own face looking back. Blue lanterns, and stairs going down into water that waits.',
     truth:
@@ -541,6 +556,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Whispering Causeway (Bog road)': {
+    ambience: 'bog',
     readAloud:
       'A road of floating lanterns crosses black water. The water is full of voices. They are all very polite, and they all want something.',
     truth:
@@ -579,6 +595,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Jar-House ✦ LEVEL 3': {
+    ambience: 'bog',
     readAloud:
       'A house on stilts wearing other houses’ shutters. Inside, shelves to the ceiling: green jars, each humming, each labeled in a shaking hand.',
     truth:
@@ -607,6 +624,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Rent Comes Due (Bog climax)': {
+    ambience: 'bog',
     readAloud:
       'It arrives without a wake. A barge of grey wood, stacked with crates that hum, poled by something wearing a ferryman’s coat — and the coat is the most alive thing about it. On the deck, a man is pouring tea.',
     truth:
@@ -626,6 +644,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Gallery of Best Faces (Mirror road)': {
+    ambience: 'tent',
     readAloud:
       'A palace of standing mirrors with no walls holding them up. None of them show you. All of them show someone’s finest hour, on loop.',
     truth:
@@ -673,6 +692,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Back Room ✦ LEVEL 3': {
+    ambience: 'tent',
     readAloud:
       'Behind the gallery: a workshop. Faces in clamps. Smiles being polished. A laugh, disassembled on velvet, each note pinned like a butterfly.',
     truth:
@@ -700,6 +720,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'Opening Night (Mirror climax)': {
+    ambience: 'carnival',
     readAloud:
       'The gallery has become a theatre. The mirrors are the audience. Every seat reflects someone the Ones Below have kept, applauding on loop, and the stage is waiting for its final acquisition. In the front row, a man with a cup of tea.',
     truth:
@@ -719,6 +740,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Stairs Below (Under-Sea road)': {
+    ambience: 'harbour',
     readAloud:
       'The stairs go down into water that doesn’t ask you to hold your breath. It asks you to trust it. Peaches doesn’t have to be asked at all.',
     truth:
@@ -794,6 +816,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Sale of the Tail (Under-Sea climax)': {
+    ambience: 'harbour',
     readAloud:
       'The sale floor is an amphitheater of shells. The audience breathes water and wears pearls that used to be wishes. Lot the first: one mermaid’s tail. Lot the second, small: one spring, grove-cut. In the highest seat, a man with a cup of tea raises one finger.',
     truth:
@@ -813,6 +836,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     ],
   },
   'The Moon-Night': {
+    ambience: 'moon-night',
     readAloud:
       'The moon fills the sky. The Sea is standing up on its hind legs to reach her. Every lantern in the Fair is lit, and the biggest stage is empty, and everyone you ever freed is standing behind you.',
     truth:
