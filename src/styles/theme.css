@@ -155,7 +155,11 @@ button:active:not(:disabled) {
 
 /* ---- motion ---- */
 
-@keyframes card-rise {
+/* The name is camelCase because every call site says `cardRise` — it came
+   over from the prototype that way, and the port to this file renamed only
+   the keyframe. Renaming it back is a two-line fix instead of thirty-six;
+   theme.test.ts now fails if the two ever drift apart again. */
+@keyframes cardRise {
   from {
     opacity: 0;
     transform: translateY(14px);
@@ -167,7 +171,7 @@ button:active:not(:disabled) {
 }
 
 .rise {
-  animation: card-rise 0.45s ease both;
+  animation: cardRise 0.45s ease both;
 }
 
 @keyframes glow-pulse {
