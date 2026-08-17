@@ -144,7 +144,7 @@ export const NIGHT_BATTLES: NightBattle[] = [
     ],
     ends:
       'If the organ crosses the Fair’s fence line, every costume stops at the line — they cannot follow. That is the escape hatch: run, don’t win.',
-    win: 'They keep the song. Everything downstream is stranger, and the Fair now knows their faces.',
+    win: 'They keep the song — AND THE SEA COMES WITH IT. A foot, then a yard, then a slow grey wall following the thing it cannot remember loving, at exactly the speed they walk. Carry it to Saltmere and the tide comes up the harbour steps at dawn and sits there, three streets deep and silent, and Griff will not go near it. Tell them nothing.',
     loss:
       'The organ goes back on its spindle and each of them pays one personal item as a "restocking fee" — recoverable later at the drowned market, which is a reason to take the blue gate.',
     foes: [porter, flyingSword('an empty sleeve, prop rapier, cuffs still buttoned')],
@@ -156,7 +156,7 @@ export const NIGHT_BATTLES: NightBattle[] = [
 export const NIGHT_PATH: Night = {
   session: 3,
   title: 'The Carnival Night',
-  moon: 'A fingernail-paring of moon over the sand — thinner than last month, and closer.',
+  moon: 'A fingernail-paring of moon over the sand. Thin. Nothing yet.',
   writtenFor: 1,
   checkpoints: [
     {
@@ -169,7 +169,7 @@ export const NIGHT_PATH: Night = {
         'The lanterns start a mile out, strung on nothing you can see. At the gate stand two of them: one holds a slate, one is humming a tune you almost know. The slate says: WELCOME. Then the hand wipes it, and writes again: ADMISSION IS SOLD IN SETS. YOU FIVE ARRIVED ON ONE TIDE.',
       doThis: [
         'Read the Moon line first. One line, then let it go.',
-        'Ask each player, warmly, out loud: one honest answer. Write every one down — they come back at the very end, in their own words.',
+        'Hush wipes the slate and writes: WHAT BROUGHT YOU HERE? Ask each player at the real table, out loud, warmly, and wait — the person, not the sheet. Write the words down exactly as they say them; do not tidy them. When the fifth is written he holds up: FIVE. THAT IS THE SET.',
         'The gate opens. Set the room to the Getting Fair.',
       ],
       doors: [
@@ -184,7 +184,7 @@ export const NIGHT_PATH: Night = {
         { if: 'They refuse to go in', then: 'The lanterns wait. So does the tide, which has not come back. Let the silence do the work.' },
         { if: 'They ask about the tide', then: 'Hush writes one word: SOON. Hum stops humming for exactly one beat.' },
         { if: 'They count the lanterns', then: 'There is one for every person inside. Let them do that arithmetic themselves.' },
-        { if: 'They investigate the Twins', then: '10 — ghost-words under the wiped slate, every one a name. 15 — the tally: five chalk marks were made BEFORE the party walked up. 20 — Hush’s slate is in Hum’s handwriting, and the paper fence keeps promises in, not people out. (Full card: Cheat → the Twins.)' },
+        { if: 'They investigate the Twins', then: '10 — ghost-words under the wiped slate, every one a name. 15 — the tally: five chalk marks made BEFORE they walked up, and beside them A SET. NOT YET SORTED (fresh chalk, counted tonight as they crossed the sand). 20 — Hush’s slate is in Hum’s handwriting, and the paper fence keeps promises in, not people out. (Full card: Cheat → the Twins.)' },
         { if: 'They ask what the Twins gave away', then: 'Hum hums. Hush writes nothing at all, and wipes the slate. Between them they make one whole speaker — he has the words, she has the sound. Never confirm it out loud.' },
       ],
       lands: [{ who: 'Everyone', note: 'Five honest answers on paper. This is the campaign’s last scene, seeded tonight.' }],

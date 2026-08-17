@@ -19,6 +19,28 @@ export const STORY_IN_A_BREATH = [
   'The Moon is coming near again. On the night it\'s closest, sing the pieces together — and every song comes home, and the tide with it.',
 ]
 
+/**
+ * WHY THE FAIR CAME HERE — the answer to the question a player will ask.
+ * (Nobody sang it down. The Talent Night trigger never happened at the table.)
+ */
+export const WHY_HERE = [
+  'The Moon set the SEASON: the Fair comes when the Moon comes near. It always has — Griff saw it forty years ago, and the table can do that arithmetic themselves.',
+  'The five set the ADDRESS: five people, each the last one holding a piece of a song somebody already gave away, walked into one small harbour town for their own honest reasons. Last pieces lean toward each other. Five of them leaning in one place is a chord you can hear from the bottom of the dark.',
+  'So the Fair grounded HERE — off a town already on the round, because Grey-Gill has kept a tent on that seabed since the last time and hums in her sleep. Then the water walked out to meet the thing it once gave away.',
+  'THE TIDE DID NOT LEAVE BECAUSE ANYBODY SANG. The tide left because the Fair arrived, and the Fair arrived because the count came to five.',
+  'SAY IT LIKE THIS, if they ask straight out: "It wasn\'t you. The Fair comes when the Moon comes near — it always has, and it always will. What was new was where it landed. Every one of you walked to this town for your own reason, and not one of you was wrong about that. But every one of those reasons is made of the same thing: a piece of a song somebody already sold. Five last pieces, one small grey town, one tide. That\'s a chord you can hear from the bottom of the dark. So the Fair set down here — and the sea walked out to meet the thing it gave away."',
+  'NEVER say the pull out loud. Show two pieces lean toward each other once and never explain it. The moment an NPC says "you were leaning", five players learn their honest reasons were a cover story — and the ending, which is five people CHOOSING, loses its floor.',
+]
+
+/** Why each of them was in Saltmere at all. Their own reasons, every one. */
+export const WHY_THEY_CAME = [
+  'Peaches — walking the coast because the coast is as close to home as legs get; she STOPPED here because of the humming in Maddy\'s cellar, the closest she has come to hearing home from dry land.',
+  'Billy — pages in Wren\'s handwriting keep washing up along this coast, and a man in Saltmere buys strange old glass and pays in strange old coins.',
+  'Philip — he followed the false teacher down the coast, and the trail simply ends at the tideline.',
+  'Freya Moon — the blossom has been getting warmer down the coast for a month. In Saltmere it was the warmest it has ever been, days BEFORE the tide went out.',
+  'Freya Sun — she follows people, not places, and she is the only one who arrived AHEAD of the Ones Below rather than behind them: the man with the small book was three towns back, and the next name on his list lives near this coast.',
+]
+
 /** One line at every session's open. Bigger. Wronger. That's the whole clock. */
 export const MOON_CLOCK = [
   'Session 3 — "A fingernail-paring of moon over the sand. Thin. Nothing yet."',
@@ -44,14 +66,16 @@ export const THE_FIVE: CheatCard[] = [
       'Pookie the alligator saw it happen. He never leaves her. He RUNS AWAY when worried — that\'s your tell.',
       'Misses her coral house. If she got her tail back, she\'d go home. (Winning may cost the party her. Let that hang.)',
       'The carousel skips HER note. If she hums along, every lantern turns to look. Do not warn her.',
+      'IF SOMEONE ASKS why her tail was taken when they never take: they did not take it. Somebody said yes for her, long before she was born — the Sea promised away pieces that were not only its to promise. That is the crack, and it is the whole reason you can win.',
     ],
   },
   {
     title: '🎩 Billy — the one who can read the bargains',
     lines: [
-      'Three layers: William Blackwood (scholar, secretly writes songs about his friends) → Blue-Chew Billy (the show) → and beneath both, the Feywild TOOK HIS TRUE NAME. It sits Below, like Grey-Gill\'s.',
+      'Three layers: William Blackwood (scholar, secretly writes songs about his friends) → Blue-Chew Billy (the show) → and beneath both, he GAVE AWAY his true name. It sits Below, like Grey-Gill\'s.',
       'Fear: that the person everyone loves isn\'t really him. Mentor: Professor Elias Wren — "Never confuse being clever with being right." Last man to see William unmasked.',
       'The spellbook matters for the HANDWRITING — proof someone knew him before. Every page the Ones Below un-write is a page of Wren.',
+      'IF SOMEONE ASKS how, when they never take: he said yes. He was young, it seemed clever, and he does not remember doing it — which is what saying yes to them looks like afterwards, every time.',
       'Table rules (his player\'s): the more serious it gets, the funnier he gets. No joke = something is truly wrong. He checks the chain on the book when scared — never explain it.',
     ],
   },
@@ -98,7 +122,7 @@ export const WHO_IS_WHO: CheatCard[] = [
       'THE TOLL: one honest answer each, out loud. WRITE THEM DOWN. They come back once, at the very end, in the players\' own words.',
       'Slate: "ADMISSION IS SOLD IN SETS. YOU FIVE ARRIVED ON ONE TIDE."',
       'INVESTIGATION 10 — the slate has been wiped a thousand times; ghost-words sit under tonight\'s. Every one is a name. The cuff of the livery carries a crest for a town that is on no map.',
-      'INVESTIGATION 15 — the tally: one chalk mark per guest through the gate. FIVE marks were already made before the party walked up. Their set was written down before they arrived.',
+      'INVESTIGATION 15 — the tally: one chalk mark per guest. FIVE marks were made before the party walked up, and beside them in the same hand: A SET. NOT YET SORTED. The chalk is fresh — counted tonight, in a hurry, by someone watching them come across the sand. Before they reached the GATE, not before they reached the town.',
       'INVESTIGATION 20 — the seam: Hush\'s slate is in Hum\'s handwriting. They never both look away at once. And the fence is only paper — it is not keeping anything out. It is keeping promises in.',
       'IF THEY READ THE ROOM (Insight): both of them want the party to answer honestly, and neither can say why. Hum hums louder when a lie is coming, and stops the moment it lands.',
     ],

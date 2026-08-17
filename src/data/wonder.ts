@@ -21,5 +21,5 @@ export const WONDER: string[] = [
   'A bird lands nearby and does an impression of each of you sneezing. It is devastatingly accurate.',
   'The moon checks on you between clouds like a parent checking a sleeping child.',
   'Someone\'s pocket is suddenly, inexplicably, full of exactly forty-one dried peas. They are warm.',
-  'A distant carousel plays half a lullaby. Peaches knows the other half. It waits for her.',
+  'A distant carousel plays half a lullaby, stops, and waits — the way someone waits for you to come in on your line.',
 ]

@@ -45,7 +45,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'Saltmere smells of salt and woodsmoke, and tonight every soul in town is crammed into the Dry Anchor for Talent Night. Maddy Brine runs the bar like a ship’s deck. House rule, posted over the door and repeated to your faces: ALL WEAPONS SLEEP BEHIND THE BAR. She takes yours personally, names each one, and sets them on the shelf like sleeping cats. The stage is a pallet of fish crates. You’re on the bill.',
     truth:
-      'This is the audition. A hooded stranger in the corner — the Appraiser — never drinks, never claps, and writes after each act. Everything performed tonight gets PRICED. Peaches singing is why the tide leaves. Let every player describe their act, then one check of their choice, DC 10 — success or glorious disaster, the room cheers either way.',
+      'This is the night before everything. A hooded stranger in the corner — the Appraiser — never drinks, never claps, and writes after EVERY act. Everything performed tonight gets PRICED. He is not here for one of them; he is here because all five are. Let every player describe their act, then one check of their choice, DC 10 — success or glorious disaster, the room cheers either way.',
     doors: {
       fight: 'Early scuffles get one warning from Old Griff the harbormaster. The real brawl waits for the finale.',
       talk: 'Gossip: fish crowding the shallows like they’re scared of the deep · the lighthouse keeper swears the horizon "moved" · Maddy’s cellar is COLD tonight.',
@@ -58,12 +58,12 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       { label: '🎪 The show begins', kind: 'sfx', sfx: 'carnival' },
       { label: '🔔 Maddy rings last orders', kind: 'sfx', sfx: 'bell' },
       {
-        label: '✉ Peaches: after she performs',
+        label: '✉ ALL: when the applause fades',
         kind: 'whisper',
         whisper: {
-          target: PEACHES,
+          target: null,
           title: 'When the applause fades',
-          body: 'Far away — farther than hearing should reach — the water goes very, very still. Like something enormous stopped swimming to listen. You are the only one in the room who feels it.',
+          body: 'Far away — farther than hearing should reach — the water goes very, very still. Like something enormous stopped swimming to listen.',
           ephemeral: true,
         },
       },

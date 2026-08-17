@@ -28,7 +28,7 @@ to acquire every piece from every holder — and each acquisition requires
 that holder's genuine consent. This is why the Ones Below never rob
 anyone. It isn't ethics; it's the only method that works.
 
-### Rule 2 — What they hold, they hold on a promise. Break the promise, and it comes home.
+### Rule 2 — You can only give away what is yours. Give away something others hold pieces of, and the promise has a crack in it — and the day the real owners stand together and ask, it comes home.
 In the old places, a promise is real: agree to give something and mean it,
 and it leaves you — no enforcement needed. **But you can only promise away
 what is yours.** If you promise away something that partly belongs to
@@ -185,7 +185,7 @@ yet know she is the one.
 ### Billy — the one who can read the bargains
 Three layers: **William Blackwood**, scholar (secretly writes songs about
 his companions and never shows them) → **Blue-Chew Billy**, the show →
-beneath both, **the Feywild took his true name**; it sits Below on a shelf,
+beneath both, **he gave away his true name**; it sits Below on a shelf,
 like Grey-Gill's. His fear: that the person everyone loves isn't really
 him. Mentor **Professor Elias Wren** — "Never confuse being clever with
 being right" — was the last person to see William unmasked. The spellbook
@@ -314,7 +314,7 @@ choice; if she stays, he keeps it.
 
 The Buyer survives. He keeps everything freely given, files the loss under
 *instructive*, and leaves the player who out-sang him a card and a genuine
-compliment: *"The Court will be watching your career with interest."*
+compliment: *"We'll be watching your career with interest."*
 
 ---
 

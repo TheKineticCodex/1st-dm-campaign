@@ -7,6 +7,8 @@ import {
   MOON_CLOCK,
   PANIC_LINES,
   STORY_IN_A_BREATH,
+  WHY_HERE,
+  WHY_THEY_CAME,
   THE_FIVE,
   THREE_RULES,
   TONIGHT_BEATS,
@@ -34,6 +36,29 @@ export function CheatSheet() {
           ))}
         </ol>
       </Section>
+
+      <Section style={{ borderColor: C.brassDim }}>
+        <Eyebrow>Why the Fair came here — the answer, if they ask</Eyebrow>
+        <ul className="mt-2 space-y-2">
+          {WHY_HERE.map((line, i) => (
+            <li key={i} className="text-base flex items-start gap-2" style={{ color: C.parchment }}>
+              <Spark size={12} style={{ color: C.gold, marginTop: 7, flexShrink: 0 }} />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Fold id="cheat:whycame" title="🚶 Why each of them was in Saltmere at all">
+        <ul className="space-y-2">
+          {WHY_THEY_CAME.map((line, i) => (
+            <li key={i} className="text-base flex items-start gap-2" style={{ color: C.parchment }}>
+              <Spark size={12} style={{ color: C.sea, marginTop: 7, flexShrink: 0 }} />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </Fold>
 
       <Section>
         <Eyebrow>The only three rules players ever need</Eyebrow>

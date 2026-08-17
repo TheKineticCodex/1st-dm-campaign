@@ -49,7 +49,7 @@ export interface RunSheetRow {
 
 export const SESSION1_RUN_SHEET: RunSheetRow[] = [
   { time: '0:00', beat: 'Arrivals', what: 'Maddy takes weapons BY NAME — that is the introductions. Get every phone at the table open to its sheet.' },
-  { time: '0:20', beat: 'Talent Night', what: 'Every player performs: describe the act, one check of their choice DC 10. Fire Peaches\'s whisper after her act. The Appraiser writes.' },
+  { time: '0:20', beat: 'Talent Night', what: 'Every player performs: describe the act, one check of their choice DC 10. The Appraiser writes after EVERY act — not just one.' },
   { time: '1:00', beat: 'The Intermission Games', what: 'Judges "deliberate." Run whichever games the table bites on — each one rehearses a mechanic the brawl needs.' },
   { time: '1:40', beat: 'The Brawl', what: 'The vote comes back wrong → riot. Knockout rule aloud, Moves menu open, waves of 4. Old Griff wades in last.' },
   { time: '2:20', beat: 'The Hum in the Cellar', what: 'The tone flip. Cold wall, inside barnacles, chalk carousel. Fire the Peaches and Freya Moon whispers at the wall-touch.' },

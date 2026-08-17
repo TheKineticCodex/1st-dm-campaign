@@ -71,9 +71,9 @@ export const RUN_PRIMER: { title: string; lines: string[] }[] = [
     title: 'The three rules of the Fair (say them when asked)',
     lines: [
       '1 · They never take. They get you to say yes.',
-      '2 · What they hold, they hold on a promise. Break the promise and it comes home.',
+      '2 · You can only give away what is yours. Give away something others hold pieces of too, and the promise has a crack in it — the day the real owners stand together and ask, it comes home.',
       '3 · Sing the pieces together and the song comes home.',
-      'If a player says "wait — I thought they can\'t take things", they have understood the campaign. Smile.',
+      'If a player says "wait — I thought they can\'t take things", they have understood the campaign. Smile, then say the true half: PEACHES — they did not take it; somebody said yes for her long before she was born, because the Sea promised away pieces that were not only its to promise. That is the crack, and it is the whole reason you can win. BILLY — he said yes; he was young, it seemed clever, and he does not remember doing it, which is what saying yes to them looks like afterwards, every time.',
     ],
   },
   {
@@ -179,10 +179,10 @@ export const RUN_SCENES: RunScene[] = [
     played: true,
     where: 'The Dry Anchor, Saltmere',
     goal: 'Introductions by weapon-name; every player performs; the Appraiser prices it all.',
-    oneBreath: 'A tavern talent night that is secretly an audition. Peaches singing is why the tide leaves.',
+    oneBreath: 'A tavern talent night that is secretly an inventory. Five songs walked in the same door; somebody wrote that down.',
     beats: ['Maddy takes weapons by name (that IS the introductions).', 'Each act: describe it, one check of choice DC 10 — success or glorious disaster, the room cheers either way.', 'The stranger in the corner never drinks, never claps, writes after each act.'],
     theyMight: [{ if: 'They pick a fight early', then: 'One warning from Old Griff. The real brawl waits.' }, { if: 'They read the stranger', then: 'Insight DC 13: his mug has NEVER emptied. First dread, earned.' }],
-    players: [{ who: 'Peaches', note: 'Fire her whisper after she performs.' }],
+    players: [{ who: 'Everyone', note: 'The Appraiser writes after EVERY act — he is not here for one of them, he is here because all five are.' }],
     battles: [],
     exit: 'Judges "deliberate" → the Intermission Games.',
   },
@@ -302,7 +302,7 @@ export const RUN_SCENES: RunScene[] = [
     players: [{ who: 'Billy', note: 'The page. Proof someone knew him before. He checks the chain on his book.' }],
     battles: [
       {
-        code: 'CARN-A', name: 'The Empty Costumes', when: 'They rob a stall or block the porters', force: '3 Flying Swords + 1 Animated Armor (~350 XP)', arena: 'The Midway map — prize shelves (climbable, collapsible), a ring-toss stall (nets), lantern strings (cut = 10-ft dark patches)',
+        code: 'CARN-A', name: 'The Empty Costumes', when: 'They rob a stall or block the porters', force: '5 empty costumes (Flying Swords) — one each. 250 XP at level 1; see Tonight’s path', arena: 'The Midway map — prize shelves (climbable, collapsible), a ring-toss stall (nets), lantern strings (cut = 10-ft dark patches)',
         tricks: ['Costumes ignore anyone not holding stall property.', 'Dropping the loot ends their interest instantly — teach it: they only want what is "theirs".', 'The Armor folds flat and slides under stalls.'],
         goal: 'Carry the crates to the back fence.', retreat: 'Stock secured, or the Armor destroyed.',
         win: 'The stallkeep gifts Billy the page freely + a discount forever.', loss: 'The crates (and Billy\'s page) go BELOW — recoverable at the drowned market.', draw: 'Half the stock gone; the stallkeep whispers the word "tithe" for the first time.',
@@ -355,7 +355,7 @@ export const RUN_SCENES: RunScene[] = [
     ],
     players: [{ who: 'Peaches', note: 'Her choice. Whatever she does, the lanterns know now.' }, { who: 'Freya Moon', note: 'The pendant stirs for the first time. Say only that.' }],
     battles: [
-      { code: 'CARN-A′', name: 'The Empty Costumes, doubled', when: 'They take the organ', force: '6 Flying Swords + 2 Animated Armor', arena: 'The carousel platform, turning; horses as cover', tricks: ['The platform keeps turning — every round the exits move.', 'The organ slides toward Peaches on its own.'], goal: 'Repossess the organ.', retreat: 'If the organ leaves the Fair\'s fence, they stop at the line.', win: 'They keep the song. Everything downstream is stranger.', loss: 'The organ back on the carousel; one personal item each as "restocking fee" — recoverable at the market.', foes: [F.flyingSword('an empty sleeve, prop rapier'), F.animatedArmor('a porter with nobody inside')] },
+      { code: 'CARN-A′', name: 'The Empty Costumes, doubled', when: 'They take the organ', force: 'The Porter (Animated Armor run at HP 45) + 4 empty costumes — 400 XP at level 1; see Tonight’s path', arena: 'The carousel platform, turning; horses as cover', tricks: ['The platform keeps turning — every round the exits move.', 'The organ slides toward Peaches on its own.'], goal: 'Repossess the organ.', retreat: 'If the organ crosses the Fair\'s fence line, every costume stops at the line. Run, do not win.', win: 'They keep the song. Everything downstream is stranger.', loss: 'The organ back on the carousel; one personal item each as "restocking fee" — recoverable at the market.', foes: [F.flyingSword('an empty sleeve, prop rapier'), F.animatedArmor('a porter with nobody inside')] },
     ],
     exit: '→ Whispers in the Dark.',
   },
@@ -642,7 +642,7 @@ export const RUN_SCENES: RunScene[] = [
       'The Twins read the five Gate answers, in the players\' own words, once more. Read them slowly. This is why you wrote them down.',
       'All five sing — described in the fiction, not performed. Each their own song. Then: Table → 🌕 The finale: ready the phones, then Sing it. Every phone and your MacBook play the whole song together; the iPad\'s Moon rises.',
       'The Sea remembers her and chooses to keep the memory. The tide comes home up Saltmere harbour at dawn; the chapel bell rings alone; the horizon steps back eleven feet.',
-      'The Buyer survives. He files the loss under "instructive" and leaves the one who out-sang him a card: "The Court will be watching your career with interest."',
+      'The Buyer survives. He files the loss under "instructive" and leaves the one who out-sang him a card: "We will be watching your career with interest."',
       'Then five doors. Ask each player, in turn: "The tide is in. Where do you go?" Do not decide for them.',
     ],
     theyMight: [
