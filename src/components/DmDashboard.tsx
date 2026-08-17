@@ -1,6 +1,15 @@
-// Phase 2 — the DM Dashboard (spec §5). DM-code-gated; mobile-friendly,
-// optimized for iPad. Six sections: Roster · Vault · Lost Things · Notes ·
-// NPCs · Clues. All components live at module level.
+// The Lantern-Keeper's Book — three doors, not eleven.
+//
+//   Tonight     the night in the order it happens. He opens here.
+//   Table       everything that reaches the five phones and the big screen.
+//   Look it up  the answer to anything a player asks, and the sitting-down work.
+//
+// Everything that used to be its own tab is still here — it is a fold now,
+// and every old destination still works through LANDS_ON / OPENS_FOLD below,
+// which also opens the right panel when it arrives. All three tabs stay
+// mounted and hide with display:none: leaving the Table used to tear down the
+// realtime channel and the game host, which killed a running derby and wiped
+// the dice feed. All components live at module level.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { QUIZ } from '../data/quiz'
@@ -18,25 +27,41 @@ import { BeforeTheLanterns } from './BeforeTheLanterns'
 import { NightPath } from './NightPath'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
-import { TonightSection } from './TonightSection'
-import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display, eyebrow, nightGround, panelSurface, onState, seaLit, bloodLit, wellSurface, numerals } from './ui'
+import { PartyStrip, RunNight, StoryTimeline, TheThingWithNoName } from './TonightSection'
+import { NIGHT_PATH } from '../data/nightPath'
+import { readNightProgress } from '../lib/night'
+import { PANIC_LINES } from '../data/cheatSheet'
+import type { VitalsEvent } from '../types'
+import { Btn, C, CalmToggle, Eyebrow, Fold, H, Section, TextArea, TextInput, body, display, eyebrow, nightGround, onState, seaLit, bloodLit, wellSurface, numerals } from './ui'
 import { Icon, Lantern, Spark, type IconName } from './icons'
 
-type DmSection = 'home' | 'tonight' | 'run' | 'cheat' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
+type DmSection = 'tonight' | 'table' | 'look'
 
+// The label strings are load-bearing — three live specs drive the nav by them.
+// 'table' as a glyph reads as a close ✕ at 19px, so the Table wears the die.
 const SECTIONS: [DmSection, IconName, string][] = [
-  ['home', 'book', 'Book'],
   ['tonight', 'tonight', 'Tonight'],
-  ['run', 'run', 'Run'],
-  ['cheat', 'cheat', 'Cheat'],
-  ['roster', 'roster', 'Roster'],
-  ['vault', 'vault', 'Vault'],
-  ['lost', 'lost', 'Lost'],
-  ['notes', 'notes', 'Notes'],
-  ['npcs', 'npcs', 'NPCs'],
-  ['clues', 'clues', 'Clues'],
-  ['table', 'table', 'Table'],
+  ['table', 'die', 'Table'],
+  ['look', 'cheat', 'Look it up'],
 ]
+
+/**
+ * Every destination anything in the Book has ever asked for, and where it
+ * lives now. Nothing that used to be reachable stopped being reachable.
+ */
+const LANDS_ON: Record<string, DmSection> = {
+  home: 'tonight', tonight: 'tonight',
+  table: 'table', roster: 'table', level: 'table', stage: 'table',
+  look: 'look', run: 'look', cheat: 'look',
+  vault: 'look', lost: 'look', notes: 'look', npcs: 'look', clues: 'look', story: 'look',
+}
+
+/** And which panel to open when it gets there, so nothing lands on a closed fold. */
+const OPENS_FOLD: Record<string, string> = {
+  roster: 'table-troupe', level: 'dm-level', stage: 'dm-stage',
+  run: 'look-runbook', vault: 'look-vault', lost: 'look-lost',
+  notes: 'look-notes', npcs: 'look-npcs', clues: 'look-clues', story: 'look-story',
+}
 
 export interface WhisperPrefill {
   target: string
@@ -51,13 +76,39 @@ interface DmDashboardProps {
 
 export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   const store = useMemo(() => getStore(session), [session])
-  const [section, setSection] = useState<DmSection>('home')
+  const [section, setSection] = useState<DmSection>('tonight')
+  const [openFold, setOpenFold] = useState<string | null>(null)
   const [roster, setRoster] = useState<RosterEntry[]>([])
   const [loaded, setLoaded] = useState(false)
   const [whisperPrefill, setWhisperPrefill] = useState<WhisperPrefill | null>(null)
   const [ambient, setAmbient] = useState(false)
+  const [frozen, setFrozen] = useState(false)
+  const [live, setLive] = useState<Record<string, VitalsEvent>>({})
+  // The Table and Look it up are heavy; don't build them at boot, but once
+  // they exist keep them alive so nothing in them dies on a tab tap.
+  const [seen, setSeen] = useState<Record<DmSection, boolean>>({ tonight: true, table: false, look: false })
 
   useEffect(() => keepGlassLit(), [])
+
+  // The strip at the top of every screen shows the table's own numbers.
+  // Joins are ref-counted, so this sits happily beside the Table's.
+  useEffect(() => {
+    const ch = joinTableChannelLazy(store.getChannelId(), {
+      vitals: (v: VitalsEvent) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
+    })
+    return () => ch.close()
+  }, [store])
+
+  // A fold asked to open should be able to be asked again later.
+  useEffect(() => {
+    if (!openFold) return
+    const t = setTimeout(() => setOpenFold(null), 300)
+    return () => clearTimeout(t)
+  }, [openFold])
+
+  useEffect(() => {
+    if (!seen[section]) setSeen((cur) => ({ ...cur, [section]: true }))
+  }, [section, seen])
 
   // Roster keeps itself fresh — no more tapping refresh to see a new player.
   useEffect(() => {
@@ -79,13 +130,19 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
 
   const refreshRoster = async () => setRoster(await store.listRoster())
 
+  /** Take him anywhere, by any name the Book has ever used for it. */
+  const go = (id: string) => {
+    setSection(LANDS_ON[id] ?? 'tonight')
+    setOpenFold(OPENS_FOLD[id] ?? null)
+  }
+
   const forgeWhisper = (target: string, quote: string) => {
     setWhisperPrefill({
       target,
       title: 'The lanterns remember',
       body: `You once told the lanterns: “${quote}”\n\n`,
     })
-    setSection('table')
+    go('table')
   }
 
   const handleLeave = () => {
@@ -125,6 +182,15 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
           <span className="flex items-center gap-3 flex-shrink-0">
             <button
               type="button"
+              onClick={() => setFrozen(!frozen)}
+              aria-pressed={frozen}
+              className="text-xs"
+              style={{ ...body, fontWeight: 600, color: frozen ? C.sea : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            >
+              if you freeze
+            </button>
+            <button
+              type="button"
               onClick={() => setAmbient(true)}
               className="inline-flex items-center gap-1.5"
               style={{ ...body, ...onState, fontSize: 12, fontWeight: 600, borderRadius: 999, padding: '0 14px', minHeight: 36, cursor: 'pointer' }}
@@ -150,22 +216,48 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
           <p style={{ color: C.faint }}>The book is opening…</p>
         ) : (
           <>
-            {section === 'home' && (
-              <HomeSection store={store} roster={roster} onGo={setSection} onRefresh={refreshRoster} />
+            {frozen && (
+              <div className="rounded-xl p-4 mb-3" style={{ ...seaLit }}>
+                <Eyebrow style={{ color: C.sea }}>if you freeze — any one of these buys you a minute</Eyebrow>
+                {PANIC_LINES.slice(0, 3).map((l) => (
+                  <p key={l} className="text-base flex items-start gap-2" style={{ color: C.parchment }}>
+                    <Spark size={12} style={{ color: C.sea, marginTop: 7, flexShrink: 0 }} />
+                    <span>{l}</span>
+                  </p>
+                ))}
+                <p className="text-sm mt-2" style={{ ...numerals, color: C.sea }}>
+                  And when they try something: “Yes — give me a roll.” Easy 10 · Medium 15 · Hard 20.
+                </p>
+              </div>
             )}
-            {section === 'tonight' && (
-              <TonightSection store={store} roster={roster} onGo={(s) => setSection(s as DmSection)} />
+
+            <PartyStrip roster={roster} live={live} onTap={() => go('roster')} />
+
+            <div style={{ display: section === 'tonight' ? 'block' : 'none' }}>
+              <TonightTab store={store} roster={roster} onGo={go} />
+            </div>
+            {seen.table && (
+              <div style={{ display: section === 'table' ? 'block' : 'none' }}>
+                <TableTab
+                  store={store}
+                  roster={roster}
+                  whisperPrefill={whisperPrefill}
+                  onPrefillUsed={() => setWhisperPrefill(null)}
+                  onRefresh={refreshRoster}
+                  openFold={openFold}
+                />
+              </div>
             )}
-            {section === 'run' && <RunbookSection store={store} />}
-            {section === 'cheat' && <CheatSheet />}
-            {section === 'roster' && <RosterSection roster={roster} onRefresh={refreshRoster} store={store} />}
-            {section === 'vault' && <VaultSection roster={roster} onForgeWhisper={forgeWhisper} />}
-            {section === 'lost' && <LostSection store={store} roster={roster} />}
-            {section === 'notes' && <NotesSection store={store} />}
-            {section === 'npcs' && <NpcSection store={store} />}
-            {section === 'clues' && <ClueSection store={store} />}
-            {section === 'table' && (
-              <TableSection store={store} roster={roster} whisperPrefill={whisperPrefill} />
+            {seen.look && (
+              <div style={{ display: section === 'look' ? 'block' : 'none' }}>
+                <LookTab
+                  store={store}
+                  roster={roster}
+                  onForgeWhisper={forgeWhisper}
+                  onRefresh={refreshRoster}
+                  openFold={openFold}
+                />
+              </div>
             )}
           </>
         )}
@@ -230,35 +322,219 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
 
 // -------------------------------------------------------------------- Home
 
-function HomeSection({
+// ------------------------------------------------------------ the three tabs
+
+/**
+ * TONIGHT — the night in the order it happens, and the tab he lands on.
+ * The path is the spine, unfolded. Nothing else opens by itself, which is
+ * what makes a long page safe: the first screenful is the same shape at
+ * every checkpoint.
+ */
+function TonightTab({ store, roster, onGo }: { store: Store; roster: RosterEntry[]; onGo: (s: string) => void }) {
+  const started = Object.keys(readNightProgress().took).length > 0
+  return (
+    <div style={{ animation: 'cardRise .4s ease-out' }}>
+      <NightPath store={store} roster={roster} onGo={onGo} />
+
+      <Fold id="tonight-align" title="🌕 A Freya called Sun, a Freya called Moon">
+        <TheThingWithNoName store={store} />
+      </Fold>
+
+      <Fold id="tonight-clock" title="🗓 Tonight’s clock — when each part happens">
+        <div className="grid gap-1 mt-1">
+          {NIGHT_PATH.checkpoints.map((c, i) => (
+            <div key={c.id} className="rounded-lg p-2 flex gap-3" style={wellSurface}>
+              <span className="text-sm shrink-0" style={{ ...body, ...numerals, color: C.gold, fontWeight: 600, width: 20 }}>
+                {i + 1}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm" style={{ color: C.parchment, fontWeight: 600 }}>
+                  {c.title} <span style={{ ...numerals, color: C.faint, fontWeight: 400 }}>· {c.minutes}</span>
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: C.faint }}>
+                  {c.doThis[0]}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Fold>
+
+      <Fold id="tonight-lanterns" title="🕯 Before the lanterns — the list" defaultOpen={!started}>
+        <BeforeTheLanterns store={store} roster={roster} />
+      </Fold>
+
+      <Fold id="tonight-more" title="📖 More on this scene — the menu, the room, the soundboard">
+        <RunNight store={store} roster={roster} onGo={onGo} />
+      </Fold>
+    </div>
+  )
+}
+
+/** TABLE — everything that reaches the five phones and the big screen. */
+function TableTab({
   store,
   roster,
-  onGo,
+  whisperPrefill,
+  onPrefillUsed,
   onRefresh,
+  openFold,
 }: {
   store: Store
   roster: RosterEntry[]
-  onGo: (s: DmSection) => void
+  whisperPrefill: WhisperPrefill | null
+  onPrefillUsed: () => void
   onRefresh: () => void
+  openFold: string | null
 }) {
-  const [counts, setCounts] = useState<{ clues: number; npcs: number; notes: number } | null>(null)
+  return (
+    <div style={{ animation: 'cardRise .4s ease-out' }}>
+      <TableSection
+        store={store}
+        roster={roster}
+        whisperPrefill={whisperPrefill}
+        onPrefillUsed={onPrefillUsed}
+        openFold={openFold}
+      />
+      <Fold id="table-troupe" title="⚔ The troupe — hit points, conditions, bargains" forceOpen={openFold === 'table-troupe'}>
+        <RosterSection roster={roster} onRefresh={onRefresh} store={store} />
+      </Fold>
+    </div>
+  )
+}
+
+/**
+ * LOOK IT UP — the answer to anything a player asks, and the sitting-down
+ * work. The Cheat Sheet is first and open, because that is the panic surface
+ * and the tab is named for the question.
+ */
+function LookTab({
+  store,
+  roster,
+  onForgeWhisper,
+  onRefresh,
+  openFold,
+}: {
+  store: Store
+  roster: RosterEntry[]
+  onForgeWhisper: (target: string, quote: string) => void
+  onRefresh: () => void
+  openFold: string | null
+}) {
+  const open = (id: string) => openFold === id
+  return (
+    <div style={{ animation: 'cardRise .4s ease-out' }}>
+      <CheatSheet />
+
+      <Fold id="look-runbook" title="🧭 Every scene, act by act" forceOpen={open('look-runbook')}>
+        <RunbookSection store={store} />
+      </Fold>
+      <Fold id="look-story" title="✦ The whole story — where they are, and every road ahead" forceOpen={open('look-story')}>
+        <StoryTimeline store={store} />
+      </Fold>
+      <Fold id="look-npcs" title="🎭 Who is in the book" forceOpen={open('look-npcs')}>
+        <NpcSection store={store} />
+      </Fold>
+      <Fold id="look-vault" title="☾ What they told the lanterns" forceOpen={open('look-vault')}>
+        <VaultSection roster={roster} onForgeWhisper={onForgeWhisper} />
+      </Fold>
+      <Fold id="look-lost" title="🔑 What each of them lost" forceOpen={open('look-lost')}>
+        <LostSection store={store} roster={roster} />
+      </Fold>
+      <Fold id="look-clues" title="🕯 What they have worked out" forceOpen={open('look-clues')}>
+        <ClueSection store={store} />
+      </Fold>
+      <Fold id="look-notes" title="✒ Nights written down" forceOpen={open('look-notes')}>
+        <NotesSection store={store} />
+      </Fold>
+      <Fold id="look-chairs" title="❖ The chairs — who has joined, who has forged" forceOpen={open('look-chairs')}>
+        <Chairs roster={roster} onRefresh={onRefresh} />
+      </Fold>
+      <SeedTheBook store={store} />
+    </div>
+  )
+}
+
+/** One chair per protagonist, always — the Equal Protagonists rule, visible. */
+function Chairs({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh: () => void }) {
+  const seatCount = Math.max(PARTY_SIZE, roster.length)
+  const seats = Array.from({ length: seatCount }, (_, i) => roster[i] ?? null)
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <p style={{ ...eyebrow, letterSpacing: '0.22em' }}>The {partyWord} chairs</p>
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="text-xs underline"
+          style={{ ...body, fontWeight: 600, color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+        >
+          look again
+        </button>
+      </div>
+      <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
+        {seats.map((r, i) => (
+          <div
+            key={r?.playerId ?? `empty-${i}`}
+            className="rounded-xl p-3 text-center"
+            style={r ? { ...onState, color: C.parchment } : { ...wellSurface, border: `1px dashed ${C.panelEdge}` }}
+          >
+            {r ? (
+              <>
+                {r.character?.build.portraitUrl ? (
+                  <img
+                    src={r.character.build.portraitUrl}
+                    alt=""
+                    className="mx-auto"
+                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
+                  />
+                ) : (
+                  <span className="block" style={{ lineHeight: 0, color: C.gold }} aria-hidden="true">
+                    <Icon name={r.character ? 'roster' : 'vault'} size={26} />
+                  </span>
+                )}
+                <p className="text-sm mt-1" style={{ color: C.parchment, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {r.character?.build.name || r.playerName}
+                </p>
+                <p className="text-xs" style={{ color: C.faint }}>
+                  {r.character ? 'forged ✓' : r.quiz ? 'divined — not yet forged' : 'at the gate'}
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="block" style={{ lineHeight: 0, opacity: 0.4, color: C.gold }} aria-hidden="true">
+                  <Spark size={26} />
+                </span>
+                <p className="text-xs mt-1 italic" style={{ color: C.faint }}>
+                  an empty chair,
+                  <br />
+                  waiting
+                </p>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** First run only: lay the cast and the clue cards. Gone once they exist. */
+function SeedTheBook({ store }: { store: Store }) {
+  const [clues, setClues] = useState<number | null>(null)
   const [seeding, setSeeding] = useState(false)
   const [seeded, setSeeded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const [clues, npcs, notes] = await Promise.all([store.listClues(), store.listNpcs(), store.listSessionNotes()])
-      if (!cancelled) setCounts({ clues: clues.length, npcs: npcs.length, notes: notes.length })
+      const c = await store.listClues()
+      if (!cancelled) setClues(c.length)
     })()
     return () => {
       cancelled = true
     }
   }, [store, seeded])
-
-  const activeBargains = roster.flatMap((r) => r.character?.notes.bargains ?? []).filter(
-    (b) => b.status === 'sealed' || b.status === 'offered',
-  ).length
 
   const seedBook = async () => {
     setSeeding(true)
@@ -269,129 +545,24 @@ function HomeSection({
     setSeeded(true)
   }
 
-  // One chair per protagonist, always — the Equal Protagonists rule
-  // made visible. Extra joiners beyond the configured seats still show.
-  const seatCount = Math.max(PARTY_SIZE, roster.length)
-  const seats = Array.from({ length: seatCount }, (_, i) => roster[i] ?? null)
-
+  if (seeded)
+    return (
+      <p role="status" className="text-sm mt-3 flex items-center gap-1.5" style={{ color: C.sea }}>
+        <Spark size={12} /> The threads are laid — see the panels above. Edit everything; it is your book.
+      </p>
+    )
+  if (clues === null || clues > 0) return null
   return (
-    <div style={{ animation: 'cardRise .4s ease-out' }}>
-      <H>The Book opens</H>
-
-      <div className="mt-3">
-        <NightPath roster={roster} />
-        <BeforeTheLanterns store={store} roster={roster} />
-      </div>
-
-      <Section>
-        <div className="flex items-center justify-between">
-          <p style={{ ...eyebrow, letterSpacing: '0.22em' }}>
-            The {partyWord} chairs
-          </p>
-          <button
-            type="button"
-            onClick={onRefresh}
-            className="text-xs underline"
-            style={{ ...body, fontWeight: 600, color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
-          >
-            look again
-          </button>
-        </div>
-        <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
-          {seats.map((r, i) => (
-            <div
-              key={r?.playerId ?? `empty-${i}`}
-              className="rounded-xl p-3 text-center"
-              style={
-                r
-                  ? { ...onState, color: C.parchment }
-                  : { ...wellSurface, border: `1px dashed ${C.panelEdge}` }
-              }
-            >
-              {r ? (
-                <>
-                  {r.character?.build.portraitUrl ? (
-                    <img
-                      src={r.character.build.portraitUrl}
-                      alt=""
-                      className="mx-auto"
-                      style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
-                    />
-                  ) : (
-                    <span className="block" style={{ lineHeight: 0, color: C.gold }} aria-hidden="true">
-                      <Icon name={r.character ? 'roster' : 'vault'} size={26} />
-                    </span>
-                  )}
-                  <p className="text-sm mt-1" style={{ color: C.parchment, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {r.character?.build.name || r.playerName}
-                  </p>
-                  <p className="text-xs" style={{ color: C.faint }}>
-                    {r.character ? 'forged ✓' : r.quiz ? 'divined — not yet forged' : 'at the gate'}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <span className="block" style={{ lineHeight: 0, opacity: 0.4, color: C.gold }} aria-hidden="true">
-                    <Spark size={26} />
-                  </span>
-                  <p className="text-xs mt-1 italic" style={{ color: C.faint }}>
-                    an empty chair,
-                    <br />
-                    waiting
-                  </p>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', alignContent: 'start', alignItems: 'start' }}>
-        {([
-          ['vault', 'vault', 'Vault', `${roster.filter((r) => r.quiz).length} divinations kept`],
-          ['clues', 'clues', 'Clue paths', counts ? `${counts.clues} conclusions tracked` : '…'],
-          ['npcs', 'npcs', 'NPCs', counts ? `${counts.npcs} souls in the book` : '…'],
-          ['notes', 'notes', 'Sessions', counts ? `${counts.notes} nights recorded` : '…'],
-          ['roster', 'roster', 'Bargains', `${activeBargains} in force`],
-          ['table', 'table', 'The Table', 'derby · dice · whispers · map'],
-        ] as [DmSection, IconName, string, string][]).map(([id, icon, label, detail]) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => onGo(id)}
-            className="rounded-xl p-4 text-left"
-            style={{ ...panelSurface, color: C.parchment, cursor: 'pointer', minHeight: 44 }}
-          >
-            <p className="flex items-center gap-2" style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>
-              <Icon name={icon} size={18} style={{ color: C.goldDim }} />
-              {label}
-            </p>
-            <p className="text-xs mt-1" style={{ color: C.faint }}>
-              {detail}
-            </p>
-          </button>
-        ))}
-      </div>
-
-      {counts !== null && counts.clues === 0 && !seeded && (
-        <Section style={{ marginTop: 12, border: `1px solid ${C.sea}55` }}>
-          <Eyebrow>Before the first night</Eyebrow>
-          <p className="text-sm" style={{ color: C.parchment }}>
-            The book can lay the campaign's threads for you: the cast (the Twins, Grey-Gill,
-            the Buyer, the three keepers, Saltmere) and four clue cards that track the pieces
-            of the song, the proof, the Ones Below, and the Moon.
-          </p>
-          <Btn onClick={() => void seedBook()} disabled={seeding}>
-            {seeding ? 'Threading the needle…' : <>Lay the threads <Spark size={14} /> (cast + clues)</>}
-          </Btn>
-        </Section>
-      )}
-      {seeded && (
-        <p role="status" className="text-sm mt-3 flex items-center gap-1.5" style={{ color: C.sea }}>
-          <Spark size={12} /> The threads are laid — see Clues and NPCs. Edit everything; it's your book.
-        </p>
-      )}
-    </div>
+    <Section style={{ marginTop: 12, border: `1px solid ${C.sea}55` }}>
+      <Eyebrow>Before the first night</Eyebrow>
+      <p className="text-sm" style={{ color: C.parchment }}>
+        The book can lay the campaign’s threads for you: the cast (the Twins, Grey-Gill, the Buyer, the three keepers,
+        Saltmere) and four clue cards that track the pieces of the song, the proof, the Ones Below, and the Moon.
+      </p>
+      <Btn onClick={() => void seedBook()} disabled={seeding}>
+        {seeding ? 'Threading the needle…' : <>Lay the threads <Spark size={14} /> (cast + clues)</>}
+      </Btn>
+    </Section>
   )
 }
 

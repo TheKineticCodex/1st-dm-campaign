@@ -45,10 +45,8 @@ test('living stage: map + light + fog + the order; finale: arm → wake → sing
   await stage.getByRole('button', { name: /stage/ }).click()
   await pl.waitForTimeout(8000) // the phone's realtime channel takes a few seconds to join
 
-  // ---- the living stage: Tonight → planning → stage controls
-  await dm.getByRole('navigation', { name: 'DM sections' }).getByRole('button', { name: /Tonight/ }).click()
-  const planning = dm.getByRole('button', { name: /back to planning/ })
-  if (await planning.isVisible().catch(() => false)) await planning.click()
+  // ---- the living stage: Table → the stage remote (open by default)
+  await dm.getByRole('navigation', { name: 'DM sections' }).getByRole('button', { name: 'Table', exact: true }).click()
   const fileInput = dm.locator('input[type=file]').last()
   await fileInput.setInputFiles({ name: 'e2e-map.png', mimeType: 'image/png', buffer: PNG })
   await expect(dm.getByRole('button', { name: /Change the map image/ })).toBeVisible({ timeout: 20000 })
@@ -61,8 +59,7 @@ test('living stage: map + light + fog + the order; finale: arm → wake → sing
   await expect(dm.getByRole('button', { name: /fog on/ })).toBeVisible()
   await expect(stage.locator('canvas')).toHaveCount(1, { timeout: 10000 })
 
-  // a fight: Table → initiative with the enemy → the stage shows the order + turn banner
-  await dm.getByRole('navigation', { name: 'DM sections' }).getByRole('button', { name: /Table/ }).click()
+  // a fight: initiative with the enemy → the stage shows the order + turn banner
   await dm.getByPlaceholder(/Add an enemy/).fill('Enemy 1')
   await dm.getByRole('button', { name: 'add', exact: true }).click()
   await dm.getByRole('button', { name: /Begin the encounter/ }).click()

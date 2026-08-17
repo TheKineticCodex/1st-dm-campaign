@@ -322,7 +322,7 @@ export const RUN_SCENES: RunScene[] = [
     timing: '30–40 min · the night\'s heart',
     beats: [
       'Set the room to 🕯 Inside a tent. Slow down.',
-      'Fire the ✉ readings one at a time (Run the night → cues). Let each land in silence.',
+      'Fire the ✉ readings one at a time — the buttons are right under the checkpoint on Tonight. Let each land in silence.',
       'When asked who bought her name: only bubbles come. She and Billy share the wound. Don\'t say it.',
       'She gives one true thing about the road ahead if asked kindly: "Three gates. One opens tonight. The others remember."',
     ],

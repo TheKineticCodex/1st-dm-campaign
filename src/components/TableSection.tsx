@@ -11,6 +11,9 @@ import { SONGS } from '../data/songPieces'
 import { readCache, writeCache } from '../lib/storage'
 import type { Bargain, Encounter, FinaleEvent, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
 import { MapBoard } from './MapBoard'
+import { StageControls } from './TonightSection'
+import { BattleCard } from './NightPath'
+import { battlesHere, partyLevel, readNightProgress } from '../lib/night'
 import { createHost, type Host } from '../lib/gameHost'
 import type { GameEvent, GameState } from '../lib/games'
 import { GamesPanel } from './games/GamesPanel'
@@ -18,7 +21,7 @@ import { FinalePanel } from './Finale'
 import { playWhole } from '../lib/song'
 import { duck } from '../lib/ambience'
 import { DEFAULT_WEDGES, Wheel } from './Wheel'
-import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, bloodLit, body, display, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { Btn, C, Eyebrow, Fold, H, HintOnce, eyebrow, TextArea, TextInput, bloodLit, body, display, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
 import { Icon, Spark } from './icons'
 
 interface DmRace {
@@ -41,6 +44,30 @@ interface TableSectionProps {
   roster: RosterEntry[]
   /** Callback engine: a Vault answer forged into a ready-to-send whisper. */
   whisperPrefill?: WhisperPrefill | null
+  /** Told once the composer has taken it, so the next forge is a new one. */
+  onPrefillUsed?: () => void
+  /** The panel the Book was asked to open on the way in. */
+  openFold?: string | null
+}
+
+/**
+ * The fight he is standing in, with its numbers — so the foe's AC and the
+ * turn order are never on two different tabs at the same moment.
+ */
+function TonightsFight({ roster }: { roster: RosterEntry[] }) {
+  const battles = battlesHere(readNightProgress())
+  if (!battles.length) return null
+  const { level, heads } = partyLevel(roster)
+  return (
+    <div className="mb-3">
+      <p className="mb-1" style={{ ...eyebrow, color: C.blood }}>
+        the fight this checkpoint can open
+      </p>
+      {battles.map((b) => (
+        <BattleCard key={b.id} b={b} level={level} heads={heads} />
+      ))}
+    </div>
+  )
 }
 
 /** Combat glance-strip: every character's HP, AC, and conditions in one line. */
@@ -110,7 +137,18 @@ function PartyGlance({ roster, live }: { roster: RosterEntry[]; live: Record<str
   )
 }
 
-export function TableSection({ store, roster, whisperPrefill }: TableSectionProps) {
+export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, openFold }: TableSectionProps) {
+  // The Table never unmounts now, so the parent's copy of the prefill has to
+  // be cleared or a second forged whisper would look identical to the first
+  // and be ignored. Keep our own, tell the parent we took it.
+  const [prefill, setPrefill] = useState<WhisperPrefill | null>(whisperPrefill ?? null)
+  useEffect(() => {
+    if (!whisperPrefill) return
+    setPrefill(whisperPrefill)
+    onPrefillUsed?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [whisperPrefill])
+
   const channelRef = useRef<TableChannel | null>(null)
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -240,11 +278,16 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
       <PartyGlance roster={roster} live={live} />
 
       <div className="mt-3" />
-      <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen>
+      {encounter?.active && <TonightsFight roster={roster} />}
+      <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen forceOpen={openFold === 'dm-initiative'}>
         {loaded && <InitiativePanel encounter={encounter} pcRows={pcRows} onChange={update} />}
       </Fold>
 
-      <Fold id="dm-games" title="🐌 Carnival games — the Snail Derby">
+      <Fold id="dm-stage" title="🎪 The stage — what the iPad shows the table" defaultOpen forceOpen={openFold === 'dm-stage'}>
+        <StageControls store={store} roster={roster} channelRef={channelRef} />
+      </Fold>
+
+      <Fold id="dm-derby" title="🐌 Carnival games — the Snail Derby" forceOpen={openFold === 'dm-derby'}>
         {!race && (
           <>
             <p className="text-sm" style={{ color: C.faint }}>
@@ -319,7 +362,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         )}
       </Fold>
 
-      <Fold id="dm-dice" title="🎲 The table's dice — live" defaultOpen>
+      <Fold id="dm-dice" title="🎲 The table's dice — live" defaultOpen forceOpen={openFold === 'dm-dice'}>
         {feed.length === 0 ? (
           <p className="text-sm" style={{ color: C.faint }}>
             The dice are quiet. Every roll from every phone lands here.
@@ -349,9 +392,9 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         )}
       </Fold>
 
-      <Fold id="dm-whispers" title="✉ Whispers & handouts" forceOpen={!!whisperPrefill}>
+      <Fold id="dm-whispers" title="✉ Whispers & handouts" forceOpen={!!prefill || openFold === 'dm-whispers'}>
         <HandoutComposer
-          key={whisperPrefill ? `${whisperPrefill.target}-${whisperPrefill.body.slice(0, 24)}` : 'blank'}
+          key={prefill ? `${prefill.target}-${prefill.body.slice(0, 24)}` : 'blank'}
           store={store}
           roster={roster}
           channelRef={channelRef}
@@ -359,15 +402,15 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         />
       </Fold>
 
-      <Fold id="dm-bargains" title="⚖ Strike a bargain">
+      <Fold id="dm-bargains" title="⚖ Strike a bargain" forceOpen={openFold === 'dm-bargains'}>
         <BargainComposer store={store} roster={roster} channelRef={channelRef} />
       </Fold>
 
-      <Fold id="dm-level" title="✦ Level up the party">
+      <Fold id="dm-level" title="✦ Level up the party" forceOpen={openFold === 'dm-level'}>
         <LevelUpComposer store={store} roster={roster} channelRef={channelRef} />
       </Fold>
 
-      <Fold id="dm-song" title="🎵 A piece comes home">
+      <Fold id="dm-song" title="🎵 A piece comes home" forceOpen={openFold === 'dm-song'}>
         <SongComposer store={store} channelRef={channelRef} />
       </Fold>
 
@@ -390,7 +433,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         />
       </Fold>
 
-      <Fold id="dm-games" title="🎪 The game booth — Draw · Hold the Note · The Toll · The Bargain" forceOpen={!!game}>
+      <Fold id="dm-booth" title="🎪 The game booth — Draw · Hold the Note · The Toll · The Bargain" forceOpen={!!game}>
         <GamesPanel
           store={store}
           roster={roster}
@@ -431,7 +474,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
         />
       </Fold>
 
-      <Fold id="dm-map" title="🗺 The table map">
+      <Fold id="dm-map" title="🗺 The scratch map — this device only, the stage never sees it" forceOpen={openFold === 'dm-map'}>
         <MapBoard pcNames={pcRows.map((r) => r.name)} />
       </Fold>
     </div>

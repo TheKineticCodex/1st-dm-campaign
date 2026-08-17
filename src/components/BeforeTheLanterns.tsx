@@ -142,7 +142,7 @@ export function BeforeTheLanterns({ store, roster }: { store: Store; roster: Ros
         glyph: 'tonight',
         label: beat ? `Tonight opens at ${beat}` : 'Tonight has no beat yet',
         done: !!beat,
-        note: beat ? undefined : 'set one in Tonight → planning: tap “go here” on a beat',
+        note: beat ? undefined : 'set one in Look it up → the whole story: tap “go here” on a beat',
       },
       {
         id: 'page',

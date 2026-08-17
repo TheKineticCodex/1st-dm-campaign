@@ -206,7 +206,7 @@ export const ECLIPSE_CARDS: CheatCard[] = [
       ...ECLIPSE_TEST,
       '—',
       ...ECLIPSE_HOW,
-      'Tonight’s number, the words to read, and whose turn it is all live in Tonight → run the night, at the bottom.',
+      'Tonight’s number, the words to read, and whose turn it is all live on Tonight, just under the checkpoint.',
     ],
   },
   {

@@ -1,10 +1,14 @@
-// ⚑ Tonight — the MacBook control room for a live session: the party at a
-// glance, the branching story timeline (advance it as the table chooses),
-// and the stage controls that drive what the iPad shows.
+// ⚑ The pieces the Book arranges: the run-the-night panel, the Alignment,
+// the party strip, the story timeline, and the stage controls that drive
+// what the iPad shows the table.
+//
+// This file no longer owns a tab. DmDashboard mounts these five where they
+// are actually needed — the party strip on every screen, the timeline under
+// "Look it up", the stage beside the initiative order on the Table.
 
 import { useEffect, useRef, useState } from 'react'
 import { ACT1_SCENES, type SceneCue } from '../data/act1Scenes'
-import { DM_BASICS, SESSION1_RUN_SHEET } from '../data/dmBasics'
+import { DM_BASICS } from '../data/dmBasics'
 import {
   ECLIPSE_MAX,
   ECLIPSE_TEST,
@@ -21,13 +25,14 @@ import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
+import { fireCue } from '../lib/cues'
 import { readCache, writeCache } from '../lib/storage'
 import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
-import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
+import { isCarouselPlaying, playMissingNote, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
 import type { RosterEntry, Store } from '../lib/store'
-import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
+import type { Handout, Npc, StageState, StageToken, StoryNode, VitalsEvent } from '../types'
 import { FogOverlay, TINTS, TintOverlay } from './Battlefield'
-import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, bloodLit, body, display, eyebrow, goldAction, leftRule, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
+import { Btn, C, Eyebrow, Fold, TextArea, TextInput, bloodLit, body, display, eyebrow, goldAction, leftRule, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
 import { Icon, Spark, type IconName } from './icons'
 
 const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', C.blood, '#8BB8E0']
@@ -54,7 +59,9 @@ const FOG_SIZES: [number, string][] = [
   [0.24, 'wide'],
 ]
 
-export function TonightSection({
+// ---------------------------------------------------------- run the night
+
+export function RunNight({
   store,
   roster,
   onGo,
@@ -64,8 +71,6 @@ export function TonightSection({
   onGo: (section: string) => void
 }) {
   const channelRef = useRef<TableChannel | null>(null)
-  const [running, setRunning] = useState(false)
-
   useEffect(() => {
     channelRef.current = joinTableChannelLazy(store.getChannelId(), {})
     return () => {
@@ -73,63 +78,6 @@ export function TonightSection({
     }
   }, [store])
 
-  return (
-    <div style={{ animation: 'cardRise .4s ease-out' }}>
-      <div className="flex items-center justify-between">
-        <H>Tonight</H>
-        <button
-          type="button"
-          onClick={() => setRunning(!running)}
-          className="rounded-lg px-5 py-2 inline-flex items-center gap-2"
-          style={{
-            ...display,
-            fontSize: 18,
-            fontWeight: 600,
-            ...(running ? { ...panelSurface, color: C.parchment } : goldAction),
-            minHeight: 44,
-            cursor: 'pointer',
-          }}
-        >
-          {running ? (
-            <>
-              <Icon name="quill" size={16} style={{ color: C.brassDim }} /> back to planning
-            </>
-          ) : (
-            <>
-              <Icon name="play" size={16} /> Run the night
-            </>
-          )}
-        </button>
-      </div>
-      <PartyStrip roster={roster} />
-      {running ? (
-        <RunNight store={store} roster={roster} channelRef={channelRef} onGo={onGo} />
-      ) : (
-        <div
-          className="grid gap-3 mt-3"
-          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', alignItems: 'start' }}
-        >
-          <StoryTimeline store={store} />
-          <StageControls store={store} roster={roster} channelRef={channelRef} />
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ---------------------------------------------------------- run the night
-
-function RunNight({
-  store,
-  roster,
-  channelRef,
-  onGo,
-}: {
-  store: Store
-  roster: RosterEntry[]
-  channelRef: { current: TableChannel | null }
-  onGo: (section: string) => void
-}) {
   const [nodes, setNodes] = useState<StoryNode[]>([])
   const [npcs, setNpcs] = useState<Npc[]>([])
   const [wonder, setWonder] = useState<string | null>(null)
@@ -179,50 +127,8 @@ function RunNight({
     setTimeout(() => setSentNote(null), 2500)
   }
 
-  const fireCue = (cue: SceneCue) => {
-    if (cue.kind === 'sfx' && cue.sfx) {
-      duck(2.5)
-      SFX[cue.sfx]?.play()
-      return
-    }
-    if (cue.kind === 'song' && cue.song) {
-      if (cue.song === 'carousel') {
-        if (!carouselOn) duck(60, 0.35)
-        toggleCarousel()
-      } else if (cue.song === 'note') {
-        duck(5)
-        playMissingNote()
-      } else if (cue.song === 'whole') {
-        // The one thing in the app that must never sound by accident.
-        if (window.confirm('This plays the Sea’s song WHOLE — the note lands, once. Are you at the end?')) {
-          duck(12, 0.15)
-          playWhole()
-          note('The song, whole. ✦')
-        }
-      } else {
-        duck(6)
-        playFragment(cue.song)
-      }
-      return
-    }
-    if (cue.kind === 'go-table') {
-      onGo('table')
-      return
-    }
-    if (cue.kind === 'whisper' && cue.whisper) {
-      const h: Handout = {
-        id: crypto.randomUUID(),
-        target: cue.whisper.target,
-        title: cue.whisper.title,
-        body: cue.whisper.body,
-        ephemeral: cue.whisper.ephemeral,
-        sentAt: new Date().toISOString(),
-      }
-      void store.sendHandout(h)
-      channelRef.current?.sendHandout(h)
-      note(`Whisper sealed and sent ${cue.whisper.target ? `to ${cue.whisper.target}` : 'to everyone'} ✦`)
-    }
-  }
+  const fire = (cue: SceneCue) =>
+    fireCue(cue, { store, channel: channelRef.current, note, onGo })
 
   const advanceTo = async (target: StoryNode) => {
     if (current && current.id !== target.id) await store.saveStoryNode({ ...current, status: 'done' })
@@ -268,8 +174,11 @@ function RunNight({
           <Eyebrow>now — act {current.act}</Eyebrow>
           <h3 style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>{current.title}</h3>
 
-          <p className="mt-3 leading-relaxed" style={{ color: C.gold, fontStyle: 'italic', fontSize: 19, lineHeight: 1.65 }}>
-            “{guide.readAloud}”
+          <p className="mb-1 mt-3" style={{ ...eyebrow, color: C.brassDim }}>
+            the older wording — for you, not to read
+          </p>
+          <p className="rounded-lg px-3 py-2 text-sm" style={{ ...wellSurface, color: C.faint, fontStyle: 'italic', lineHeight: 1.55 }}>
+            {guide.readAloud}
           </p>
           <p className="text-sm mt-3" style={{ color: C.parchment }}>
             <span style={{ ...eyebrow, color: C.sea }}>
@@ -395,7 +304,7 @@ function RunNight({
                     key={label}
                     type="button"
                     disabled={!!missing}
-                    onClick={() => fireCue(cue)}
+                    onClick={() => fire(cue)}
                     title={missing ? `${cue.whisper!.target} hasn't joined yet` : undefined}
                     className="rounded-lg px-3 py-2 text-sm"
                     style={{
@@ -442,29 +351,6 @@ function RunNight({
           </div>
         </div>
       )}
-
-      {/* tonight's run sheet */}
-      <div className="mt-3">
-        <Fold id="dm-runsheet" title="🗓 Tonight’s run sheet — the whole night at a glance">
-          <div className="grid gap-1 mt-2">
-            {SESSION1_RUN_SHEET.map((row) => (
-              <div key={row.time} className="rounded-lg p-2 flex gap-3" style={wellSurface}>
-                <span className="text-sm shrink-0" style={{ ...body, ...numerals, color: C.gold, fontWeight: 600, width: 44 }}>
-                  {row.time}
-                </span>
-                <div>
-                  <p className="text-sm" style={{ color: C.parchment, fontWeight: 600 }}>
-                    {row.beat}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: C.faint }}>
-                    {row.what}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Fold>
-      </div>
 
       {/* the nervous-DM basics */}
       <div className="mt-3">
@@ -591,7 +477,6 @@ function RunNight({
         </div>
       </div>
 
-      <TheThingWithNoName store={store} channelRef={channelRef} note={note} />
     </div>
   )
 }
@@ -608,17 +493,23 @@ function RunNight({
  */
 const ECLIPSE_KEY = 'eclipse'
 
-function TheThingWithNoName({
-  store,
-  channelRef,
-  note,
-}: {
-  store: Store
-  channelRef: { current: TableChannel | null }
-  note: (msg: string) => void
-}) {
+export function TheThingWithNoName({ store }: { store: Store }) {
   const [state, setState] = useState<EclipseState | null>(null)
   const [open, setOpen] = useState(false)
+  const [said, setSaid] = useState<string | null>(null)
+  const channelRef = useRef<TableChannel | null>(null)
+
+  const note = (m: string) => {
+    setSaid(m)
+    setTimeout(() => setSaid(null), 2500)
+  }
+
+  useEffect(() => {
+    channelRef.current = joinTableChannelLazy(store.getChannelId(), {})
+    return () => {
+      channelRef.current?.close()
+    }
+  }, [store])
 
   useEffect(() => {
     let cancelled = false
@@ -730,6 +621,11 @@ function TheThingWithNoName({
                 <Icon name="envelope" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
                 seal it to {shadow.who}
               </Btn>
+              {said && (
+                <p role="status" className="text-xs mt-1.5" style={{ color: C.gold }}>
+                  {said}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -765,7 +661,16 @@ function TheThingWithNoName({
 
 // -------------------------------------------------------------- party strip
 
-function PartyStrip({ roster }: { roster: RosterEntry[] }) {
+/**
+ * The five, on every screen. `live` is the phones' own broadcast, so the
+ * numbers are the table's, not a roster row that reloads every 30 seconds;
+ * tapping a face is the way to the sheet that can lay a condition on them.
+ */
+export function PartyStrip({ roster, live, onTap }: {
+  roster: RosterEntry[]
+  live?: Record<string, VitalsEvent>
+  onTap?: () => void
+}) {
   return (
     <div className="grid gap-2 mt-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
       {roster
@@ -773,10 +678,19 @@ function PartyStrip({ roster }: { roster: RosterEntry[] }) {
         .map((r) => {
           const sheet = computeSheet(r.character!.build)
           if (!sheet) return null
-          const hp = Math.max(0, sheet.hpMax - r.character!.state.damage)
-          const hpPct = (hp / sheet.hpMax) * 100
+          const v = live?.[r.playerName]
+          const hpMax = v?.hpMax ?? sheet.hpMax
+          const hp = v ? Math.max(0, v.hp) : Math.max(0, sheet.hpMax - r.character!.state.damage)
+          const hpPct = hpMax > 0 ? (hp / hpMax) * 100 : 0
+          const conditions = v?.conditions ?? r.character!.state.conditions
+          const Tag = (onTap ? 'button' : 'div') as 'button' | 'div'
           return (
-            <div key={r.playerId} className="rounded-xl p-3 flex gap-3 items-center" style={{ ...panelSurface, borderColor: hp === 0 ? C.blood : C.panelEdge }}>
+            <Tag
+              key={r.playerId}
+              {...(onTap ? { type: 'button' as const, onClick: onTap } : {})}
+              className="rounded-xl p-3 flex gap-3 items-center text-left w-full"
+              style={{ ...panelSurface, borderColor: hp === 0 ? C.blood : C.panelEdge, minHeight: 44, cursor: onTap ? 'pointer' : undefined }}
+            >
               {r.character!.build.portraitUrl ? (
                 <img
                   src={r.character!.build.portraitUrl}
@@ -796,13 +710,13 @@ function PartyStrip({ roster }: { roster: RosterEntry[] }) {
                   <div style={{ width: `${hpPct}%`, height: '100%', background: hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : C.blood }} />
                 </div>
                 <p className="text-xs mt-1" style={{ ...numerals, color: C.faint }}>
-                  <span style={{ color: hp === 0 ? C.blood : hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : C.blood }}>{hp}/{sheet.hpMax}</span> hp · AC {sheet.ac.val}
-                  {r.character!.state.conditions.length > 0 && (
-                    <span style={{ color: C.gold }}> · {r.character!.state.conditions.join(', ')}</span>
+                  <span style={{ color: hp === 0 ? C.blood : hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : C.blood }}>{hp}/{hpMax}</span> hp · AC {sheet.ac.val}
+                  {conditions.length > 0 && (
+                    <span style={{ color: C.gold }}> · {conditions.join(', ')}</span>
                   )}
                 </p>
               </div>
-            </div>
+            </Tag>
           )
         })}
       {roster.filter((r) => r.character).length === 0 && (
@@ -823,7 +737,7 @@ const STATUS_STYLE: Record<StoryNode['status'], { border: string; opacity: numbe
   skipped: { border: C.panelEdge, opacity: 0.4 },
 }
 
-function StoryTimeline({ store }: { store: Store }) {
+export function StoryTimeline({ store }: { store: Store }) {
   const [nodes, setNodes] = useState<StoryNode[]>([])
   const [loaded, setLoaded] = useState(false)
   const [seeding, setSeeding] = useState(false)
@@ -1014,7 +928,7 @@ function StoryTimeline({ store }: { store: Store }) {
 
 // ----------------------------------------------------------- stage controls
 
-function StageControls({
+export function StageControls({
   store,
   roster,
   channelRef,

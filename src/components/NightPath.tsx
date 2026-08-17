@@ -1,32 +1,29 @@
-// Tonight's path — the Lantern-Keeper's own choose-your-own-adventure.
+// Tonight's path — the Lantern-Keeper's own choose-your-own-adventure, and
+// the spine of the Tonight tab.
 //
 // One checkpoint open at a time: the gold words to read, the two or three
-// things to do, the doors they might walk through, and — folded beside them
-// — the small ones they might try that aren't on the list. Tap the door the
-// party took; the Book writes it down and moves you on. Everything is kept
-// per night, so a reload mid-scene loses nothing, and the trail at the end
-// is the night as it actually happened.
+// things to do, the buttons those things need, the doors they might walk
+// through, and — folded beside them — the small ones they might try that
+// aren't on the list. Tap the door the party took; the Book writes it down
+// and moves you on. Everything is kept per night, so a reload mid-scene
+// loses nothing, and the trail at the end is the night as it happened.
+//
+// The progress lives in lib/night.ts, not here, so the Table can show the
+// fight he is actually walking into.
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ACT1_SCENES, type SceneCue } from '../data/act1Scenes'
 import { NIGHT_PATH, weigh, type Checkpoint, type NightBattle, type PathDoor } from '../data/nightPath'
-import { readCache, writeCache } from '../lib/storage'
-import type { RosterEntry } from '../lib/store'
-import { C, display, eyebrow, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { SCENES, setScene } from '../lib/ambience'
+import { fireCue } from '../lib/cues'
+import { EMPTY_NIGHT, readNightProgress, writeNightProgress, type NightProgress } from '../lib/night'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
+import { isCarouselPlaying, subscribeSong } from '../lib/song'
+import type { RosterEntry, Store } from '../lib/store'
+import { Btn, C, display, eyebrow, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
 import { Icon, Spark } from './icons'
 
-interface Progress {
-  /** checkpoint id → the door they took */
-  took: Record<string, string>
-  /** checkpoint the Book is sitting on */
-  at: string
-  /** true once the last gate is chosen */
-  done?: boolean
-}
-
-const KEY = `night:${NIGHT_PATH.session}`
-const EMPTY: Progress = { took: {}, at: NIGHT_PATH.checkpoints[0]!.id }
-
-function BattleCard({ b, level, heads }: { b: NightBattle; level: number; heads: number }) {
+export function BattleCard({ b, level, heads }: { b: NightBattle; level: number; heads: number }) {
   const [open, setOpen] = useState(false)
   const w = weigh(b.xp, level, heads)
   const boss = b.kind === 'boss'
@@ -154,12 +151,93 @@ function DoorButton({ d, onTake }: { d: PathDoor; onTake: () => void }) {
   )
 }
 
-export function NightPath({ roster }: { roster: RosterEntry[] }) {
-  const [p, setP] = useState<Progress>(() => readCache<Progress>(KEY) ?? EMPTY)
+/**
+ * The scene's own buttons, directly under the bullet that tells him to press
+ * them. They used to live a tab away from the instruction naming them, which
+ * is how the heart of the night ended up with the words on one screen and the
+ * five sealed readings on another.
+ */
+function CueRow({ store, roster, cues, ambience, note }: {
+  store: Store
+  roster: RosterEntry[]
+  cues: SceneCue[]
+  ambience?: string
+  note: (m: string) => void
+}) {
+  const channel = useRef<TableChannel | null>(null)
+  const [carouselOn, setCarouselOn] = useState(isCarouselPlaying())
 
-  const save = (next: Progress) => {
+  useEffect(() => subscribeSong(() => setCarouselOn(isCarouselPlaying())), [])
+  useEffect(() => {
+    // Joins are ref-counted (lib/realtime): co-mounting beside the Table's own
+    // join is safe, and the socket only leaves with the last one.
+    channel.current = joinTableChannelLazy(store.getChannelId(), {})
+    return () => {
+      channel.current?.close()
+    }
+  }, [store])
+
+  const names = new Set(roster.map((r) => r.playerName))
+  const room = SCENES.find((s) => s.id === ambience)
+  if (!cues.length && !room) return null
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-2.5">
+      {room && (
+        <button
+          type="button"
+          onClick={() => void setScene(room.id).catch(() => note('The room would not load — tap again.'))}
+          className="rounded-lg px-3 py-2 text-sm"
+          style={{ ...wellSurface, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+        >
+          <Icon name="tent" size={14} style={{ color: C.brassDim, marginRight: 6 }} />
+          set the room
+        </button>
+      )}
+      {cues.map((cue) => {
+        const away = cue.kind === 'whisper' && cue.whisper?.target && !names.has(cue.whisper.target)
+        const text = cue.kind === 'song' && cue.song === 'carousel' && carouselOn ? '■ stop the carousel' : cue.label
+        const [glyph, words] = splitLeadGlyph(text)
+        return (
+          <button
+            key={cue.label}
+            type="button"
+            disabled={!!away}
+            onClick={() => fireCue(cue, { store, channel: channel.current, note })}
+            title={away ? `${cue.whisper!.target} hasn’t joined yet` : undefined}
+            className="rounded-lg px-3 py-2 text-sm inline-flex items-center gap-1.5"
+            style={{
+              ...(cue.kind === 'whisper' ? onState : { ...wellSurface, color: C.parchment }),
+              ...(away ? { color: C.faint, border: `1px dashed ${C.brassDim}` } : null),
+              minHeight: 44,
+              cursor: away ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {glyph && <Icon name={glyph} size={14} style={{ color: cue.kind === 'whisper' ? C.gold : C.brassDim, flexShrink: 0 }} />}
+            <span>{words}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+export function NightPath({ store, roster, onGo }: {
+  store: Store
+  roster: RosterEntry[]
+  onGo?: (section: string) => void
+}) {
+  const [p, setP] = useState<NightProgress>(() => readNightProgress())
+  const [said, setSaid] = useState<string | null>(null)
+
+  const save = (next: NightProgress) => {
     setP(next)
-    writeCache(KEY, next)
+    writeNightProgress(next)
+  }
+
+  const note = (m: string) => {
+    setSaid(m)
+    setTimeout(() => setSaid(null), 2500)
   }
 
   // Their real level and headcount, straight off the roster.
@@ -272,6 +350,20 @@ export function NightPath({ roster }: { roster: RosterEntry[] }) {
             </p>
           ))}
 
+          {/* the buttons the bullets above just asked for */}
+          <CueRow
+            store={store}
+            roster={roster}
+            cues={ACT1_SCENES[current.scene]?.cues ?? []}
+            ambience={ACT1_SCENES[current.scene]?.ambience}
+            note={note}
+          />
+          {said && (
+            <p role="status" className="text-xs mt-1.5" style={{ color: C.gold }}>
+              {said}
+            </p>
+          )}
+
           {/* the fights available here */}
           {current.doors
             .map((d) => battleFor(d.battle))
@@ -304,9 +396,19 @@ export function NightPath({ roster }: { roster: RosterEntry[] }) {
             The music ends the session, not you.
           </p>
           <p className="text-sm mt-1" style={{ color: C.parchment }}>
-            Level the party to 2 from the Table, let the carousel fade behind them, and stop there. Write tonight’s three
-            lines in Notes while it is warm — the pre-session list clears itself the moment you do.
+            Let the carousel fade behind them and stop there. Then two things, while it is warm — the pre-session list
+            clears itself the moment the night is written down.
           </p>
+          <div className="flex flex-wrap gap-2 mt-2.5">
+            <Btn secondary onClick={() => onGo?.('level')}>
+              <Icon name="sheet" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+              level them to 2
+            </Btn>
+            <Btn secondary onClick={() => onGo?.('notes')}>
+              <Icon name="notes" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+              write tonight’s three lines
+            </Btn>
+          </div>
         </div>
       )}
 
@@ -324,7 +426,7 @@ export function NightPath({ roster }: { roster: RosterEntry[] }) {
         {walked.length > 0 && (
           <button
             type="button"
-            onClick={() => save(EMPTY)}
+            onClick={() => save(EMPTY_NIGHT)}
             className="text-xs"
             style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', minHeight: 36, padding: 0, textDecoration: 'underline' }}
           >
