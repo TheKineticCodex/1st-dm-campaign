@@ -184,6 +184,8 @@ export const NIGHT_PATH: Night = {
         { if: 'They refuse to go in', then: 'The lanterns wait. So does the tide, which has not come back. Let the silence do the work.' },
         { if: 'They ask about the tide', then: 'Hush writes one word: SOON. Hum stops humming for exactly one beat.' },
         { if: 'They count the lanterns', then: 'There is one for every person inside. Let them do that arithmetic themselves.' },
+        { if: 'They investigate the Twins', then: '10 — ghost-words under the wiped slate, every one a name. 15 — the tally: five chalk marks were made BEFORE the party walked up. 20 — Hush’s slate is in Hum’s handwriting, and the paper fence keeps promises in, not people out. (Full card: Cheat → the Twins.)' },
+        { if: 'They ask what the Twins gave away', then: 'Hum hums. Hush writes nothing at all, and wipes the slate. Between them they make one whole speaker — he has the words, she has the sound. Never confirm it out loud.' },
       ],
       lands: [{ who: 'Everyone', note: 'Five honest answers on paper. This is the campaign’s last scene, seeded tonight.' }],
       exit: '→ The Games of the Midway',

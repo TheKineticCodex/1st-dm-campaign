@@ -89,9 +89,18 @@ export const WHO_IS_WHO: CheatCard[] = [
   {
     title: '🚪 The Twins — Brother Hush & Sister Hum (the gate)',
     lines: [
-      'Hush never speaks: write 3–5 words on paper and HOLD IT UP. Hum answers everything in half-sung fragments.',
-      'The toll: one honest answer each, out loud. WRITE THEM DOWN. They come back once, at the very end, in the players\' own words.',
+      'WHO: the Fair\'s ushers and its bookkeepers. They take the toll and write it down. They keep the books — they do not set the prices. That is the Buyer, and they owe him like everyone else here.',
+      'WHAT THEY GAVE: between them they make one whole speaker. Hush gave away his voice — he has the words and no sound. Hum gave away her words — she has the sound and no words. Neither one can say the thing plainly. Same shelf as Grey-Gill\'s name, Below.',
+      'THEY ARE NOT CRUEL AND THEY ARE NOT FREE. They are doing a job they cannot stop doing. Play them courteous, tired, and absolutely immovable.',
+      'LOOK — the pair: two tall ushers in faded gate-livery, brass buttons, white gloves that never get dirty. Identical faces you can only hold in your head one at a time. Neither of them blinks; nobody notices for an hour.',
+      'LOOK — Hush: a slate on a cord, a chalk stub tied on, and a mouth that does not open. LOOK — Hum: her mouth never stops moving, and the words never arrive. They stay exactly the same distance apart all night, even walking.',
+      'PLAY THEM: Hush — write 3–5 words on paper and HOLD IT UP; never read it aloud. Hum — answer everything in half-sung fragments that trail off…',
+      'THE TOLL: one honest answer each, out loud. WRITE THEM DOWN. They come back once, at the very end, in the players\' own words.',
       'Slate: "ADMISSION IS SOLD IN SETS. YOU FIVE ARRIVED ON ONE TIDE."',
+      'INVESTIGATION 10 — the slate has been wiped a thousand times; ghost-words sit under tonight\'s. Every one is a name. The cuff of the livery carries a crest for a town that is on no map.',
+      'INVESTIGATION 15 — the tally: one chalk mark per guest through the gate. FIVE marks were already made before the party walked up. Their set was written down before they arrived.',
+      'INVESTIGATION 20 — the seam: Hush\'s slate is in Hum\'s handwriting. They never both look away at once. And the fence is only paper — it is not keeping anything out. It is keeping promises in.',
+      'IF THEY READ THE ROOM (Insight): both of them want the party to answer honestly, and neither can say why. Hum hums louder when a lie is coming, and stops the moment it lands.',
     ],
   },
   {
