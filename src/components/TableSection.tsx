@@ -252,6 +252,20 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
     [roster],
   )
 
+  // Taking a thing off the stage — defined once, so its own panel and the
+  // "back to the title screen" button can never disagree about how.
+  const clearWheel = () => {
+    const id = wheel?.wheelId ?? 'none'
+    setWheel(null)
+    channelRef.current?.sendWheel({ wheelId: id, phase: 'clear' })
+  }
+  const clearFinale = () => {
+    const id = finale?.finaleId ?? 'none'
+    setFinale(null)
+    setFinaleReady(new Set())
+    channelRef.current?.sendFinale({ finaleId: id, phase: 'clear' })
+  }
+
   const update = (e: Encounter | null) => {
     setEncounter(e)
     if (e) {
@@ -284,7 +298,20 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
       </Fold>
 
       <Fold id="dm-stage" title="🎪 The stage — what the iPad shows the table" defaultOpen forceOpen={openFold === 'dm-stage'}>
-        <StageControls store={store} roster={roster} channelRef={channelRef} />
+        <StageControls
+          store={store}
+          roster={roster}
+          channelRef={channelRef}
+          overlays={{
+            game: !!game,
+            wheel: !!wheel,
+            finale: !!finale,
+            fighting: !!encounter?.active && encounter.order.length > 0,
+            clearGame: () => hostRef.current?.stop(),
+            clearWheel,
+            clearFinale,
+          }}
+        />
       </Fold>
 
       <Fold id="dm-derby" title="🐌 Carnival games — the Snail Derby" forceOpen={openFold === 'dm-derby'}>
@@ -425,11 +452,7 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
             setWheel(w)
             channelRef.current?.sendWheel(w)
           }}
-          onClear={() => {
-            const id = wheel?.wheelId ?? 'none'
-            setWheel(null)
-            channelRef.current?.sendWheel({ wheelId: id, phase: 'clear' })
-          }}
+          onClear={clearWheel}
         />
       </Fold>
 
@@ -465,12 +488,7 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
             duck(14, 0.12)
             setTimeout(() => playWhole(), inMs)
           }}
-          onClear={() => {
-            const id = finale?.finaleId ?? 'none'
-            setFinale(null)
-            setFinaleReady(new Set())
-            channelRef.current?.sendFinale({ finaleId: id, phase: 'clear' })
-          }}
+          onClear={clearFinale}
         />
       </Fold>
 

@@ -928,14 +928,34 @@ export function StoryTimeline({ store }: { store: Store }) {
 
 // ----------------------------------------------------------- stage controls
 
+/**
+ * What the iPad is showing, and one way back.
+ *
+ * The stage faces away from the Lantern-Keeper all night, so the Book has to
+ * tell him what is on it. These are the four things that can be up, in the
+ * order the stage itself prefers them (StageScreen renders the first that is
+ * true), plus the initiative rail, which rides over any of them.
+ */
+export interface StageOverlays {
+  game: boolean
+  wheel: boolean
+  finale: boolean
+  fighting: boolean
+  clearGame: () => void
+  clearWheel: () => void
+  clearFinale: () => void
+}
+
 export function StageControls({
   store,
   roster,
   channelRef,
+  overlays,
 }: {
   store: Store
   roster: RosterEntry[]
   channelRef: { current: TableChannel | null }
+  overlays?: StageOverlays
 }) {
   const [stage, setStage] = useState<StageState>(EMPTY_STAGE)
   const [uploading, setUploading] = useState(false)
@@ -992,6 +1012,27 @@ export function StageControls({
     push({ ...stage, tokens: stage.tokens.map((t) => (t.id === dragging.current ? { ...t, x, y } : t)) }, true)
   }
 
+  // The stage renders the first of these that is true, so the readout has to
+  // agree with StageScreen's own order or the Book would lie to him.
+  const showing = overlays?.finale
+    ? { what: 'The finale — the Moon', tone: C.gold }
+    : overlays?.wheel
+      ? { what: 'The Fortune Wheel', tone: C.gold }
+      : overlays?.game
+        ? { what: 'A carnival game', tone: C.gold }
+        : stage.mode === 'map' && stage.mapUrl
+          ? { what: 'The battle map', tone: C.sea }
+          : { what: 'The title screen', tone: C.faint }
+  const covered = !!(overlays?.finale || overlays?.wheel || overlays?.game)
+  const anythingUp = covered || (stage.mode === 'map' && !!stage.mapUrl)
+
+  const backToTitle = () => {
+    overlays?.clearFinale()
+    overlays?.clearWheel()
+    overlays?.clearGame()
+    push({ ...stage, mode: 'ambient' })
+  }
+
   return (
     <div className="rounded-xl p-4" style={panelSurface}>
       <Eyebrow>The stage — what the iPad shows the table</Eyebrow>
@@ -1000,6 +1041,36 @@ export function StageControls({
           The stage needs the campaign lantern (Supabase) to reach the iPad.
         </p>
       )}
+
+      {/* The stage faces away from him all night. This is the only way he
+          knows what five people are looking at. */}
+      <div
+        className="rounded-lg px-3 py-2.5 mt-2 flex flex-wrap items-center justify-between gap-2"
+        style={{ ...wellSurface, borderLeft: `3px solid ${showing.tone}` }}
+      >
+        <span className="min-w-0">
+          <span className="block" style={{ ...eyebrow, fontSize: 10.5, color: C.brassDim }}>
+            they are looking at
+          </span>
+          <span style={{ ...display, fontSize: 19, fontWeight: 600, color: showing.tone }}>
+            {showing.what}
+          </span>
+          {overlays?.fighting && (
+            <span className="text-xs" style={{ color: C.copper }}> · with the turn order over it</span>
+          )}
+          {covered && stage.mode === 'map' && stage.mapUrl && (
+            <span className="block text-xs" style={{ color: C.faint }}>
+              your map is still loaded, underneath
+            </span>
+          )}
+        </span>
+        {anythingUp && (
+          <Btn secondary onClick={backToTitle}>
+            <Icon name="lantern" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+            back to the title screen
+          </Btn>
+        )}
+      </div>
       {/* Segmented control: lit, never a gold fill. */}
       <div className="flex gap-2 mt-2">
         <button
