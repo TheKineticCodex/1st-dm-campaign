@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import type { Handout } from '../types'
-import { Btn, C, body, display, eyebrow } from './ui'
+import { Btn, C, body, display, eyebrow, phoneSafe } from './ui'
 import { Spark } from './icons'
 
 const paperShadow = '0 24px 60px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.3)'
@@ -83,8 +83,8 @@ export function SealedEnvelope({ handout, onDismiss }: SealedEnvelopeProps) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-6"
-      style={{ background: 'rgba(6, 12, 14, 0.88)', zIndex: 70 }}
+      className="fixed inset-0 flex items-center justify-center"
+      style={{ ...phoneSafe, background: 'rgba(6, 12, 14, 0.88)', zIndex: 70, overflowY: 'auto' }}
       role="dialog"
       aria-label={handout.target ? 'A sealed whisper, for you alone' : 'A sealed envelope arrives'}
     >

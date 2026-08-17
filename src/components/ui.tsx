@@ -170,6 +170,48 @@ export function Eyebrow({ children, style }: { children: ReactNode; style?: CSSP
   )
 }
 
+/**
+ * A full-screen overlay on a phone with a notch. `inset-0` puts the top of the
+ * content under the status bar and the Dynamic Island, which is how the wheel
+ * ended up with its first line — and anything sitting up there — out of reach.
+ * Spread this over the overlay's own padding.
+ */
+export const phoneSafe: CSSProperties = {
+  paddingTop: 'calc(1.25rem + env(safe-area-inset-top))',
+  paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
+  paddingLeft: 'calc(1rem + env(safe-area-inset-left))',
+  paddingRight: 'calc(1rem + env(safe-area-inset-right))',
+}
+
+/**
+ * The way out of a full-screen overlay, parked clear of the notch. Nobody
+ * should ever be stranded on a screen the Lantern-Keeper forgot to clear.
+ */
+export function SetAside({ onClose, label = 'set aside' }: { onClose: () => void; label?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClose}
+      className="absolute rounded-full inline-flex items-center justify-center gap-1.5 px-3"
+      style={{
+        ...body,
+        top: 'calc(10px + env(safe-area-inset-top))',
+        right: 'calc(10px + env(safe-area-inset-right))',
+        minHeight: 44,
+        fontSize: 12,
+        fontWeight: 600,
+        color: C.faint,
+        background: `${C.nightDeep}E6`,
+        border: `1px solid ${C.panelEdge}`,
+        cursor: 'pointer',
+        zIndex: 5,
+      }}
+    >
+      {label} <Icon name="cross" size={13} />
+    </button>
+  )
+}
+
 export type BtnTone = 'night' | 'paper'
 
 /** Ink-on-cream button colours (mirrors the --btn-* vars theme.css sets under .paper). Disabled = slate ink ≥5:1 on cream. */

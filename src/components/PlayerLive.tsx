@@ -11,7 +11,7 @@ import type { Bargain, Encounter, FinaleEvent, Handout, RaceEvent, VitalsEvent, 
 import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
 import { Wheel } from './Wheel'
-import { C, body, display, eyebrow, goldAction, numerals } from './ui'
+import { C, SetAside, body, display, eyebrow, goldAction, numerals, phoneSafe } from './ui'
 import { Icon, Spark } from './icons'
 
 const RACE_GOAL = 40
@@ -78,6 +78,11 @@ export function PlayerLive({
   const [race, setRace] = useState<PlayerRace | null>(null)
   const [wheel, setWheel] = useState<WheelEvent | null>(null)
   const [game, setGame] = useState<GameState | null>(null)
+  // Which wheel / race / game the player has waved away. Keyed on the id so
+  // the next one the Lantern-Keeper starts always comes back up on its own.
+  const [asideWheel, setAsideWheel] = useState<string | null>(null)
+  const [asideRace, setAsideRace] = useState<string | null>(null)
+  const [asideGame, setAsideGame] = useState<string | null>(null)
   const [finale, setFinale] = useState<FinaleEvent | null>(null)
   const [offer, setOffer] = useState<Bargain | null>(null)
   const [ceremony, setCeremony] = useState<{ outcome: 'fulfilled' | 'broken'; title: string } | null>(null)
@@ -303,13 +308,14 @@ export function PlayerLive({
         <BargainCeremony outcome={ceremony.outcome} title={ceremony.title} onDone={() => setCeremony(null)} />
       )}
 
-      {wheel && (
+      {wheel && asideWheel !== wheel.wheelId && (
         <div
-          className="fixed inset-0 flex flex-col items-center justify-start p-6"
-          style={{ background: C.nightDeep, zIndex: 75, overflowY: 'auto' }}
+          className="fixed inset-0 flex flex-col items-center justify-start"
+          style={{ ...phoneSafe, background: C.nightDeep, zIndex: 75, overflowY: 'auto' }}
           role="dialog"
           aria-label="The Fortune Wheel"
         >
+          <SetAside onClose={() => setAsideWheel(wheel.wheelId)} />
           <p className="mt-4" style={{ ...eyebrow, letterSpacing: '0.25em' }}>
             The carnival presents
           </p>
@@ -358,9 +364,9 @@ export function PlayerLive({
         </div>
       )}
 
-      {game && (
+      {game && asideGame !== game.gameId && (
         <Suspense fallback={null}>
-          <GamePhoneOverlay state={game} me={playerName} send={sendGameInput} />
+          <GamePhoneOverlay state={game} me={playerName} send={sendGameInput} onSetAside={() => setAsideGame(game.gameId)} />
         </Suspense>
       )}
 
@@ -370,13 +376,14 @@ export function PlayerLive({
         </Suspense>
       )}
 
-      {race && (
+      {race && asideRace !== race.raceId && (
         <div
-          className="fixed inset-0 flex flex-col items-center justify-center p-6"
-          style={{ background: C.nightDeep, zIndex: 75 }}
+          className="fixed inset-0 flex flex-col items-center justify-center"
+          style={{ ...phoneSafe, background: C.nightDeep, zIndex: 75, overflowY: 'auto' }}
           role="dialog"
           aria-label="The Great Snail Derby"
         >
+          <SetAside onClose={() => setAsideRace(race.raceId)} />
           {race.phase === 'racing' ? (
             <>
               <p style={{ ...eyebrow, letterSpacing: '0.25em' }}>

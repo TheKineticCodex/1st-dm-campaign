@@ -4,20 +4,27 @@
 
 import type { GameInput, GameState } from '../../lib/games'
 import { GAME_TITLES } from '../../lib/games'
-import { C, display, eyebrow } from '../ui'
+import { C, SetAside, display, eyebrow, phoneSafe } from '../ui'
 import { DrawPhone, DrawStage } from './DrawGame'
 import { NotePhone, NoteStage } from './NoteGame'
 import { TollPhone, TollStage } from './TollGame'
 import { BargainPhone, BargainStage } from './BargainGame'
 
-export function GamePhoneOverlay({ state, me, send }: { state: GameState; me: string; send: (i: GameInput) => void }) {
+export function GamePhoneOverlay({ state, me, send, onSetAside }: {
+  state: GameState
+  me: string
+  send: (i: GameInput) => void
+  /** A game the stall-keeper forgot to close must not strand a phone. */
+  onSetAside?: () => void
+}) {
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-start p-5"
-      style={{ background: `${C.nightDeep}FC`, zIndex: 76, overflowY: 'auto' }}
+      className="fixed inset-0 flex flex-col items-center justify-start"
+      style={{ ...phoneSafe, background: `${C.nightDeep}FC`, zIndex: 76, overflowY: 'auto' }}
       role="dialog"
       aria-label={GAME_TITLES[state.kind]}
     >
+      {onSetAside && <SetAside onClose={onSetAside} />}
       <p className="mt-3" style={{ ...eyebrow }}>
         The carnival presents
       </p>

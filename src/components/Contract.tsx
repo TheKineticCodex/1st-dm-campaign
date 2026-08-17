@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react'
 import SignaturePad from 'signature_pad'
 import type { Bargain } from '../types'
 import { isCalm } from '../lib/storage'
-import { Btn, C, body, display, eyebrow } from './ui'
+import { Btn, C, body, display, eyebrow, phoneSafe } from './ui'
 import { Icon, Spark, SparkRule } from './icons'
 
 /** A brass-ink eyebrow set between two tiny sparks — labels ON PAPER only. */
@@ -68,8 +68,8 @@ export function ContractView({ bargain, onSign, onClose }: ContractViewProps) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto"
-      style={{ background: 'rgba(6, 12, 14, 0.9)', zIndex: 78 }}
+      className="fixed inset-0 flex items-center justify-center overflow-y-auto"
+      style={{ ...phoneSafe, background: 'rgba(6, 12, 14, 0.9)', zIndex: 78 }}
       role="dialog"
       aria-label={`Contract: ${bargain.title}`}
     >
@@ -213,8 +213,8 @@ export function BargainCeremony({ outcome, title, onDone }: { outcome: 'fulfille
   const calm = isCalm() || (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center p-8 text-center"
-      style={{ background: `${C.nightDeep}F5`, zIndex: 82 }}
+      className="fixed inset-0 flex flex-col items-center justify-center text-center"
+      style={{ ...phoneSafe, background: `${C.nightDeep}F5`, zIndex: 82 }}
       role="status"
     >
       <div style={{ position: 'relative' }}>
