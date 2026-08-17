@@ -50,6 +50,57 @@ export const MOON_CLOCK = [
   'Finale — "The moon fills the sky. The Sea is standing up on its hind legs to reach her."',
 ]
 
+/**
+ * WHY ANY OF IT WORKS — the lens, not new content. Nothing here is ever
+ * said in-world by anybody. It is here so that when a player asks a hard
+ * question you answer it the same way every time. See eclipse.ts for the
+ * one place the two unpriceable things in the sky ever come up.
+ */
+export const THE_HIDDEN_LOGIC: CheatCard[] = [
+  {
+    title: '🤫 The physics — for you, never for them',
+    lines: [
+      'A song is not a thing. It is a WAVE — a movement through a medium — and the medium is everybody who loves it. That is the engine of this entire campaign, and no character in it will ever say the word.',
+      'Which is why they cannot take one. A wave is not in any one place, so there is nothing to pick up. All they can do is find the loudest part of it and get that part to say yes.',
+      'THEIR CRIME, in one image: they put waves in jars. In a jar it still hums — it just never reaches anybody. That is exactly what "something that no longer knows itself" means, on every shelf Below.',
+      'It is why every keeper is broken the same way. Hush has the words and no sound. Hum has the sound and no words. Grey-Gill opens her mouth and only bubbles come out. Three broken transmitters in a row was never a coincidence, and you never point it out.',
+      'It is why the ending is five people singing at once and not one hero with a key. Five sources, one medium, and the thing arrives whole.',
+      'And it is why nobody has ever priced sunlight, or the pull of the Moon, or the tide: nobody holds them. That is the only place the two Freyas’ names mean anything at all — see the thing with no name.',
+    ],
+  },
+  {
+    title: '🤫 The one line under all of it',
+    lines: [
+      'YOU CAN ONLY SELL WHAT YOU HOLD ALONE.',
+      'The Sea held its song alone — or thought it did. It was wrong, and that mistake is the crack in the promise, and the crack is the whole win.',
+      'Say none of this to anyone. The words allowed at the table are hum, pull, lean, reach. Never wave, never explain. Show two pieces lean toward each other once, and stop.',
+    ],
+  },
+]
+
+/** The words, spelled and used the same way every single time. */
+export const THE_WORDS: CheatCard[] = [
+  {
+    title: '📖 The four words — never mix them up mid-scene',
+    lines: [
+      'BELOW is the PLACE. A market in the dark where the selves of things sit humming on shelves.',
+      'THE ONES BELOW are the PEOPLE. Capital O, capital B. This is the only name the players ever hear for them.',
+      'THE FAIR is their SHOPFRONT — the travelling one. Same firm, different premises. The table is meant to work out that the Fair belongs to the Ones Below; DO NOT hand it to them. It lands at the Midway, on the crates.',
+      'THE BUYER is the ONE FACE. The only one who can take a yes. Everyone else Below is a keeper who owes him rent. The players may hear his name from Act 2 on; they do not see him until the roads.',
+      'And THE APPRAISER sets the prices. Three jobs, three people: he prices, the Buyer buys, the keepers keep. If you only remember one line, remember that one.',
+    ],
+  },
+  {
+    title: '📖 The three keepers — one road each',
+    lines: [
+      'THE JAR-WOMAN — the Bog. Voices in green jars, shelves to the ceiling, four payments behind on her rent. She will deal.',
+      'THE MIRROR-MAN — the Hall. Everyone’s finest hour on loop. Believes keeping is love: "In here, nothing is ever lost."',
+      'THE MARKET-MOTHER — the drowned market. Sells "one scale, for sentiment," smiling. Beat her by the rules and never kill her — kill her and the sale defaults to the Buyer.',
+      'None of the three is the villain, and all three are frightened of the same man. Play them tired.',
+    ],
+  },
+]
+
 /** The only rules the players ever need. Say them out loud when asked. */
 export const THREE_RULES = [
   'They never take. They get you to say yes.',

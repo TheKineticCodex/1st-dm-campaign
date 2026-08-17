@@ -135,7 +135,7 @@ export const RUN_CAST: { who: string; line: string; where: string }[] = [
   { who: 'Grandmother Grey-Gill', line: 'Old gills under a shawl. Sold her own NAME for her tent — bubbles when she tries to say who has it. Reads confessions back as prophecy.', where: 'Her tent' },
   { who: 'The carousel operator', line: 'Hums the Sea\'s song with a hole in it, weeps, notices neither. The organ IS the taken song.', where: 'The Missing Note' },
   { who: 'The Appraiser', line: 'Absent — a coat on a hook. "He\'s out. Appraising." Priced things ashore.', where: 'A closed tent' },
-  { who: 'The jar-woman', line: 'Keeper of the Bog. Voices in green jars. Behind on her rent to the Buyer — will deal.', where: 'Bog road' },
+  { who: 'The jar-woman', line: 'Keeper of the Bog. Voices in green jars. Behind on her rent to the Buyer — will deal. All three keepers say his name out loud; whichever road they walk first is where the players learn it.', where: 'Bog road' },
   { who: 'The mirror-man', line: 'Keeper of the Hall. Everyone\'s best moment on loop. Believes keeping is love: "In here, nothing is ever lost."', where: 'Mirror road' },
   { who: 'The market-mother', line: 'Keeper of the drowned market. Sells "one scale, for sentiment," smiling. Must be beaten by the rules — never killed.', where: 'Under-Sea road' },
   { who: 'The Buyer', line: 'The one face. Courteous, punctual, unseen until the roads. Never lies. Glimpsed at each road\'s climax; speaks once, over tea.', where: 'Every climax · the tea' },

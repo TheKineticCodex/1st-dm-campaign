@@ -3,6 +3,7 @@
 // and one-tap cues. Keyed by the beat titles seeded in the live timeline.
 
 import type { SceneId } from '../lib/ambience'
+import { BILLY, FREYA, FREYA_MOON, PEACHES, PHILIP } from './campaign'
 
 export interface SceneCue {
   label: string
@@ -32,12 +33,6 @@ export interface SceneGuide {
   /** The room under the scene — an ambience bed (lib/ambience.ts). One tap sets it. */
   ambience?: SceneId
 }
-
-const PEACHES = 'Peaches capiche'
-const BILLY = 'William Blackwood'
-const PHILIP = 'Philip'
-const FREYA = 'Freya'
-const FREYA_MOON = 'Freya Moon'
 
 export const ACT1_SCENES: Record<string, SceneGuide> = {
   'Talent Night at the Dry Anchor': {
@@ -405,7 +400,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: FREYA,
           title: 'Grey-Gill reads your blades',
-          body: '“Two swords, and daggers besides — armor worn on the outside so nobody checks for the wound underneath. You told the lanterns you would risk everything so your people never suffer what you suffered. The ones Below heard that too, love. They will never come for you. They will come for your list.”',
+          body: '“Two swords, and daggers besides — armor worn on the outside so nobody checks for the wound underneath. You told the lanterns you would risk everything so your people never suffer what you suffered. The Ones Below heard that too, love. They will never come for you. They will come for your list.”',
         },
       },
       {
@@ -602,7 +597,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       'The jar-woman is behind on her rent to the Buyer. She hates him and fears him more; she will deal. A jarred PIECE OF THE SEA’S SONG is in the room. THE PROOF: bring Peaches near it and the jar hums back and unlatches on its own. Show it. Never explain it.',
     doors: {
       fight: 'Every broken jar frees something grieving. Winning loses the guide.',
-      talk: 'She names the barge’s hour for a kindness: carry her sister’s laugh somewhere safe.',
+      talk: 'She names the barge’s hour for a kindness: carry her sister’s laugh somewhere safe. THE NAME ARRIVES HERE if the Bog is their first road — say it tired, not ominous, the way anyone says the name of the man they owe: “The Buyer comes on the hour. I am four payments behind. You have never met him and I would keep it that way, only you won’t.”',
       sneak: 'The ledger under the mattress: ONE PIECE OF THE SEA’S SONG — jarred, awaiting collection.',
       bargain: 'Quill: the piece-jar for taking on ONE rent payment. The fine print does not say whose.',
       insane: 'Opening the piece-jar: it sings itself home to Peaches — forever audible. Beautiful; also a beacon.',
@@ -651,7 +646,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       'Kept moments. One mirror: Wren mid-laugh. One covered: Billy, unsmiling — PENDING. One loops the day PHILIP chose not to kill — already priced. And somewhere in this hall Billy reaches for the chain on his book and it is EMPTY. Do not announce it. Let him find it.',
     doors: {
       fight: 'A performance with no performer — Billy’s shape, gestures perfect, face absent. A genuinely honest sentence from Billy staggers it.',
-      talk: 'Mirrors answer with their one moment. Watched in sequence, Wren’s mirrors teach.',
+      talk: 'Mirrors answer with their one moment. Watched in sequence, Wren’s mirrors teach. THE NAME ARRIVES HERE if the Hall is their first road — proudly, a man name-dropping his landlord: “Every piece you see is on loan from the Buyer. I only keep it beautifully.”',
       sneak: 'The mirror-man’s catalog: WREN, FINAL VOLUME — IN TRANSIT. The book is HERE.',
       bargain: 'Reflections for memories.',
       insane: 'Breaking one frees its moment forever — its owner, wherever they are, feels it return.',
@@ -712,7 +707,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: null,
           title: 'Something got out',
-          body: 'A laugh — a real one, warm and a little rude — rolls through the Hall like weather. Every mirror ripples like water. Somewhere, a curator drops his pen. (Level 3.)',
+          body: 'A laugh — a real one, warm and a little rude — rolls through the Hall like weather. Every mirror ripples like water. Somewhere out of sight, somebody with a ledger drops his pen. (Level 3.)',
         },
       },
       { label: '✨ The laugh reassembles', kind: 'sfx', sfx: 'sparkle' },
@@ -747,7 +742,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       'Breathing toll: one small truth spoken into the water per traveler. Peaches breathes free. Freya Moon’s pendant WARMS the deeper they go — she is the compass now. Drowned commuters gossip: “the tail lot,” not looking at Peaches.',
     doors: {
       fight: 'Market security escorts, not executioners — they grapple, never kill.',
-      talk: 'Drowned commuters: a sale tonight. “The tail lot.” And a smaller lot: “grove-cut, one spring.”',
+      talk: 'Drowned commuters: a sale tonight. “The tail lot.” And a smaller lot: “grove-cut, one spring.” THE NAME ARRIVES HERE if the water is their first road — a commuter, bored, checking a list and not looking up: “Buyer’s in tonight. He always is, for a tail.”',
       sneak: 'The back-current bypasses security (group Stealth; failure = surrounded start).',
       bargain: 'Lantern-jellies rented “for a hum.” Peaches’ hum makes them burst into harmony.',
       insane: 'Peaches announces herself: skip to the sale, on their terms. Allowed!',
@@ -840,7 +835,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
     readAloud:
       'The moon fills the sky. The Sea is standing up on its hind legs to reach her. Every lantern in the Fair is lit, and the biggest stage is empty, and everyone you ever freed is standing behind you.',
     truth:
-      'THE FINALE. The Twins read the five Gate answers, in the players’ own words. Then all five sing — described, not performed — each their own song; five songs, one chord. The Sea remembers her. Dawn: the tide comes home up Saltmere harbor; the chapel bell rings alone; the horizon steps back eleven feet. THEN FIVE DOORS. Ask each player, in turn: “The tide is in. Where do you go?” If Peaches chooses the water, Pookie speaks, once: “She sang to me first.”',
+      'THE FINALE. The Twins read the five Gate answers, in the players’ own words. Then all five sing — described, not performed — each their own song; five songs, one chord. The Sea remembers her. Dawn: the tide comes home up Saltmere harbor; the chapel bell rings alone; the horizon steps back eleven feet. THEN FIVE DOORS. Ask each player, in turn: “The tide is in. Where do you go?” If Peaches chooses the water, Pookie speaks, once: “She sang to me first.” THE LAST ALIGNMENT IS SCRIPTED HERE (Cheat → a Freya called Sun, a Freya called Moon) — fire it whether or not the number ever came up, and let a player read the one name still priced.',
     doors: {
       fight: 'The Ones Below make it FEEL like a battle. It is not one. Nothing here can be fought.',
       talk: 'The Buyer, one last time, courteous: “You could keep it all as it is. Nothing lost. Nothing changed.” Let them answer.',
@@ -855,6 +850,18 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
       { label: '🐊 Pookie hums (if she chooses the water)', kind: 'song', song: 'pookie' },
       { label: '🌊 The Sea rises', kind: 'sfx', sfx: 'ocean' },
       { label: '🔔 The chapel bell, alone', kind: 'sfx', sfx: 'bell' },
+      {
+        // The thing with no name, last time, scripted. Never name it — not
+        // in the label the DM reads, and certainly not on a phone.
+        label: '🌑 ALL: every light goes out (the last one — scripted)',
+        kind: 'whisper',
+        whisper: {
+          target: null,
+          title: 'Every light goes out, and it does not get dark',
+          body: 'Two round things slide across one another over the harbour, and where they do not quite fit there is a ring of white fire. Everything on the ground has two shadows. And every price in the world has gone blank at once — except one, out on the empty stage, hanging on nothing, with a name written on it.',
+          ephemeral: true,
+        },
+      },
       {
         label: '✉ ALL: the song, whole',
         kind: 'whisper',

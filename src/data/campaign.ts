@@ -11,3 +11,15 @@ const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'sev
 
 /** 'five' for 5, falling back to digits past eight. */
 export const partyWord = NUMBER_WORDS[PARTY_SIZE] ?? String(PARTY_SIZE)
+
+/**
+ * The five seats, by the exact name each player joined with. A sealed
+ * whisper finds a phone by name and nothing else, so these strings are the
+ * contract between the Book and the table — spell them the way the Roster
+ * spells them, and change them in one place only.
+ */
+export const PEACHES = 'Peaches capiche'
+export const BILLY = 'William Blackwood'
+export const PHILIP = 'Philip'
+export const FREYA = 'Freya'
+export const FREYA_MOON = 'Freya Moon'

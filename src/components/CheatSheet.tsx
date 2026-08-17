@@ -10,11 +10,14 @@ import {
   WHY_HERE,
   WHY_THEY_CAME,
   THE_FIVE,
+  THE_HIDDEN_LOGIC,
+  THE_WORDS,
   THREE_RULES,
   TONIGHT_BEATS,
   WHO_IS_WHO,
   type CheatCard,
 } from '../data/cheatSheet'
+import { ECLIPSE_CARDS } from '../data/eclipse'
 import { C, Eyebrow, Fold, H, Section, display } from './ui'
 import { Icon, Spark } from './icons'
 
@@ -71,6 +74,12 @@ export function CheatSheet() {
         </div>
       </Section>
 
+      <Eyebrow>The words — spell them the same way every time</Eyebrow>
+      <CardList prefix="words" cards={THE_WORDS} />
+
+      <Eyebrow>Never read aloud — the why, for you only</Eyebrow>
+      <CardList prefix="logic" cards={THE_HIDDEN_LOGIC} />
+
       <Fold id="cheat:moon" title="🌙 The Moon clock — read one line at every session's open">
         <ul className="space-y-2">
           {MOON_CLOCK.map((line, i) => (
@@ -83,6 +92,9 @@ export function CheatSheet() {
           No rules. Bigger and wronger every time. They'll feel the clock without you counting.
         </p>
       </Fold>
+
+      <Eyebrow>A Freya called Sun, a Freya called Moon</Eyebrow>
+      <CardList prefix="eclipse" cards={ECLIPSE_CARDS} />
 
       <Eyebrow>Tonight — the carnival</Eyebrow>
       <CardList prefix="beat" cards={TONIGHT_BEATS} defaultOpen />

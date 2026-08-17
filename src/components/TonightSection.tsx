@@ -5,11 +5,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { ACT1_SCENES, type SceneCue } from '../data/act1Scenes'
 import { DM_BASICS, SESSION1_RUN_SHEET } from '../data/dmBasics'
+import {
+  ECLIPSE_MAX,
+  ECLIPSE_TEST,
+  ECLIPSE_WHISPER,
+  beatFor,
+  openTheNight,
+  spent,
+  theRoll,
+  whoseTurn,
+  type EclipseState,
+} from '../data/eclipse'
 import { seedStory } from '../data/storySeeds'
 import { WONDER } from '../data/wonder'
 import { computeSheet } from '../lib/compute'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
+import { readCache, writeCache } from '../lib/storage'
 import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
 import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
 import type { RosterEntry, Store } from '../lib/store'
@@ -578,6 +590,175 @@ function RunNight({
           )}
         </div>
       </div>
+
+      <TheThingWithNoName store={store} channelRef={channelRef} note={note} />
+    </div>
+  )
+}
+
+// ------------------------------------------------- the thing with no name
+
+/**
+ * The Alignment. A Freya called Sun, a Freya called Moon, and somebody in
+ * the middle — and once in a while the sky agrees with the arrangement.
+ * Tonight's number, one roll behind the screen, and the words to read.
+ *
+ * The word for it is never on this screen, because a player will glance at
+ * the iPad. See src/data/eclipse.ts for every rule this panel obeys.
+ */
+const ECLIPSE_KEY = 'eclipse'
+
+function TheThingWithNoName({
+  store,
+  channelRef,
+  note,
+}: {
+  store: Store
+  channelRef: { current: TableChannel | null }
+  note: (msg: string) => void
+}) {
+  const [state, setState] = useState<EclipseState | null>(null)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const notes = await store.listSessionNotes()
+      if (cancelled) return
+      const played = notes.map((n) => n.sessionNumber)
+      const night = (played.length ? Math.max(...played) : 0) + 1
+      const next = openTheNight(readCache<EclipseState>(ECLIPSE_KEY), night)
+      writeCache(ECLIPSE_KEY, next)
+      setState(next)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [store])
+
+  if (!state) return null
+
+  const save = (next: EclipseState) => {
+    writeCache(ECLIPSE_KEY, next)
+    setState(next)
+  }
+
+  // Before the roll these describe what WOULD happen; after it fires tonight
+  // they describe what just did.
+  const behind = state.firedTonight ? state.fired - 1 : state.fired
+  const beat = beatFor(behind)
+  const shadow = whoseTurn({ ...state, fired: behind })
+  const done = spent(state)
+  const missed = state.lastRoll !== null && !state.firedTonight
+
+  const sealIt = () => {
+    if (!shadow) return
+    const h: Handout = {
+      id: crypto.randomUUID(),
+      target: shadow.target,
+      title: ECLIPSE_WHISPER.title,
+      body: ECLIPSE_WHISPER.body,
+      ephemeral: true,
+      sentAt: new Date().toISOString(),
+    }
+    void store.sendHandout(h)
+    channelRef.current?.sendHandout(h)
+    note(`Sealed to ${shadow.who} ✦`)
+  }
+
+  return (
+    <div className="rounded-xl p-4 mt-3" style={panelSurface}>
+      <div className="flex items-baseline justify-between gap-3">
+        <Eyebrow>🌑 the thing with no name</Eyebrow>
+        <p style={{ ...display, ...numerals, fontSize: 22, fontWeight: 700, color: done ? C.faint : C.gold, whiteSpace: 'nowrap' }}>
+          {done ? '—' : `${state.number}+`}
+        </p>
+      </div>
+      <p className="text-xs" style={{ color: C.faint }}>
+        {state.fired} of {ECLIPSE_MAX} ·{' '}
+        {state.firedTonight
+          ? 'that was tonight’s — one a night'
+          : done
+            ? 'nothing left to roll'
+            : `roll ${state.number} or higher`}{' '}
+        · never say what it is
+      </p>
+
+      {!done && (
+        <>
+          <p className="text-sm mt-2" style={{ color: C.parchment }}>
+            Sun steps in front of an offer · Moon reaches for something taken · somebody who is not
+            a Freya stands between them · <span style={{ color: C.sea }}>and nobody planned it</span>.
+          </p>
+          <div className="flex flex-wrap gap-2 items-center mt-2">
+            <Btn secondary onClick={() => save(theRoll(state, 1 + Math.floor(Math.random() * 20)))}>
+              <Icon name="die" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+              roll it behind the screen
+            </Btn>
+            {missed && (
+              <span className="text-sm" style={{ ...numerals, color: C.faint }}>
+                {state.lastRoll}. Not tonight.
+              </span>
+            )}
+          </div>
+        </>
+      )}
+
+      {state.firedTonight && (
+        <div className="rounded-lg p-3 mt-3" style={{ ...wellSurface, borderLeft: `3px solid ${C.gold}` }}>
+          <p style={{ ...eyebrow, color: C.gold }}>
+            {state.lastRoll} · {beat.name}
+            {shadow && <span style={{ color: C.sea }}> · the shadow falls on {shadow.who}</span>}
+          </p>
+          <p className="mt-2 leading-relaxed" style={{ color: C.gold, fontStyle: 'italic', fontSize: 19, lineHeight: 1.65 }}>
+            “{beat.readAloud}”
+          </p>
+          <p className="text-sm mt-3" style={{ color: C.parchment }}>
+            <span style={{ ...eyebrow, color: C.sea }}>then · </span>
+            {beat.thenWhat}
+          </p>
+          <p className="text-sm mt-2 italic" style={{ color: C.faint }}>
+            {beat.comic}
+          </p>
+          <p className="text-xs mt-2" style={{ color: C.faint }}>
+            The two who caused it are the only two who do not see it. Everyone else describes it to
+            them afterwards, badly.
+          </p>
+          {shadow && (
+            <div className="mt-2">
+              <Btn secondary onClick={sealIt}>
+                <Icon name="envelope" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+                seal it to {shadow.who}
+              </Btn>
+            </div>
+          )}
+        </div>
+      )}
+
+      {done && !state.firedTonight && (
+        <p className="text-sm mt-2" style={{ color: C.faint }}>
+          Three is the lot. The last one is the Moon-Night, and it is already written.
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="text-xs mt-2"
+        style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', minHeight: 36, padding: 0, textDecoration: 'underline' }}
+      >
+        {open ? 'hide the three things' : 'the three things that have to be true'}
+      </button>
+      {open && (
+        <ul className="mt-1 space-y-1">
+          {ECLIPSE_TEST.map((line, i) => (
+            <li key={i} className="text-xs flex items-start gap-2" style={{ color: C.parchment }}>
+              <Spark size={10} style={{ color: C.sea, marginTop: 5, flexShrink: 0 }} />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

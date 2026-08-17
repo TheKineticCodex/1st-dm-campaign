@@ -9,6 +9,7 @@
 // Canon: campaign/the-story.md, src/data/runbook.ts, src/data/act1Scenes.ts.
 // Monster numbers are SRD 5.2 from memory; glance once before the night.
 
+import { ECLIPSE_NUDGE } from './eclipse'
 import type { Foe } from './runbook'
 
 export interface PathDoor {
@@ -215,6 +216,7 @@ export const NIGHT_PATH: Night = {
         { if: 'They try to buy something', then: 'Anything can be bought — for teeth, memories, birthdays. Anything serious gets the quill and a contract.' },
         { if: 'They ask a stall-keeper their name', then: 'A long pause. "…I’ll have it back on Tuesday." Then a smile, and business as usual.' },
         { if: 'They look for a price tag', then: 'There are none. There is a sign: WE NEVER CHARGE COIN.' },
+        ECLIPSE_NUDGE,
       ],
       lands: [{ who: 'Billy', note: 'The page is his mentor’s handwriting, and the ink looks recent.' }],
       exit: '→ Grandmother Grey-Gill’s Tent',
@@ -244,6 +246,7 @@ export const NIGHT_PATH: Night = {
         { if: 'They ask about the carousel', then: '"Don’t hum along, dear." She does not explain, and she will not repeat it.' },
         { if: 'They ask about the Twins', then: '"They keep the books. They don’t make the prices."' },
         { if: 'Billy asks about his name', then: 'She looks at him for a long moment. "You and I should not talk about that in here." Don’t say the shared wound aloud.' },
+        ECLIPSE_NUDGE,
       ],
       lands: [
         { who: 'Peaches', note: 'She is recognised the moment she walks in.' },
@@ -276,6 +279,7 @@ export const NIGHT_PATH: Night = {
         { if: 'They ask the operator his name', then: 'He has to think about it. That should be enough.' },
         { if: 'They search for the missing note in the machine', then: 'There is a gap in the pin-drum exactly one note wide, and the wood around it is worn smooth by something being taken out often.' },
         { if: 'Freya Moon is near', then: 'Her pendant stirs for the first time. Say only that.' },
+        ECLIPSE_NUDGE,
       ],
       lands: [
         { who: 'Peaches', note: 'Her choice. Whatever she does, the lanterns know now.' },
