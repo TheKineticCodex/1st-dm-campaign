@@ -222,10 +222,12 @@ function CueRow({ store, roster, cues, ambience, note }: {
   )
 }
 
-export function NightPath({ store, roster, onGo }: {
+export function NightPath({ store, roster, onGo, onWalked }: {
   store: Store
   roster: RosterEntry[]
   onGo?: (section: string) => void
+  /** True once any door has been tapped. The rhyme above us steps aside on it. */
+  onWalked?: (walked: boolean) => void
 }) {
   const [p, setP] = useState<NightProgress>(() => readNightProgress())
   const [said, setSaid] = useState<string | null>(null)
@@ -233,6 +235,7 @@ export function NightPath({ store, roster, onGo }: {
   const save = (next: NightProgress) => {
     setP(next)
     writeNightProgress(next)
+    onWalked?.(Object.keys(next.took).length > 0)
   }
 
   const note = (m: string) => {

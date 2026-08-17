@@ -25,6 +25,7 @@ import { CheatSheet } from './CheatSheet'
 import { RunbookSection } from './RunbookSection'
 import { BeforeTheLanterns } from './BeforeTheLanterns'
 import { NightPath } from './NightPath'
+import { TheRhyme } from './TheRhyme'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
 import { PartyStrip, RunNight, StoryTimeline, TheThingWithNoName } from './TonightSection'
@@ -331,10 +332,13 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
  * every checkpoint.
  */
 function TonightTab({ store, roster, onGo }: { store: Store; roster: RosterEntry[]; onGo: (s: string) => void }) {
-  const started = Object.keys(readNightProgress().took).length > 0
+  // The progress lives in a cache, and a cache cannot tell anybody it changed,
+  // so the path reports up when a door is tapped.
+  const [started, setStarted] = useState(() => Object.keys(readNightProgress().took).length > 0)
   return (
     <div style={{ animation: 'cardRise .4s ease-out' }}>
-      <NightPath store={store} roster={roster} onGo={onGo} />
+      <TheRhyme store={store} started={started} />
+      <NightPath store={store} roster={roster} onGo={onGo} onWalked={setStarted} />
 
       <Fold id="tonight-align" title="🌕 A Freya called Sun, a Freya called Moon">
         <TheThingWithNoName store={store} />
