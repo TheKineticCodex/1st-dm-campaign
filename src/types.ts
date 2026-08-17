@@ -307,12 +307,28 @@ export interface StageFog {
   reveals: { x: number; y: number; r: number }[]
 }
 
+/** Something held up to the table: Hush's slate, a rule for a fight. */
+export interface StageCard {
+  id: string
+  kind: 'slate' | 'note' | 'gates'
+  /** Already-vetted words. Never assembled from campaign prose at runtime. */
+  lines: string[]
+}
+
 export interface StageState {
   mode: 'ambient' | 'map'
   mapUrl: string | null
   tokens: StageToken[]
   tint?: StageTint
   fog?: StageFog
+  /**
+   * The checkpoint they are standing on — an ID like 'greygill', never prose.
+   * The stage looks the place up in its own copy of the night, so no DM-only
+   * sentence can ever cross the wire by accident.
+   */
+  at?: string | null
+  /** Held up over whatever else is on the glass. */
+  card?: StageCard | null
 }
 
 /** The finale — the song, whole, on every phone at once. */

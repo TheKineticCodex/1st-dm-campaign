@@ -26,6 +26,8 @@ import { computeSheet } from '../lib/compute'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
 import { fireCue } from '../lib/cues'
+import { readNightProgress } from '../lib/night'
+import { cardsFor } from '../data/stageCards'
 import { readCache, writeCache } from '../lib/storage'
 import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
 import { isCarouselPlaying, playMissingNote, stopSong, subscribeSong, toggleCarousel } from '../lib/song'
@@ -961,6 +963,10 @@ export function StageControls({
   const [loaded, setLoaded] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [fogRadius, setFogRadius] = useState(0.14)
+  // Where the night is standing. The progress is a localStorage cache on this
+  // same laptop with nobody to notify, so it is re-read rather than subscribed.
+  const [at, setAt] = useState<string | null>(() => readNightProgress().at)
+  const sentAt = useRef<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const dragging = useRef<string | null>(null)
@@ -994,6 +1000,26 @@ export function StageControls({
     persistTimer.current = setTimeout(() => void store.saveStage(next), 800)
   }
 
+  useEffect(() => {
+    const t = setInterval(() => setAt(readNightProgress().at), 2000)
+    return () => clearInterval(t)
+  }, [])
+
+  // Tell the stage which room it is in — six times a night, not every two
+  // seconds. A new room also wipes whatever was held up for the last one.
+  useEffect(() => {
+    if (!loaded || !at || sentAt.current === at) return
+    sentAt.current = at
+    push({ ...stage, at, card: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [at, loaded])
+
+  useEffect(() => {
+    if (!loaded) return
+    if (!overlays?.fighting && stage.card?.kind === 'note') push({ ...stage, card: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overlays?.fighting, loaded])
+
   const summonParty = () => {
     const existing = new Set(stage.tokens.map((t) => t.id))
     const added: StageToken[] = roster
@@ -1020,21 +1046,26 @@ export function StageControls({
 
   // The stage renders the first of these that is true, so the readout has to
   // agree with StageScreen's own order or the Book would lie to him.
+  const held = stage.card
   const showing = overlays?.finale
     ? { what: 'The finale — the Moon', tone: C.gold }
     : overlays?.game
       ? { what: 'A carnival game', tone: C.gold }
+      : held && held.kind === 'slate'
+        ? { what: `The slate — ${held.lines.join(' ')}`, tone: C.parchment }
+        : held && held.kind === 'gates'
+          ? { what: 'Three lanterns, and no words', tone: C.parchment }
       : stage.mode === 'map' && stage.mapUrl
         ? { what: 'The battle map', tone: C.sea }
         : { what: 'The title screen', tone: C.faint }
-  const covered = !!(overlays?.finale || overlays?.game)
-  const anythingUp = covered || (stage.mode === 'map' && !!stage.mapUrl)
+  const covered = !!(overlays?.finale || overlays?.game || (held && held.kind !== 'note'))
+  const anythingUp = covered || !!held || (stage.mode === 'map' && !!stage.mapUrl)
 
   const backToTitle = () => {
     overlays?.clearFinale()
     overlays?.clearWheel()
     overlays?.clearGame()
-    push({ ...stage, mode: 'ambient' })
+    push({ ...stage, mode: 'ambient', card: null })
   }
 
   return (
@@ -1080,6 +1111,39 @@ export function StageControls({
           </Btn>
         )}
       </div>
+      {loaded && cardsFor(at, !!overlays?.fighting).length > 0 && (
+        <div className="mt-3">
+          <p style={{ ...eyebrow, color: C.brassDim }}>hold something up to them</p>
+          <div className="flex flex-wrap gap-2 mt-1.5">
+            {cardsFor(at, !!overlays?.fighting).map((d) => {
+              const up = stage.card?.id === d.card.id
+              return (
+                <button
+                  key={d.card.id}
+                  type="button"
+                  aria-pressed={up}
+                  onClick={() => push({ ...stage, card: up ? null : d.card })}
+                  className="rounded-lg px-3 py-2 text-sm"
+                  style={{ ...(up ? onState : chipOff), minHeight: 44, cursor: 'pointer' }}
+                >
+                  {d.chip}
+                </button>
+              )
+            })}
+            {stage.card && (
+              <button
+                type="button"
+                onClick={() => push({ ...stage, card: null })}
+                className="rounded-lg px-3 py-2 text-sm"
+                style={{ ...chipOff, color: C.faint, minHeight: 44, cursor: 'pointer' }}
+              >
+                wipe the screen
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Segmented control: lit, never a gold fill. */}
       <div className="flex gap-2 mt-2">
         <button

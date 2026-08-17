@@ -10,7 +10,9 @@ import { joinTableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import type { Encounter, FinaleEvent, StageState, VitalsEvent } from '../types'
 import type { GameState } from '../lib/games'
+import { NIGHT_PATH } from '../data/nightPath'
 import { AmbientMode } from './AmbientMode'
+import { StageCardView, cardCoversTheScreen } from './StageCardView'
 import { FogOverlay, InitiativeRail, StageTokenView, TintOverlay, activeTokenId, vitalsFor } from './Battlefield'
 import { GameStageBoard } from './games/GameShell'
 import { FinaleStage } from './Finale'
@@ -106,11 +108,30 @@ export function StageScreen({ store, roster, onClose, locked }: StageScreenProps
   }
 
   const rail = enc && enc.active && enc.order.length > 0 ? <InitiativeRail enc={enc} live={live} roster={roster} /> : null
+  // An id came over the wire; the room's name is looked up here, from the copy
+  // of the night this device already has. No prose ever crosses.
+  const place = stage.at ? (NIGHT_PATH.checkpoints.find((c) => c.id === stage.at)?.where ?? null) : null
+  const card = stage.card && Array.isArray(stage.card.lines) ? stage.card : null
+
+  if (card && cardCoversTheScreen(card)) {
+    return (
+      <div className="fixed inset-0" style={{ background: '#0A1012', zIndex: 90 }}>
+        <StageCardView card={card} />
+        {rail && (
+          <div className="fixed inset-0" style={{ zIndex: 93, pointerEvents: 'none' }}>
+            {rail}
+          </div>
+        )}
+        {closeButton}
+      </div>
+    )
+  }
 
   if (stage.mode !== 'map' || !stage.mapUrl) {
     return (
       <div>
-        <AmbientMode roster={roster} onClose={locked ? undefined : onClose} />
+        <AmbientMode roster={roster} onClose={locked ? undefined : onClose} place={place} />
+        {card && <StageCardView card={card} />}
         {rail && (
           <div className="fixed inset-0" style={{ zIndex: 91, pointerEvents: 'none' }}>
             {rail}
@@ -135,6 +156,7 @@ export function StageScreen({ store, roster, onClose, locked }: StageScreenProps
           ))}
         </div>
       </div>
+      {card && <StageCardView card={card} />}
       {activeRow && (
         <div className="absolute left-0 right-0 text-center" style={{ top: 'calc(12px + env(safe-area-inset-top))', pointerEvents: 'none', zIndex: 3 }} role="status">
           {/* the turn pill: ember, brass rim — lit, never a gold fill */}

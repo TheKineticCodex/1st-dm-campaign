@@ -12,6 +12,8 @@ interface AmbientModeProps {
   roster: RosterEntry[]
   /** Absent on the stage device: a stray elbow must not take the screen down. */
   onClose?: () => void
+  /** The room they are standing in. Resolved from an id by the stage. */
+  place?: string | null
 }
 
 const DRIFT_SPOTS = [
@@ -22,8 +24,10 @@ const DRIFT_SPOTS = [
   { left: '46%', top: '80%', dur: 33, delay: 6 },
 ]
 
-export function AmbientMode({ roster, onClose }: AmbientModeProps) {
-  const portraits = roster.filter((r) => r.character?.build.portraitUrl)
+export function AmbientMode({ roster, onClose, place }: AmbientModeProps) {
+  // Everyone with a character, not only everyone with a picture — a party of
+  // five with two portraits used to show two faces and look broken.
+  const portraits = roster.filter((r) => r.character)
 
   // On the DM's own screen the whole thing is a way back to the Book. On the
   // stage device there is no way back, so it is not a button at all — an
@@ -67,19 +71,35 @@ export function AmbientMode({ roster, onClose }: AmbientModeProps) {
               animationDelay: `${spot.delay}s`,
             }}
           >
-            <img
-              src={r.character!.build.portraitUrl}
-              alt=""
+            {r.character!.build.portraitUrl && (
+              <img
+                src={r.character!.build.portraitUrl}
+                alt=""
+                style={{
+                  width: 110,
+                  height: 110,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: `2px solid ${aura.color}`,
+                  boxShadow: `0 0 34px ${aura.color}66`,
+                  opacity: 0.85,
+                }}
+              />
+            )}
+            <span
+              className="block text-center"
               style={{
-                width: 110,
-                height: 110,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: `2px solid ${aura.color}`,
-                boxShadow: `0 0 34px ${aura.color}66`,
-                opacity: 0.85,
+                ...display,
+                fontSize: 30,
+                fontWeight: 600,
+                color: aura.color,
+                marginTop: r.character!.build.portraitUrl ? 10 : 0,
+                textShadow: '0 2px 12px rgba(6,12,14,0.9)',
+                whiteSpace: 'nowrap',
               }}
-            />
+            >
+              {r.character!.build.name || r.playerName}
+            </span>
           </span>
         )
       })}
@@ -93,9 +113,18 @@ export function AmbientMode({ roster, onClose }: AmbientModeProps) {
           <Lantern size={96} waves />
         </span>
         {/* the place-line — the Fair, and where it has docked */}
-        <span className="block uppercase mt-4" style={{ ...body, fontSize: 'clamp(12px, 1.2vw, 15px)', letterSpacing: '0.4em', color: C.brassDim, fontWeight: 600 }}>
-          The Getting Fair · Saltmere
-        </span>
+        {place ? (
+          <span
+            className="block mt-4 mx-auto"
+            style={{ ...body, fontSize: 'clamp(20px, 2.4vw, 28px)', letterSpacing: '0.14em', color: C.parchmentDeep, fontWeight: 600, maxWidth: '88%' }}
+          >
+            {place}
+          </span>
+        ) : (
+          <span className="block uppercase mt-4" style={{ ...body, fontSize: 'clamp(12px, 1.2vw, 15px)', letterSpacing: '0.4em', color: C.brassDim, fontWeight: 600 }}>
+            The Getting Fair · Saltmere
+          </span>
+        )}
         <span
           className="title-glow block mt-1"
           style={{ ...display, fontVariationSettings: "'opsz' 144", fontSize: 'clamp(40px, 7.5vw, 84px)', fontWeight: 700, color: C.gold, lineHeight: 1.05, letterSpacing: '-0.01em' }}
