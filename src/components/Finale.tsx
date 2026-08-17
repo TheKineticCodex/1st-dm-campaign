@@ -14,7 +14,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { armSong, playWhole } from '../lib/song'
 import type { FinaleEvent } from '../types'
-import { Btn, C, display } from './ui'
+import { Btn, C, display, goldAction, onState } from './ui'
+import { Icon } from './icons'
 
 // ------------------------------------------------------------ phone
 
@@ -48,7 +49,7 @@ export function FinalePhone({ event, me, send }: { event: FinaleEvent; me: strin
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-center p-8 text-center"
-      style={{ background: 'radial-gradient(ellipse at 50% 20%, #17123A 0%, #05040F 70%)', zIndex: 80, color: C.parchment }}
+      style={{ background: `radial-gradient(ellipse at 50% 20%, #10222A 0%, ${C.nightDeep} 70%)`, zIndex: 80, color: C.parchment }}
       role="dialog"
       aria-label="The finale"
     >
@@ -73,10 +74,10 @@ export function FinalePhone({ event, me, send }: { event: FinaleEvent; me: strin
           <button
             type="button"
             onClick={wake}
-            className="rounded-full mt-6"
-            style={{ ...display, fontSize: 22, fontWeight: 700, background: C.gold, color: C.ink, border: 'none', minHeight: 64, minWidth: 240, cursor: 'pointer', boxShadow: `0 0 30px ${C.gold}66` }}
+            className="rounded-full mt-6 inline-flex items-center justify-center gap-2"
+            style={{ ...display, fontSize: 22, fontWeight: 700, ...goldAction, minHeight: 64, minWidth: 240, cursor: 'pointer', boxShadow: `${goldAction.boxShadow}, 0 0 30px ${C.gold}66` }}
           >
-            ♪ wake it
+            <Icon name="note" size={22} /> wake it
           </button>
         </>
       )}
@@ -112,9 +113,9 @@ export function FinaleStage({ event }: { event: FinaleEvent }) {
     return () => clearTimeout(t)
   }, [event.phase, event.inMs, event.finaleId])
   return (
-    <div className="w-full h-full relative overflow-hidden stage-fx" style={{ background: 'radial-gradient(ellipse at 50% 110%, #1B2A4A 0%, #05040F 55%)' }}>
+    <div className="w-full h-full relative overflow-hidden stage-fx" style={{ background: `radial-gradient(ellipse at 50% 110%, #16333A 0%, ${C.nightDeep} 55%)` }}>
       {/* the sea, breathing */}
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '28%', background: 'linear-gradient(180deg, transparent, rgba(40,90,120,.35))' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '28%', background: 'linear-gradient(180deg, transparent, rgba(139,211,188,.22))' }} />
       {/* the moon */}
       <div
         aria-hidden="true"
@@ -177,10 +178,10 @@ export function FinalePanel({
     return (
       <div>
         <p className="text-sm" style={{ color: C.faint }}>
-          The Moon-Night. When all five sing, every phone sings with them — the whole song, the note in place, at once. Two steps, so it can never happen by accident: ready the phones (each player taps once to wake their phone’s voice), then sing it. Ringers on. Set the room to 🌕 first.
+          The Moon-Night. When all five sing, every phone sings with them — the whole song, the note in place, at once. Two steps, so it can never happen by accident: ready the phones (each player taps once to wake their phone’s voice), then sing it. Ringers on. Set the room to <Icon name="moonFull" size={14} style={{ verticalAlign: '-0.15em' }} /> first.
         </p>
         <Btn onClick={onArm} shimmer disabled={players.length === 0}>
-          🌕 Ready the phones
+          <Icon name="moonFull" size={18} style={{ marginRight: 6, verticalAlign: '-0.2em' }} />Ready the phones
         </Btn>
       </div>
     )
@@ -193,9 +194,10 @@ export function FinalePanel({
         {event.phase === 'start' ? (countdown ? `Singing in ${countdown}…` : 'The song, whole. ✦') : 'The phones are waking'}
       </p>
       <div className="flex flex-wrap gap-2 mt-2">
+        {/* awake phones are lit (ember), sleeping ones a hairline ring */}
         {players.map((p) => (
-          <span key={p} className="text-xs rounded-full px-2 py-1" style={{ border: `1px solid ${ready.has(p) ? C.gold : C.panelEdge}`, color: ready.has(p) ? C.gold : C.faint, background: ready.has(p) ? `${C.gold}1A` : 'transparent' }}>
-            {ready.has(p) ? '♪ ' : '· '}
+          <span key={p} className="text-xs rounded-full px-2 py-1 inline-flex items-center gap-1" style={{ ...(ready.has(p) ? onState : { border: `1px solid ${C.panelEdge}`, color: C.faint, background: 'transparent' }), minHeight: 28 }}>
+            {ready.has(p) ? <Icon name="note" size={12} /> : <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: '50%', border: `1px solid ${C.brassDim}`, display: 'inline-block' }} />}
             {p}
           </span>
         ))}
@@ -215,7 +217,7 @@ export function FinalePanel({
               }
             }}
           >
-            ✦ Sing it — in three
+            Sing it — in three ✦
           </Btn>
         )}
         <Btn secondary onClick={onClear}>

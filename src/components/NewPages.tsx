@@ -8,7 +8,8 @@
 // whenever the app returns to the foreground (the moment staleness bites).
 
 import { useEffect, useState } from 'react'
-import { C, display } from './ui'
+import { C, display, goldAction } from './ui'
+import { Spark } from './icons'
 
 const CHECK_MS = 4 * 60_000
 
@@ -61,23 +62,25 @@ export function NewPages() {
     <button
       type="button"
       onClick={() => location.reload()}
-      className="fixed left-1/2 rounded-full px-5 py-2.5"
+      className="fixed left-1/2 rounded-full px-5 py-2.5 inline-flex items-center gap-2"
       style={{
         ...display,
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + 84px)',
         transform: 'translateX(-50%)',
         zIndex: 90,
-        background: C.gold,
-        color: C.ink,
-        border: 'none',
-        fontSize: 16,
+        ...goldAction,
+        // the type gate: Fraunces never below 18px
+        fontSize: 18,
         fontWeight: 700,
-        boxShadow: `0 4px 24px ${C.gold}66`,
+        boxShadow: `inset 0 1px 0 rgba(255,245,215,0.7), inset 0 -2px 0 rgba(90,55,10,0.25), 0 6px 26px rgba(240,181,79,0.35)`,
+        maxWidth: 'calc(100vw - 32px)',
         minHeight: 44,
         cursor: 'pointer',
+        color: C.ink,
       }}
     >
-      ✦ The Book has new pages — tap to turn them
+      <Spark size={15} style={{ flexShrink: 0 }} />
+      <span>The Book has new pages — tap to turn them</span>
     </button>
   )
 }

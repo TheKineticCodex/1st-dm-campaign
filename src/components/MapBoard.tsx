@@ -6,7 +6,7 @@
 import { useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { readCache, writeCache } from '../lib/storage'
-import { Btn, C, Eyebrow } from './ui'
+import { Btn, C, Eyebrow, display } from './ui'
 
 interface Token {
   id: string
@@ -22,7 +22,7 @@ interface MapState {
   tokens: Token[]
 }
 
-const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#C96A6A', '#8BB8E0', '#A8C97F']
+const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', C.blood, '#8BB8E0', '#A8C97F']
 
 interface MapBoardProps {
   pcNames: string[]
@@ -69,7 +69,7 @@ export function MapBoard({ pcNames }: MapBoardProps) {
         {
           id: `foe-${crypto.randomUUID()}`,
           label: `E${n}`,
-          color: '#C96A6A',
+          color: C.blood,
           x: 0.5,
           y: 0.1,
         },
@@ -114,7 +114,7 @@ export function MapBoard({ pcNames }: MapBoardProps) {
             onPointerUp={() => (dragging.current = null)}
             onPointerLeave={() => (dragging.current = null)}
             className="relative w-full rounded-xl overflow-hidden select-none"
-            style={{ border: `1px solid ${C.panelEdge}`, touchAction: 'none' }}
+            style={{ background: C.nightDeep, border: `1px solid ${C.panelEdge}`, touchAction: 'none' }}
           >
             <img src={map.imageDataUrl} alt="Table map" className="w-full block" draggable={false} />
             {map.tokens.map((t) => (
@@ -137,10 +137,12 @@ export function MapBoard({ pcNames }: MapBoardProps) {
                   transform: 'translate(-50%, -50%)',
                   width: 44,
                   height: 44,
+                  ...display,
+                  fontSize: 15,
                   background: t.color,
                   color: C.ink,
-                  border: `2px solid ${C.night}`,
-                  boxShadow: '0 2px 10px rgba(0,0,0,.45)',
+                  border: `2px solid ${C.nightDeep}`,
+                  boxShadow: `0 2px 10px rgba(0,0,0,.45), 0 0 12px ${t.color}55`,
                   cursor: 'grab',
                   touchAction: 'none',
                 }}

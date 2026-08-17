@@ -6,9 +6,19 @@
 
 import { useState } from 'react'
 import { COINS, type BargainInput, type BargainState, type Coin } from '../../lib/games'
-import { C, display } from '../ui'
+import { C, display, goldAction, onState, panelSurface, seaLit, wellSurface } from '../ui'
+import { Icon, type IconName } from '../icons'
 
 const coinOf = (id: Coin) => COINS.find((c) => c.id === id) ?? COINS[0]
+/** The Buyer's coins, drawn — the data's emoji never reaches the screen. */
+const COIN_ICON: Record<Coin, IconName> = {
+  memory: 'sparkOutline',
+  name: 'quill',
+  promise: 'anchor',
+  favor: 'scales',
+  secret: 'hush',
+  song: 'note',
+}
 
 export function BargainPhone({ state, me, send }: { state: BargainState; me: string; send: (i: BargainInput) => void }) {
   const mine = state.bids.find((b) => b.by === me)
@@ -40,9 +50,9 @@ export function BargainPhone({ state, me, send }: { state: BargainState; me: str
                 onClick={() => setCoin(c.id)}
                 aria-pressed={coin === c.id}
                 className="rounded-lg px-2 py-2 text-xs"
-                style={{ background: coin === c.id ? `${C.gold}22` : C.night, border: `1px solid ${coin === c.id ? C.gold : C.panelEdge}`, color: C.parchment, minHeight: 56, cursor: 'pointer' }}
+                style={{ ...(coin === c.id ? onState : { ...panelSurface, color: C.parchment }), minHeight: 56, cursor: 'pointer' }}
               >
-                <span style={{ fontSize: 20, display: 'block' }}>{c.glyph}</span>
+                <Icon name={COIN_ICON[c.id]} size={20} style={{ display: 'block', margin: '0 auto 2px' }} />
                 {c.label}
               </button>
             ))}
@@ -52,9 +62,10 @@ export function BargainPhone({ state, me, send }: { state: BargainState; me: str
             onChange={(e) => setText(e.target.value)}
             rows={3}
             placeholder={`${coinOf(coin).label} — which one? Say it plainly.`}
-            className="w-full rounded-md px-3 py-2 mt-2"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${sent ? C.sea : C.panelEdge}` }}
+            className="w-full rounded-md px-3 py-2 mt-2 outline-none"
+            style={{ ...wellSurface, color: C.parchment, ...(sent ? { borderColor: C.sea } : null), resize: 'vertical' }}
           />
+          {/* the ONE brass action while the bid is open; sealed, it drops to a lit state */}
           <button
             type="button"
             onClick={() => {
@@ -62,10 +73,12 @@ export function BargainPhone({ state, me, send }: { state: BargainState; me: str
               send({ type: 'bid', coin, text })
               setSent(true)
             }}
-            className="w-full rounded-md py-3 mt-2"
-            style={{ ...display, fontWeight: 700, background: C.gold, color: C.ink, border: 'none', minHeight: 44, cursor: 'pointer' }}
+            aria-pressed={sent}
+            className="w-full rounded-md py-3 mt-2 inline-flex items-center justify-center gap-2"
+            style={{ ...display, fontSize: 18, fontWeight: 700, ...(sent ? onState : goldAction), minHeight: 44, cursor: 'pointer' }}
           >
-            {sent ? 'Sealed ⚖ (tap to change)' : 'Seal the bid ⚖'}
+            <Icon name="scales" size={16} />
+            {sent ? 'Sealed (tap to change)' : 'Seal the bid'}
           </button>
           <p className="text-xs mt-2" style={{ color: C.faint }}>
             {state.bids.length}/{state.players.length} sealed
@@ -87,8 +100,8 @@ export function BargainPhone({ state, me, send }: { state: BargainState; me: str
             const open = state.opened.includes(b.by)
             const taken = state.accepted === b.by
             return (
-              <div key={b.by} className="rounded-lg px-3 py-2 mb-2 flex items-start gap-3" style={{ background: C.panel, border: `1px solid ${taken ? C.gold : open ? C.sea : C.panelEdge}` }}>
-                <span style={{ fontSize: 22, color: taken ? C.gold : C.parchment }}>{coinOf(b.coin).glyph}</span>
+              <div key={b.by} className="rounded-lg px-3 py-2 mb-2 flex items-start gap-3" style={taken ? { ...onState } : open ? { ...seaLit } : { ...panelSurface, color: C.parchment }}>
+                <Icon name={COIN_ICON[b.coin]} size={22} style={{ color: taken ? C.goldHi : open ? C.sea : C.parchment, marginTop: 2 }} />
                 <div className="flex-1">
                   <p className="text-xs" style={{ color: C.faint }}>
                     {coinOf(b.coin).label}
@@ -99,7 +112,7 @@ export function BargainPhone({ state, me, send }: { state: BargainState; me: str
                       <p className="text-sm" style={{ color: C.parchment }}>
                         {b.text}
                       </p>
-                      <p className="text-xs" style={{ color: taken ? C.gold : C.sea }}>
+                      <p className="text-xs" style={{ color: taken ? C.goldHi : C.sea }}>
                         — {b.by}
                         {taken ? ' · taken' : ''}
                       </p>
@@ -143,14 +156,16 @@ export function BargainStage({ state }: { state: BargainState }) {
               style={{
                 width: 250,
                 minHeight: 150,
-                background: taken ? `${C.gold}22` : C.panel,
-                border: `2px solid ${taken ? C.gold : open ? C.sea : C.panelEdge}`,
-                boxShadow: taken ? `0 0 40px ${C.gold}66` : open ? `0 0 20px ${C.sea}44` : 'none',
+                ...(taken
+                  ? { ...onState, boxShadow: `${onState.boxShadow}, 0 0 40px rgba(240,181,79,0.3)` }
+                  : open
+                    ? { ...seaLit, boxShadow: `${seaLit.boxShadow}, 0 0 20px rgba(139,211,188,0.26)` }
+                    : { ...panelSurface, color: C.parchment }),
                 opacity: dim ? 0.55 : 1,
                 transition: 'all .4s ease',
               }}
             >
-              <p style={{ fontSize: 40, lineHeight: 1, color: taken ? C.gold : C.parchment }}>{coinOf(b.coin).glyph}</p>
+              <Icon name={COIN_ICON[b.coin]} size={40} style={{ color: taken ? C.goldHi : open ? C.sea : C.parchment }} />
               <p className="mt-1" style={{ ...display, fontSize: 20, color: C.parchment }}>
                 {coinOf(b.coin).label}
               </p>
@@ -159,7 +174,7 @@ export function BargainStage({ state }: { state: BargainState }) {
                   <p className="mt-2" style={{ color: C.parchment, fontSize: 17 }}>
                     {b.text}
                   </p>
-                  <p className="mt-1" style={{ ...display, fontSize: 20, color: taken ? C.gold : C.sea }}>
+                  <p className="mt-1" style={{ ...display, fontSize: 20, color: taken ? C.goldHi : C.sea }}>
                     — {b.by}
                     {taken ? ' · taken' : ''}
                   </p>

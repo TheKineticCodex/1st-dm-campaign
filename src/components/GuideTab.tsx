@@ -6,15 +6,17 @@ import { useMemo, useState } from 'react'
 import { GUIDE } from '../data/guide'
 import { CONDITIONS } from '../data/rules'
 import { ACTIONS, GLOSSARY, type RefEntry } from '../data/rulesRef'
-import { C, Eyebrow, H, display } from './ui'
+import { C, Eyebrow, H, display, eyebrow, onState, panelSurface, wellSurface } from './ui'
+import { Icon, type IconName } from './icons'
 
 type Tab = 'turn' | 'rules' | 'guide'
 
+/** Cost pills, in tokens: action = gold, bonus = the Sea, reaction = copper, movement = brass, free = faint. */
 const COST_COLOR: Record<string, string> = {
   action: C.gold,
   'bonus action': C.sea,
-  reaction: '#C08BE0',
-  movement: '#8BB8E0',
+  reaction: C.copper,
+  movement: C.brassDim,
   free: C.faint,
 }
 
@@ -43,7 +45,7 @@ export function GuideTab() {
   const card = (e: RefEntry & { group?: string }, key: string) => {
     const isOpen = open === key
     return (
-      <div key={key} className="rounded-lg mb-2 overflow-hidden" style={{ border: `1px solid ${isOpen ? C.gold : C.panelEdge}`, background: C.panel }}>
+      <div key={key} className="rounded-lg mb-2 overflow-hidden" style={{ ...panelSurface, ...(isOpen ? { borderColor: C.gold } : {}) }}>
         <button
           type="button"
           onClick={() => setOpen(isOpen ? null : key)}
@@ -54,7 +56,7 @@ export function GuideTab() {
           <span style={{ ...display, fontSize: 17, fontWeight: 600 }}>
             {e.name}
             {e.cost && (
-              <span className="text-xs ml-2 rounded-full px-2 align-middle" style={{ ...({} as object), fontFamily: 'inherit', fontWeight: 500, background: `${COST_COLOR[e.cost]}22`, color: COST_COLOR[e.cost], border: `1px solid ${COST_COLOR[e.cost]}55` }}>
+              <span className="text-xs ml-2 rounded-full px-2 align-middle" style={{ ...eyebrow, fontSize: 11, letterSpacing: '0.12em', color: COST_COLOR[e.cost], background: `linear-gradient(${COST_COLOR[e.cost]}1F, ${COST_COLOR[e.cost]}1F), ${C.nightDeep}`, border: `1px solid ${COST_COLOR[e.cost]}66`, padding: '1px 8px' }}>
                 {e.cost}
               </span>
             )}
@@ -64,7 +66,7 @@ export function GuideTab() {
               </span>
             )}
           </span>
-          <span style={{ color: C.gold }}>{isOpen ? '−' : '+'}</span>
+          <span aria-hidden="true" style={{ color: C.brassDim, fontSize: 18, lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
         </button>
         {isOpen && (
           <p className="px-4 pb-4 text-sm leading-relaxed" style={{ color: C.parchment, opacity: 0.92 }}>
@@ -75,22 +77,25 @@ export function GuideTab() {
     )
   }
 
-  const tabBtn = (id: Tab, label: string) => (
+  // segmented tabs: the active one is lit (ember), the rest sit on the panel
+  const tabBtn = (id: Tab, icon: IconName, label: string) => (
     <button
       type="button"
+      role="tab"
+      aria-selected={tab === id}
       onClick={() => {
         setTab(id)
         setOpen(null)
       }}
-      className="flex-1 rounded-md py-2 text-sm"
+      className="flex-1 rounded-md py-2 text-sm inline-flex items-center justify-center gap-1.5"
       style={{
-        background: tab === id ? C.gold : C.panel,
-        color: tab === id ? C.ink : C.faint,
-        border: `1px solid ${tab === id ? C.gold : C.panelEdge}`,
+        ...(tab === id ? onState : { ...panelSurface, color: C.faint }),
+        fontWeight: 600,
         minHeight: 44,
         cursor: 'pointer',
       }}
     >
+      <Icon name={icon} size={16} />
       {label}
     </button>
   )
@@ -109,7 +114,7 @@ export function GuideTab() {
         placeholder="Search anything — grapple, prone, concentration, cover…"
         aria-label="Search the rules"
         className="w-full rounded-lg px-3 py-2 mt-3 text-base"
-        style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+        style={{ ...wellSurface, color: C.parchment, minHeight: 44 }}
       />
 
       {results ? (
@@ -124,9 +129,9 @@ export function GuideTab() {
       ) : (
         <>
           <div className="flex gap-2 mt-3" role="tablist">
-            {tabBtn('turn', '⚔ Your turn')}
-            {tabBtn('rules', '📖 Rules')}
-            {tabBtn('guide', '🕯 Guide')}
+            {tabBtn('turn', 'play', 'Your turn')}
+            {tabBtn('rules', 'story', 'Rules')}
+            {tabBtn('guide', 'clues', 'Guide')}
           </div>
 
           {tab === 'turn' && (
@@ -141,11 +146,11 @@ export function GuideTab() {
 
           {tab === 'rules' && (
             <div className="mt-3">
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+              <p className="mb-1" style={{ ...eyebrow, color: C.sea }}>
                 conditions
               </p>
               {conditions.map((e) => card(e, `c-${e.name}`))}
-              <p className="text-xs uppercase tracking-widest mb-1 mt-4" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+              <p className="mb-1 mt-4" style={{ ...eyebrow, color: C.sea }}>
                 the words that come up
               </p>
               {GLOSSARY.map((e) => card(e, `g-${e.name}`))}

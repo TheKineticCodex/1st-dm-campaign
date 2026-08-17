@@ -8,7 +8,7 @@ const DmDashboard = lazy(() => import('./components/DmDashboard').then((m) => ({
 const TabShell = lazy(() => import('./components/TabShell').then((m) => ({ default: m.TabShell })))
 
 const Lighting = () => (
-  <p style={{ color: '#A89ED0', textAlign: 'center', marginTop: 80, fontFamily: "'Alegreya', Georgia, serif" }}>The lanterns are lighting…</p>
+  <p style={{ color: '#B3AA97', textAlign: 'center', marginTop: 80, fontFamily: "'Vollkorn', Georgia, serif" }}>The lanterns are lighting…</p>
 )
 
 initCalm()

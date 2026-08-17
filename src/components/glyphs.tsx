@@ -193,8 +193,8 @@ export const CLASS_SIGILS: Record<string, ReactNode> = {
 
 /** The light the lanterns see in you — aura choices for the medallion. */
 export const AURAS: Record<string, { color: string; name: string; word: string }> = {
-  lantern: { color: '#E8B84B', name: 'Lantern Gold', word: 'warmth that refuses to go out' },
-  seafoam: { color: '#7FD4C1', name: 'Seafoam', word: 'something the tide once loved' },
+  lantern: { color: '#F0B54F', name: 'Lantern Gold', word: 'warmth that refuses to go out' },
+  seafoam: { color: '#8BD3BC', name: 'Seafoam', word: 'something the tide once loved' },
   twilight: { color: '#C08BE0', name: 'Twilight Violet', word: 'a question the stars keep asking' },
   rose: { color: '#E08BA8', name: 'Briar Rose', word: 'sweetness with thorns in it' },
 }

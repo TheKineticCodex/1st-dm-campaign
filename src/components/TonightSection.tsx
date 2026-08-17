@@ -15,9 +15,25 @@ import { isCarouselPlaying, playFragment, playMissingNote, playWhole, stopSong, 
 import type { RosterEntry, Store } from '../lib/store'
 import type { Handout, Npc, StageState, StageToken, StoryNode } from '../types'
 import { FogOverlay, TINTS, TintOverlay } from './Battlefield'
-import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, Fold, H, TextArea, TextInput, bloodLit, body, display, eyebrow, goldAction, leftRule, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
+import { Icon, Spark, type IconName } from './icons'
 
-const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', '#C96A6A', '#8BB8E0']
+const TOKEN_COLORS = [C.sea, C.gold, '#C08BE0', '#E08BA8', C.blood, '#8BB8E0']
+
+/** A data label like "🔔 The Toll Bell" → drawn glyph + the words (never a colour emoji as UI). */
+function GlyphLabel({ text, size = 14, glyphColor, fallback }: { text: string; size?: number; glyphColor?: string; fallback?: IconName }) {
+  const [glyph, words] = splitLeadGlyph(text)
+  const name = glyph ?? fallback ?? null
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {name && <Icon name={name} size={size} style={{ color: glyphColor, flexShrink: 0 }} />}
+      <span>{words}</span>
+    </span>
+  )
+}
+
+/** A recessed chip: night-deep well when off, lit (ember/sea) when on. */
+const chipOff: React.CSSProperties = { ...wellSurface, color: C.parchment }
 
 const EMPTY_STAGE: StageState = { mode: 'ambient', mapUrl: null, tokens: [] }
 const FOG_SIZES: [number, string][] = [
@@ -52,19 +68,25 @@ export function TonightSection({
         <button
           type="button"
           onClick={() => setRunning(!running)}
-          className="rounded-lg px-5 py-2"
+          className="rounded-lg px-5 py-2 inline-flex items-center gap-2"
           style={{
             ...display,
-            fontSize: 17,
+            fontSize: 18,
             fontWeight: 600,
-            background: running ? C.panel : C.gold,
-            color: running ? C.faint : C.ink,
-            border: `1px solid ${running ? C.panelEdge : C.gold}`,
+            ...(running ? { ...panelSurface, color: C.parchment } : goldAction),
             minHeight: 44,
             cursor: 'pointer',
           }}
         >
-          {running ? '✎ back to planning' : '▶ Run the night'}
+          {running ? (
+            <>
+              <Icon name="quill" size={16} style={{ color: C.brassDim }} /> back to planning
+            </>
+          ) : (
+            <>
+              <Icon name="play" size={16} /> Run the night
+            </>
+          )}
         </button>
       </div>
       <PartyStrip roster={roster} />
@@ -212,9 +234,12 @@ function RunNight({
 
   return (
     <div className="mt-3">
-      <p className="text-sm rounded-lg px-4 py-2 mb-3" style={{ background: `${C.sea}14`, border: `1px solid ${C.sea}55`, color: C.sea }}>
-        ✦ Lost? Read the gold words aloud. Press a button. Then ask the table: “What do you do?”
-        That is the entire job — the Book does the rest.
+      <p className="text-sm rounded-lg px-4 py-2 mb-3 flex items-start gap-2 italic" style={{ background: `${C.sea}14`, border: `1px solid ${C.sea}55`, borderLeft: `3px solid ${C.sea}`, color: C.sea }}>
+        <Spark size={12} style={{ marginTop: 5, flexShrink: 0 }} />
+        <span>
+          Lost? Read the gold words aloud. Press a button. Then ask the table: “What do you do?”
+          That is the entire job — the Book does the rest.
+        </span>
       </p>
       {sentNote && (
         <p role="status" className="text-sm mb-2" style={{ color: C.gold }}>
@@ -227,7 +252,7 @@ function RunNight({
           No current beat. Flip to planning and tap “go here” on a beat to begin.
         </p>
       ) : (
-        <div className="rounded-xl p-5" style={{ background: C.panel, border: `1px solid ${C.gold}66`, boxShadow: `0 0 24px ${C.gold}22` }}>
+        <div className="rounded-xl p-5" style={{ ...panelSurface, border: `1px solid ${C.gold}66`, boxShadow: `inset 3px 0 0 ${C.gold}, inset 0 1px 0 ${C.hairline}, 0 0 24px ${C.gold}22` }}>
           <Eyebrow>now — act {current.act}</Eyebrow>
           <h3 style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>{current.title}</h3>
 
@@ -235,7 +260,7 @@ function RunNight({
             “{guide.readAloud}”
           </p>
           <p className="text-sm mt-3" style={{ color: C.parchment }}>
-            <span className="uppercase text-xs tracking-widest" style={{ color: C.sea }}>
+            <span style={{ ...eyebrow, color: C.sea }}>
               the truth ·{' '}
             </span>
             {guide.truth}
@@ -244,16 +269,16 @@ function RunNight({
           <div className="grid gap-1 mt-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
             {(
               [
-                ['⚔ If they fight', guide.doors.fight],
-                ['💬 If they talk', guide.doors.talk],
-                ['🤫 If they sneak', guide.doors.sneak],
-                ['⚖ If they bargain', guide.doors.bargain],
-                ['🌀 If they go sideways', guide.doors.insane],
-              ] as const
-            ).map(([label, text]) => (
-              <div key={label} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
-                <p className="text-xs" style={{ color: C.sea }}>
-                  {label}
+                ['swords', 'If they fight', guide.doors.fight],
+                ['mask', 'If they talk', guide.doors.talk],
+                ['hush', 'If they sneak', guide.doors.sneak],
+                ['scales', 'If they bargain', guide.doors.bargain],
+                ['storm', 'If they go sideways', guide.doors.insane],
+              ] as [IconName, string, string][]
+            ).map(([glyph, label, text]) => (
+              <div key={label} className="rounded-lg p-2" style={wellSurface}>
+                <p className="text-xs flex items-center gap-1.5" style={{ ...body, fontWeight: 600, color: C.sea }}>
+                  <Icon name={glyph} size={13} /> {label}
                 </p>
                 <p className="text-xs mt-1" style={{ color: C.parchment }}>
                   {text}
@@ -264,14 +289,14 @@ function RunNight({
 
           {guide.moves && guide.moves.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.gold, letterSpacing: '0.2em' }}>
+              <p className="mb-1" style={{ ...eyebrow, color: C.gold }}>
                 the menu — read these options aloud, reward invention
               </p>
               <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
                 {guide.moves.map((m) => (
-                  <div key={m.label} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.gold}44` }}>
+                  <div key={m.label} className="rounded-lg p-2" style={{ ...wellSurface, border: `1px solid ${C.gold}44` }}>
                     <p className="text-sm" style={{ color: C.gold }}>
-                      {m.label}
+                      <GlyphLabel text={m.label} size={14} glyphColor={C.brassDim} />
                       <span className="text-xs" style={{ color: C.sea }}>
                         {' '}
                         · {m.roll}
@@ -288,18 +313,18 @@ function RunNight({
 
           {guide.npcs.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.sea, letterSpacing: '0.2em' }}>
+              <p className="mb-1" style={{ ...eyebrow, color: C.sea }}>
                 in this scene
               </p>
               <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
                 {guide.npcs.map((name) => {
                   const npc = npcs.find((p) => p.name === name)
                   return (
-                    <div key={name} className="rounded-lg p-2" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
-                      <p className="text-sm" style={{ ...display, fontWeight: 600, color: C.gold }}>
+                    <div key={name} className="rounded-lg p-2" style={wellSurface}>
+                      <p style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>
                         {name}
                         {npc?.pronunciation && (
-                          <span className="text-xs font-normal" style={{ color: C.faint }}>
+                          <span className="text-xs font-normal" style={{ ...body, color: C.faint }}>
                             {' '}
                             · “{npc.pronunciation}”
                           </span>
@@ -307,9 +332,11 @@ function RunNight({
                       </p>
                       {npc && (
                         <>
-                          <p className="text-xs mt-1">🎭 {npc.trait}</p>
-                          <p className="text-xs" style={{ color: C.faint }}>
-                            🔒 {npc.secret}
+                          <p className="text-xs mt-1 flex items-start gap-1.5">
+                            <Icon name="mask" size={13} style={{ color: C.brassDim, marginTop: 2 }} /> <span>{npc.trait}</span>
+                          </p>
+                          <p className="text-xs flex items-start gap-1.5" style={{ color: C.faint }}>
+                            <Icon name="lost" size={13} style={{ marginTop: 2 }} /> <span>{npc.secret}</span>
                           </p>
                         </>
                       )}
@@ -325,16 +352,21 @@ function RunNight({
               <button
                 type="button"
                 onClick={() => room(scene === guide.ambience ? 'silence' : guide.ambience!)}
-                className="rounded-lg px-3 py-2 text-sm"
+                aria-pressed={scene === guide.ambience}
+                className="rounded-lg px-3 py-2 text-sm inline-flex items-center gap-1.5"
                 style={{
-                  background: scene === guide.ambience ? `${C.sea}22` : C.night,
-                  border: `1px solid ${scene === guide.ambience ? C.sea : C.panelEdge}`,
-                  color: scene === guide.ambience ? C.sea : C.parchment,
+                  ...(scene === guide.ambience ? seaLit : chipOff),
                   minHeight: 44,
                   cursor: 'pointer',
                 }}
               >
-                {scene === guide.ambience ? '■ quiet the room' : `🌊 set the room — ${SCENES.find((x) => x.id === guide.ambience)?.label ?? guide.ambience}`}
+                {scene === guide.ambience ? (
+                  '■ quiet the room'
+                ) : (
+                  <>
+                    <Icon name="wave" size={14} style={{ color: C.sea }} /> set the room — <GlyphLabel text={SCENES.find((x) => x.id === guide.ambience)?.label ?? guide.ambience} size={13} glyphColor={C.brassDim} />
+                  </>
+                )}
               </button>
             </div>
           )}
@@ -355,15 +387,13 @@ function RunNight({
                     title={missing ? `${cue.whisper!.target} hasn't joined yet` : undefined}
                     className="rounded-lg px-3 py-2 text-sm"
                     style={{
-                      background: cue.kind === 'whisper' ? `${C.gold}22` : C.night,
-                      border: `1px solid ${cue.kind === 'whisper' ? C.gold : C.panelEdge}`,
-                      color: missing ? C.faint : cue.kind === 'whisper' ? C.gold : C.parchment,
+                      ...(cue.kind === 'whisper' ? onState : chipOff),
+                      ...(missing ? { color: C.faint, border: `1px dashed ${C.brassDim}` } : null),
                       minHeight: 44,
                       cursor: missing ? 'not-allowed' : 'pointer',
-                      opacity: missing ? 0.5 : 1,
                     }}
                   >
-                    {cue.label}
+                    <GlyphLabel text={label} size={14} glyphColor={cue.kind === 'whisper' ? C.gold : C.brassDim} />
                   </button>
                 )
               })}
@@ -380,10 +410,10 @@ function RunNight({
                   onClick={() => {
                     if (target && window.confirm(`They chose: ${b.label}?`)) void advanceTo(target)
                   }}
-                  className="rounded-lg px-4 py-3"
-                  style={{ ...display, fontSize: 16, fontWeight: 600, background: C.gold, color: C.ink, border: 'none', minHeight: 48, cursor: 'pointer' }}
+                  className="rounded-lg px-4 py-3 inline-flex items-center gap-2"
+                  style={{ ...display, fontSize: 18, fontWeight: 600, ...onState, minHeight: 48, cursor: 'pointer' }}
                 >
-                  ⑂ {b.label}
+                  <Icon name="arrow" size={16} /> {b.label}
                 </button>
               )
             })}
@@ -391,10 +421,10 @@ function RunNight({
               <button
                 type="button"
                 onClick={() => void advanceTo(nextInAct)}
-                className="rounded-lg px-4 py-3"
-                style={{ ...display, fontSize: 16, fontWeight: 600, background: C.gold, color: C.ink, border: 'none', minHeight: 48, cursor: 'pointer' }}
+                className="rounded-lg px-4 py-3 inline-flex items-center gap-2"
+                style={{ ...display, fontSize: 18, fontWeight: 600, ...goldAction, minHeight: 48, cursor: 'pointer' }}
               >
-                next: {nextInAct.title} →
+                next: {nextInAct.title} <Icon name="arrow" size={16} />
               </button>
             )}
           </div>
@@ -402,12 +432,12 @@ function RunNight({
       )}
 
       {/* tonight's run sheet */}
-      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+      <div className="mt-3">
         <Fold id="dm-runsheet" title="🗓 Tonight’s run sheet — the whole night at a glance">
           <div className="grid gap-1 mt-2">
             {SESSION1_RUN_SHEET.map((row) => (
-              <div key={row.time} className="rounded-lg p-2 flex gap-3" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
-                <span className="text-sm shrink-0" style={{ ...display, color: C.gold, fontWeight: 700, width: 44 }}>
+              <div key={row.time} className="rounded-lg p-2 flex gap-3" style={wellSurface}>
+                <span className="text-sm shrink-0" style={{ ...body, ...numerals, color: C.gold, fontWeight: 600, width: 44 }}>
                   {row.time}
                 </span>
                 <div>
@@ -425,12 +455,12 @@ function RunNight({
       </div>
 
       {/* the nervous-DM basics */}
-      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+      <div className="mt-3">
         <Fold id="dm-basics" title="📖 How to DM — the whole job on eight cards">
           <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
             {DM_BASICS.map((card) => (
-              <div key={card.title} className="rounded-lg p-3" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
-                <p className="text-sm" style={{ ...display, fontWeight: 600, color: C.gold }}>
+              <div key={card.title} className="rounded-lg p-3" style={wellSurface}>
+                <p style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>
                   {card.title}
                 </p>
                 <p className="text-xs mt-1 leading-relaxed" style={{ color: C.parchment }}>
@@ -443,7 +473,7 @@ function RunNight({
       </div>
 
       {/* the soundboard */}
-      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+      <div className="rounded-xl p-4 mt-3" style={panelSurface}>
         <Eyebrow>the soundboard — plays from this MacBook</Eyebrow>
         <p className="text-xs mt-1" style={{ color: C.faint }}>
           the room — a bed under the scene; crossfades when you change it, ducks under stingers and the song
@@ -458,14 +488,13 @@ function RunNight({
               aria-pressed={scene === sc.id}
               className="rounded-lg px-3 py-2 text-sm"
               style={{
-                background: scene === sc.id ? `${C.sea}22` : C.night,
-                border: `1px solid ${scene === sc.id ? C.sea : C.panelEdge}`,
-                color: scene === sc.id ? C.sea : sc.id === 'silence' ? C.faint : C.parchment,
+                ...(scene === sc.id ? seaLit : chipOff),
+                ...(scene !== sc.id && sc.id === 'silence' ? { color: C.faint } : null),
                 minHeight: 44,
                 cursor: 'pointer',
               }}
             >
-              {sc.label}
+              <GlyphLabel text={sc.label} size={14} glyphColor={scene === sc.id ? C.sea : C.brassDim} />
             </button>
           ))}
           <label className="text-xs flex items-center gap-2" style={{ color: C.faint }}>
@@ -480,16 +509,15 @@ function RunNight({
               if (!carouselOn) duck(60, 0.35)
               toggleCarousel()
             }}
+            aria-pressed={carouselOn}
             className="rounded-lg px-3 py-2 text-sm"
             style={{
-              background: carouselOn ? `${C.gold}33` : C.night,
-              border: `1px solid ${carouselOn ? C.gold : C.panelEdge}`,
-              color: C.parchment,
+              ...(carouselOn ? onState : chipOff),
               minHeight: 44,
               cursor: 'pointer',
             }}
           >
-            {carouselOn ? '■ stop the carousel' : '🎠 The carousel — the song with the hole (loops)'}
+            {carouselOn ? '■ stop the carousel' : <GlyphLabel text="🎠 The carousel — the song with the hole (loops)" size={14} glyphColor={C.brassDim} />}
           </button>
           <button
             type="button"
@@ -498,15 +526,15 @@ function RunNight({
               playMissingNote()
             }}
             className="rounded-lg px-3 py-2 text-sm"
-            style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+            style={{ ...chipOff, minHeight: 44, cursor: 'pointer' }}
           >
-            ♪ The missing note, alone
+            <GlyphLabel text="♪ The missing note, alone" size={14} glyphColor={C.brassDim} />
           </button>
           <button
             type="button"
             onClick={stopSong}
             className="rounded-lg px-3 py-2 text-sm"
-            style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.faint, minHeight: 44, cursor: 'pointer' }}
+            style={{ ...chipOff, color: C.faint, minHeight: 44, cursor: 'pointer' }}
           >
             ■ silence the song
           </button>
@@ -521,16 +549,16 @@ function RunNight({
                 s.play()
               }}
               className="rounded-lg px-3 py-2 text-sm"
-              style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+              style={{ ...chipOff, minHeight: 44, cursor: 'pointer' }}
             >
-              {s.label}
+              <GlyphLabel text={s.label} size={14} glyphColor={C.brassDim} />
             </button>
           ))}
         </div>
       </div>
 
       {/* the wonder deck */}
-      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+      <div className="rounded-xl p-4 mt-3" style={panelSurface}>
         <Eyebrow>the wonder deck — ten seconds of Feywild, any time</Eyebrow>
         {wonder && (
           <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
@@ -539,11 +567,13 @@ function RunNight({
         )}
         <div className="flex gap-2 mt-2">
           <Btn secondary onClick={() => setWonder(WONDER[Math.floor(Math.random() * WONDER.length)])}>
-            ✦ draw a wonder
+            <Spark size={13} style={{ color: C.gold, marginRight: 6 }} />
+            draw a wonder
           </Btn>
           {wonder && (
             <Btn secondary onClick={() => sendWonder(wonder)}>
-              ✉ send it to every phone
+              <Icon name="envelope" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+              send it to every phone
             </Btn>
           )}
         </div>
@@ -565,21 +595,27 @@ function PartyStrip({ roster }: { roster: RosterEntry[] }) {
           const hp = Math.max(0, sheet.hpMax - r.character!.state.damage)
           const hpPct = (hp / sheet.hpMax) * 100
           return (
-            <div key={r.playerId} className="rounded-xl p-3 flex gap-3 items-center" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+            <div key={r.playerId} className="rounded-xl p-3 flex gap-3 items-center" style={{ ...panelSurface, borderColor: hp === 0 ? C.blood : C.panelEdge }}>
               {r.character!.build.portraitUrl ? (
-                <img src={r.character!.build.portraitUrl} alt="" style={{ width: 46, height: 46, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}`, flexShrink: 0 }} />
+                <img
+                  src={r.character!.build.portraitUrl}
+                  alt=""
+                  style={{ width: 46, height: 46, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${hp === 0 ? C.blood : hpPct > 50 ? C.sea : C.gold}`, boxShadow: `0 0 12px ${hp === 0 ? C.blood : hpPct > 50 ? C.sea : C.gold}55`, flexShrink: 0 }}
+                />
               ) : (
-                <span aria-hidden="true" style={{ fontSize: 28 }}>❖</span>
+                <span aria-hidden="true" className="inline-flex items-center justify-center rounded-full" style={{ ...(hp === 0 ? bloodLit : hpPct > 50 ? seaLit : onState), width: 46, height: 46, flexShrink: 0 }}>
+                  <Icon name="roster" size={24} />
+                </span>
               )}
               <div style={{ minWidth: 0, flex: 1 }}>
-                <p className="text-sm" style={{ ...display, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ ...display, fontSize: 18, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.character!.build.name}
                 </p>
-                <div className="rounded-full mt-1" style={{ height: 6, background: C.night, overflow: 'hidden' }}>
-                  <div style={{ width: `${hpPct}%`, height: '100%', background: hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : '#C96A6A' }} />
+                <div className="rounded-full mt-1" style={{ height: 6, background: C.nightDeep, border: `1px solid ${C.panelEdge}`, overflow: 'hidden' }}>
+                  <div style={{ width: `${hpPct}%`, height: '100%', background: hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : C.blood }} />
                 </div>
-                <p className="text-xs mt-1" style={{ color: C.faint }}>
-                  {hp}/{sheet.hpMax} hp · AC {sheet.ac.val}
+                <p className="text-xs mt-1" style={{ ...numerals, color: C.faint }}>
+                  <span style={{ color: hp === 0 ? C.blood : hpPct > 50 ? C.sea : hpPct > 25 ? C.gold : C.blood }}>{hp}/{sheet.hpMax}</span> hp · AC {sheet.ac.val}
                   {r.character!.state.conditions.length > 0 && (
                     <span style={{ color: C.gold }}> · {r.character!.state.conditions.join(', ')}</span>
                   )}
@@ -600,10 +636,10 @@ function PartyStrip({ roster }: { roster: RosterEntry[] }) {
 // ----------------------------------------------------------- story timeline
 
 const STATUS_STYLE: Record<StoryNode['status'], { border: string; opacity: number }> = {
-  done: { border: '#4a3d78', opacity: 0.55 },
-  current: { border: '#E8B84B', opacity: 1 },
-  possible: { border: '#3A2C66', opacity: 0.85 },
-  skipped: { border: '#3A2C66', opacity: 0.35 },
+  done: { border: C.brassDim, opacity: 0.6 },
+  current: { border: C.gold, opacity: 1 },
+  possible: { border: C.panelEdge, opacity: 0.9 },
+  skipped: { border: C.panelEdge, opacity: 0.4 },
 }
 
 function StoryTimeline({ store }: { store: Store }) {
@@ -639,7 +675,7 @@ function StoryTimeline({ store }: { store: Store }) {
   const acts = [...new Set(nodes.map((n) => n.act))].sort((a, b) => a - b)
 
   return (
-    <div className="rounded-xl p-4" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+    <div className="rounded-xl p-4" style={panelSurface}>
       <Eyebrow>The story — where they are, and every road ahead</Eyebrow>
       {loaded && nodes.length === 0 && (
         <>
@@ -647,9 +683,11 @@ function StoryTimeline({ store }: { store: Store }) {
             The timeline is unwritten. Lay "The Song the Sea Forgot" — Act 1 in full, with the
             Three Gates branching into prepared roads — then bend it however you like.
           </p>
+          {/* Ember-rim secondary: "Run the night" is the ONE brass on Tonight. */}
           <Btn
-            shimmer
+            secondary
             disabled={seeding}
+            style={seeding ? undefined : onState}
             onClick={async () => {
               setSeeding(true)
               await seedStory(store)
@@ -657,14 +695,14 @@ function StoryTimeline({ store }: { store: Store }) {
               setSeeding(false)
             }}
           >
-            {seeding ? 'The tide writes…' : 'Lay the story of the Sea ✦'}
+            {seeding ? 'The tide writes…' : <span className="inline-flex items-center gap-2">Lay the story of the Sea <Spark size={14} /></span>}
           </Btn>
         </>
       )}
 
       {acts.map((act) => (
         <div key={act} className="mt-3">
-          <p className="text-xs uppercase tracking-widest mb-2" style={{ color: C.sea, letterSpacing: '0.2em' }}>
+          <p className="mb-2" style={{ ...eyebrow, color: C.sea }}>
             Act {act}
           </p>
           {nodes
@@ -676,15 +714,17 @@ function StoryTimeline({ store }: { store: Store }) {
                   key={n.id}
                   className="rounded-lg p-3 mb-2"
                   style={{
-                    background: C.night,
+                    ...wellSurface,
                     border: `1px solid ${s.border}`,
                     opacity: s.opacity,
-                    boxShadow: n.status === 'current' ? `0 0 16px ${C.gold}44` : 'none',
+                    ...(n.status === 'current'
+                      ? { ...onState, ...leftRule(C.gold), boxShadow: `inset 3px 0 0 ${C.gold}, inset 0 1px 0 ${C.hairline}, 0 0 18px ${C.gold}22` }
+                      : null),
                   }}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm" style={{ ...display, fontSize: 16, fontWeight: 600, color: n.status === 'current' ? C.gold : C.parchment }}>
-                      {n.status === 'done' ? '✓ ' : n.status === 'current' ? '➤ ' : ''}
+                    <p className="text-sm inline-flex items-center gap-1.5" style={{ ...display, fontSize: 17, fontWeight: 600, color: n.status === 'current' ? C.goldHi : C.parchment }}>
+                      {n.status === 'done' ? <Spark size={12} style={{ color: C.brassDim }} /> : n.status === 'current' ? <Icon name="arrow" size={14} /> : null}
                       {n.title}
                     </p>
                     <span className="flex gap-1 flex-shrink-0">
@@ -694,7 +734,7 @@ function StoryTimeline({ store }: { store: Store }) {
                           onClick={() => void advanceTo(n)}
                           className="text-xs rounded px-2"
                           title="Make this the current beat"
-                          style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.sea, minHeight: 30, cursor: 'pointer' }}
+                          style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.sea, minHeight: 32, cursor: 'pointer' }}
                         >
                           go here
                         </button>
@@ -703,7 +743,7 @@ function StoryTimeline({ store }: { store: Store }) {
                         type="button"
                         onClick={() => setEditing(n)}
                         className="text-xs rounded px-2"
-                        style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.faint, minHeight: 30, cursor: 'pointer' }}
+                        style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.faint, minHeight: 32, cursor: 'pointer' }}
                       >
                         edit
                       </button>
@@ -724,10 +764,10 @@ function StoryTimeline({ store }: { store: Store }) {
                             const target = byId.get(b.toId)
                             if (target && window.confirm(`They chose: ${b.label}?`)) void advanceTo(target)
                           }}
-                          className="text-xs rounded-md px-2 py-1"
-                          style={{ background: `${C.gold}22`, border: `1px solid ${C.gold}`, color: C.gold, minHeight: 32, cursor: 'pointer' }}
+                          className="text-xs rounded-md px-2 py-1 inline-flex items-center gap-1.5"
+                          style={{ ...onState, minHeight: 32, cursor: 'pointer' }}
                         >
-                          ⑂ {b.label}
+                          <Icon name="arrow" size={12} /> {b.label}
                         </button>
                       ))}
                     </div>
@@ -752,13 +792,15 @@ function StoryTimeline({ store }: { store: Store }) {
       )}
 
       {editing && (
-        <div className="rounded-lg p-3 mt-2" style={{ background: C.night, border: `1px solid ${C.sea}` }}>
+        <div className="rounded-lg p-3 mt-2" style={{ ...wellSurface, border: `1px solid ${C.sea}` }}>
           <TextInput value={editing.title} onChange={(v) => setEditing({ ...editing, title: v })} placeholder="Beat title" />
           <div className="mt-2">
             <TextArea rows={4} value={editing.summary} onChange={(v) => setEditing({ ...editing, summary: v })} placeholder="What happens here — notes to yourself" />
           </div>
           <div className="flex gap-2 mt-1">
             <Btn
+              secondary
+              style={onState}
               onClick={async () => {
                 if (!editing.title.trim()) return
                 await store.saveStoryNode(editing)
@@ -856,30 +898,38 @@ function StageControls({
   }
 
   return (
-    <div className="rounded-xl p-4" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+    <div className="rounded-xl p-4" style={panelSurface}>
       <Eyebrow>The stage — what the iPad shows the table</Eyebrow>
       {!store.shared && (
         <p className="text-xs mt-1" style={{ color: C.gold }}>
           The stage needs the campaign lantern (Supabase) to reach the iPad.
         </p>
       )}
+      {/* Segmented control: lit, never a gold fill. */}
       <div className="flex gap-2 mt-2">
         <button
           type="button"
           onClick={() => push({ ...stage, mode: 'ambient' })}
-          className="flex-1 rounded-md py-2 text-sm"
-          style={{ background: stage.mode === 'ambient' ? C.gold : C.night, color: stage.mode === 'ambient' ? C.ink : C.faint, border: `1px solid ${C.panelEdge}`, minHeight: 44, cursor: 'pointer' }}
+          aria-pressed={stage.mode === 'ambient'}
+          className="flex-1 rounded-md py-2 text-sm inline-flex items-center justify-center gap-1.5"
+          style={{ ...(stage.mode === 'ambient' ? onState : chipOff), minHeight: 44, cursor: 'pointer' }}
         >
-          🕯 Ambient
+          <Icon name="clues" size={14} /> Ambient
         </button>
         <button
           type="button"
           onClick={() => push({ ...stage, mode: 'map' })}
           disabled={!stage.mapUrl}
-          className="flex-1 rounded-md py-2 text-sm"
-          style={{ background: stage.mode === 'map' ? C.gold : C.night, color: stage.mode === 'map' ? C.ink : C.faint, border: `1px solid ${C.panelEdge}`, minHeight: 44, cursor: stage.mapUrl ? 'pointer' : 'not-allowed', opacity: stage.mapUrl ? 1 : 0.5 }}
+          aria-pressed={stage.mode === 'map'}
+          className="flex-1 rounded-md py-2 text-sm inline-flex items-center justify-center gap-1.5"
+          style={{
+            ...(stage.mode === 'map' ? onState : chipOff),
+            ...(stage.mapUrl ? null : { background: 'transparent', color: C.faint, border: `1px dashed ${C.brassDim}`, boxShadow: 'none' }),
+            minHeight: 44,
+            cursor: stage.mapUrl ? 'pointer' : 'not-allowed',
+          }}
         >
-          🗺 Map
+          <Icon name="map" size={14} /> Map
         </button>
       </div>
 
@@ -936,14 +986,16 @@ function StageControls({
                   left: `${t.x * 100}%`,
                   top: `${t.y * 100}%`,
                   transform: 'translate(-50%, -50%)',
-                  width: 34,
-                  height: 34,
+                  width: 36,
+                  height: 36,
                   background: t.color,
                   color: C.ink,
-                  border: `2px solid ${C.night}`,
+                  border: `2px solid ${C.nightDeep}`,
+                  boxShadow: `0 0 12px ${t.color}55`,
                   cursor: 'grab',
                   touchAction: 'none',
-                  fontSize: 12,
+                  ...display,
+                  fontSize: 13,
                 }}
               >
                 {t.label}
@@ -977,36 +1029,42 @@ function StageControls({
       )}
       {stage.mapUrl && (
         <>
-          <p className="text-xs mt-3 mb-1" style={{ color: C.faint }}>
+          <p className="mt-3 mb-1" style={eyebrow}>
             the light
           </p>
-          <div className="flex flex-wrap gap-1">
-            {TINTS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                title={t.hint}
-                aria-pressed={(stage.tint ?? 'none') === t.id}
-                onClick={() => push({ ...stage, tint: t.id })}
-                className="text-xs rounded-full px-2 py-1"
-                style={{ background: (stage.tint ?? 'none') === t.id ? `${C.gold}22` : 'transparent', border: `1px solid ${(stage.tint ?? 'none') === t.id ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
-              >
-                {t.label}
-              </button>
-            ))}
+          <div className="flex flex-wrap gap-1.5">
+            {TINTS.map((t) => {
+              const on = (stage.tint ?? 'none') === t.id
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  title={t.hint}
+                  aria-pressed={on}
+                  onClick={() => push({ ...stage, tint: t.id })}
+                  className="text-xs rounded-full px-3"
+                  style={{ ...(on ? onState : chipOff), borderRadius: 999, cursor: 'pointer', minHeight: 36 }}
+                >
+                  <GlyphLabel text={t.label} size={13} glyphColor={on ? C.gold : C.brassDim} />
+                </button>
+              )
+            })}
           </div>
-          <p className="text-xs mt-3 mb-1" style={{ color: C.faint }}>
-            fog of war — when it’s on, tap the map above to reveal a circle
+          <p className="mt-3 mb-1" style={eyebrow}>
+            fog of war
           </p>
-          <div className="flex flex-wrap items-center gap-2">
+          <p className="text-xs mb-1" style={{ color: C.faint }}>
+            when it’s on, tap the map above to reveal a circle
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               aria-pressed={!!stage.fog?.on}
               onClick={() => push({ ...stage, fog: { on: !stage.fog?.on, reveals: stage.fog?.reveals ?? [] } })}
-              className="text-xs rounded-full px-3 py-1"
-              style={{ background: stage.fog?.on ? `${C.gold}22` : 'transparent', border: `1px solid ${stage.fog?.on ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
+              className="text-xs rounded-full px-3 inline-flex items-center gap-1.5"
+              style={{ ...(stage.fog?.on ? onState : chipOff), borderRadius: 999, cursor: 'pointer', minHeight: 36 }}
             >
-              🌫 fog {stage.fog?.on ? 'on' : 'off'}
+              <Icon name="wave" size={13} /> fog {stage.fog?.on ? 'on' : 'off'}
             </button>
             {stage.fog?.on && (
               <>
@@ -1016,8 +1074,8 @@ function StageControls({
                     type="button"
                     aria-pressed={fogRadius === r}
                     onClick={() => setFogRadius(r)}
-                    className="text-xs rounded-full px-2 py-1"
-                    style={{ background: fogRadius === r ? `${C.sea}22` : 'transparent', border: `1px solid ${fogRadius === r ? C.sea : C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 32 }}
+                    className="text-xs rounded-full px-3"
+                    style={{ ...(fogRadius === r ? seaLit : chipOff), borderRadius: 999, cursor: 'pointer', minHeight: 36 }}
                   >
                     {label}
                   </button>
@@ -1025,8 +1083,8 @@ function StageControls({
                 <button
                   type="button"
                   onClick={() => push({ ...stage, fog: { on: true, reveals: [] } })}
-                  className="text-xs rounded-full px-2 py-1"
-                  style={{ background: 'transparent', border: `1px solid ${C.panelEdge}`, color: C.faint, cursor: 'pointer', minHeight: 32 }}
+                  className="text-xs rounded-full px-3"
+                  style={{ ...chipOff, color: C.faint, borderRadius: 999, cursor: 'pointer', minHeight: 36 }}
                 >
                   re-fog everything
                 </button>
@@ -1035,10 +1093,11 @@ function StageControls({
           </div>
         </>
       )}
-      <p className="text-xs mt-2" style={{ color: C.faint }}>
-        Every move you make here appears on the iPad within a breath. On the iPad, tap 🎭 in the
-        header to enter stage mode. In a fight the iPad shows the order, whose turn it is, and
-        who’s bloodied — enemy tokens light up when their name matches the initiative row.
+      <p className="text-xs mt-3" style={{ color: C.faint }}>
+        Every move you make here appears on the iPad within a breath. On the iPad, tap{' '}
+        <Icon name="stage" size={13} style={{ color: C.brassDim }} /> in the header to enter stage mode. In a fight the
+        iPad shows the order, whose turn it is, and who’s bloodied — enemy tokens light up when
+        their name matches the initiative row.
       </p>
     </div>
   )

@@ -8,7 +8,8 @@ import { useEffect, useRef } from 'react'
 import { computeSheet } from '../lib/compute'
 import type { RosterEntry } from '../lib/store'
 import type { Encounter, StageFog, StageState, StageTint, VitalsEvent } from '../types'
-import { C, display } from './ui'
+import { C, display, eyebrow, numerals, onState } from './ui'
+import { Icon, Spark } from './icons'
 
 export const TINTS: { id: StageTint; label: string; hint: string }[] = [
   { id: 'none', label: '☀ plain', hint: 'the map as it is' },
@@ -181,30 +182,47 @@ export function InitiativeRail({ enc, live, roster }: { enc: Encounter; live: Re
   return (
     <div
       className="absolute flex flex-col gap-1"
-      style={{ top: 'calc(14px + env(safe-area-inset-top))', right: 14, width: 230, background: `${C.night}D9`, border: `1px solid ${C.panelEdge}`, borderRadius: 14, padding: '10px 12px', backdropFilter: 'blur(8px)', zIndex: 3 }}
+      style={{ top: 'calc(14px + env(safe-area-inset-top))', right: 14, width: 300, background: `linear-gradient(180deg, ${C.panelLift}E6, ${C.nightDeep}E6)`, border: `1px solid ${C.panelEdge}`, boxShadow: 'inset 0 1px 0 rgba(255,214,150,0.09), 0 12px 32px rgba(0,0,0,0.45)', borderRadius: 12, padding: '12px 14px', backdropFilter: 'blur(8px)', zIndex: 3 }}
       aria-label="Initiative"
     >
-      <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
-        ⚔ the order
+      <p className="text-xs uppercase inline-flex items-center gap-1.5" style={{ ...eyebrow, letterSpacing: '0.22em' }}>
+        <Spark size={11} /> the order
       </p>
       {enc.order.map((row, i) => {
         const on = i === enc.activeIndex
         const v = vitalsFor(row.playerName, live, roster)
         return (
-          <div key={row.id} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1" style={{ background: on ? `${C.gold}22` : 'transparent', border: `1px solid ${on ? C.gold : 'transparent'}` }}>
-            <span style={{ ...display, fontSize: on ? 20 : 16, fontWeight: on ? 700 : 400, color: on ? C.gold : row.isPc ? C.parchment : '#E0928F', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div
+            key={row.id}
+            className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5"
+            style={
+              on
+                ? // the turn pill: ember + brass rim + a 3px brass left rule
+                  { ...onState, boxShadow: `inset 3px 0 0 ${C.gold}, inset 0 1px 0 rgba(255,214,150,0.12)` }
+                : { background: 'transparent', border: '1px solid transparent' }
+            }
+          >
+            <span style={{ ...display, fontSize: on ? 36 : 28, lineHeight: 1.15, fontWeight: on ? 700 : 600, color: on ? C.goldHi : row.isPc ? C.parchment : C.blood, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {row.name}
             </span>
             {v && (
-              <span className="text-xs" style={{ color: v.down ? '#C96A6A' : v.bloodied ? '#E8B84B' : C.faint, whiteSpace: 'nowrap' }}>
-                {v.down ? '✕ down' : `♥ ${v.hp}`}
+              <span className="text-sm inline-flex items-center gap-1" style={{ ...numerals, color: v.down ? C.blood : v.bloodied ? C.gold : C.faint, whiteSpace: 'nowrap' }}>
+                {v.down ? (
+                  <>
+                    <Icon name="cross" size={13} /> down
+                  </>
+                ) : (
+                  <>
+                    <Icon name="heart" size={13} /> {v.hp}
+                  </>
+                )}
               </span>
             )}
           </div>
         )
       })}
       {active && (
-        <p className="text-xs mt-1" style={{ color: C.faint }}>
+        <p className="text-sm mt-1" style={{ color: C.faint }}>
           up next: <span style={{ color: C.parchment }}>{next?.name}</span>
         </p>
       )}
@@ -214,7 +232,7 @@ export function InitiativeRail({ enc, live, roster }: { enc: Encounter; live: Re
 
 /** A token on the stage, with its ring of state. */
 export function StageTokenView({ t, size, active, vital }: { t: { id: string; label: string; color: string; x: number; y: number }; size: number; active: boolean; vital: Vital | null }) {
-  const ring = vital?.down ? '#C96A6A' : active ? C.gold : vital?.bloodied ? '#E8B84B' : C.night
+  const ring = vital?.down ? C.blood : active ? C.gold : vital?.bloodied ? C.gold : C.nightDeep
   return (
     <div
       className="absolute"
@@ -227,8 +245,8 @@ export function StageTokenView({ t, size, active, vital }: { t: { id: string; la
         style={{
           width: size,
           height: size,
-          background: vital?.down ? '#3d2030' : t.color,
-          color: vital?.down ? '#E0928F' : C.ink,
+          background: vital?.down ? C.nightDeep : t.color,
+          color: vital?.down ? C.blood : C.ink,
           border: `3px solid ${ring}`,
           boxShadow: active ? `0 0 26px ${C.gold}AA` : `0 0 14px ${t.color}88`,
           fontSize: size * 0.34,
@@ -236,18 +254,22 @@ export function StageTokenView({ t, size, active, vital }: { t: { id: string; la
           animation: vital?.down ? 'dyingPulse 1.4s ease-in-out infinite' : undefined,
         }}
       >
-        {vital?.down ? '✕' : t.label}
+        {vital?.down ? <Icon name="cross" size={size * 0.42} /> : t.label}
       </span>
       {vital && !vital.down && (
-        <span style={{ position: 'absolute', left: '50%', bottom: -8, transform: 'translateX(-50%)', width: size * 0.9, height: 4, borderRadius: 3, background: `${C.night}CC`, overflow: 'hidden' }}>
-          <span style={{ display: 'block', width: `${(vital.hp / Math.max(1, vital.hpMax)) * 100}%`, height: '100%', background: vital.bloodied ? '#E8B84B' : C.sea, transition: 'width .3s' }} />
+        <span style={{ position: 'absolute', left: '50%', bottom: -8, transform: 'translateX(-50%)', width: size * 0.9, height: 4, borderRadius: 3, background: `${C.nightDeep}CC`, overflow: 'hidden' }}>
+          <span style={{ display: 'block', width: `${(vital.hp / Math.max(1, vital.hpMax)) * 100}%`, height: '100%', background: vital.bloodied ? C.gold : C.sea, transition: 'width .3s' }} />
         </span>
       )}
       {vital && (vital.conditions.length > 0 || vital.concentrating) && (
         <span className="flex gap-1 justify-center" style={{ position: 'absolute', left: '50%', top: '100%', transform: 'translateX(-50%)', marginTop: 8, whiteSpace: 'nowrap' }}>
-          {vital.concentrating && <span className="text-xs rounded-full px-1.5" style={{ background: `${C.night}DD`, border: `1px solid ${C.sea}88`, color: C.sea }}>◐</span>}
+          {vital.concentrating && (
+            <span className="text-xs rounded-full px-1.5 inline-flex items-center" style={{ background: `${C.nightDeep}DD`, border: `1px solid ${C.sea}88`, color: C.sea }}>
+              <Icon name="half" size={12} />
+            </span>
+          )}
           {vital.conditions.slice(0, 3).map((c) => (
-            <span key={c} className="text-xs rounded-full px-1.5" style={{ background: `${C.night}DD`, border: `1px solid ${C.gold}88`, color: C.gold }}>
+            <span key={c} className="text-xs rounded-full px-1.5" style={{ background: `${C.nightDeep}DD`, border: `1px solid ${C.gold}88`, color: C.gold }}>
               {c}
             </span>
           ))}

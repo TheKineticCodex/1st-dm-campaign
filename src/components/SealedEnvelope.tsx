@@ -2,11 +2,27 @@
 // break the wax, typewriter reveal, optional 60-second ephemeral mode for
 // dreams and whispers the character can't hold onto.
 // Respects prefers-reduced-motion (instant reveal, no typewriter).
+//
+// The paper is theme.css `.paper` + `.sea-paper-ruled`; the seal is `.wax-seal`.
 
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import type { Handout } from '../types'
-import { Btn, C, display } from './ui'
+import { Btn, C, body, display, eyebrow } from './ui'
+import { Spark } from './icons'
+
+const paperShadow = '0 24px 60px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.3)'
+
+/** A brass-ink eyebrow set between two tiny sparks — labels ON PAPER only. */
+function PaperEyebrow({ children, center }: { children: string; center?: boolean }) {
+  return (
+    <p className={`flex items-center gap-2 ${center ? 'justify-center' : ''}`} style={{ ...eyebrow, color: C.brassInk, position: 'relative' }}>
+      <Spark size={9} />
+      <span>{children}</span>
+      <Spark size={9} />
+    </p>
+  )
+}
 
 const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -68,7 +84,7 @@ export function SealedEnvelope({ handout, onDismiss }: SealedEnvelopeProps) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center p-6"
-      style={{ background: 'rgba(12, 8, 24, 0.85)', zIndex: 70 }}
+      style={{ background: 'rgba(6, 12, 14, 0.88)', zIndex: 70 }}
       role="dialog"
       aria-label={handout.target ? 'A sealed whisper, for you alone' : 'A sealed envelope arrives'}
     >
@@ -76,91 +92,101 @@ export function SealedEnvelope({ handout, onDismiss }: SealedEnvelopeProps) {
         <div
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          className="rounded-xl p-6 w-full text-center select-none"
+          className="rounded-lg px-6 pb-6 pt-5 w-full text-center select-none paper sea-paper-ruled"
           style={{
+            ...body,
             maxWidth: 420,
-            background: C.parchment,
-            color: C.ink,
-            border: `2px solid ${C.goldDim}`,
-            boxShadow: '0 12px 48px rgba(0,0,0,.6)',
+            boxShadow: paperShadow,
+            border: `1px solid ${C.brassDim}`,
             animation: 'cardRise .35s ease-out',
             touchAction: 'pan-y',
           }}
         >
-          <p className="text-xs uppercase tracking-widest" style={{ color: C.goldDim }}>
-            {handout.target ? '🤫 for your eyes only' : '✦ sealed by the carnival'}
-          </p>
+          {/* the envelope flap: a V of shadow across the top whose point lands under the seal */}
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute', left: 0, right: 0, top: 0, height: 128, pointerEvents: 'none',
+              background: 'linear-gradient(to bottom right, rgba(110,74,27,.11) 0%, transparent 52%), linear-gradient(to bottom left, rgba(110,74,27,.11) 0%, transparent 52%)',
+              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+            }}
+          />
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute', left: 0, right: 0, top: 0, height: 128, pointerEvents: 'none',
+              background: 'rgba(110,74,27,.28)',
+              clipPath: 'polygon(0 0, 1px 0, 50% calc(100% - 1.5px), calc(100% - 1px) 0, 100% 0, 50% 100%)',
+            }}
+          />
+          <PaperEyebrow center>{handout.target ? 'for your eyes only' : 'sealed by the carnival'}</PaperEyebrow>
           <div
             aria-hidden="true"
-            className="mx-auto my-6 rounded-full flex items-center justify-center"
+            className="wax-seal mx-auto"
             style={{
-              width: 84,
-              height: 84,
-              background: stage === 'breaking' ? 'transparent' : '#8E2F3C',
-              color: C.parchment,
-              fontSize: 34,
-              ...display,
-              boxShadow: stage === 'breaking' ? 'none' : 'inset 0 -4px 10px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.3)',
-              transition: 'transform .5s ease, opacity .5s ease',
-              transform: stage === 'breaking' ? 'scale(1.6) rotate(18deg)' : 'none',
+              width: 76,
+              height: 76,
+              marginTop: 42,
+              marginBottom: 20,
+              transform: stage === 'breaking' ? 'scale(1.6) rotate(18deg)' : 'rotate(-6deg)',
               opacity: stage === 'breaking' ? 0 : 1,
+              transition: 'transform .5s ease, opacity .5s ease',
+              position: 'relative',
             }}
           >
-            ✦
+            <Spark size={30} />
           </div>
           {handout.title && (
-            <p style={{ ...display, fontSize: 22, fontWeight: 700 }}>{handout.title}</p>
+            <p style={{ ...display, fontVariationSettings: "'opsz' 96", fontSize: 24, fontWeight: 700, color: C.ink, position: 'relative' }}>{handout.title}</p>
           )}
-          <p className="text-sm mt-2" style={{ color: C.goldDim }}>
+          <p className="text-sm mt-2 italic" style={{ color: C.brassInk, position: 'relative' }}>
             Swipe across the seal to break it
           </p>
           <button
             type="button"
             onClick={breakSeal}
-            className="text-xs underline mt-2"
-            style={{ background: 'none', border: 'none', color: C.goldDim, minHeight: 44, cursor: 'pointer' }}
+            data-testid="envelope-tap-open"
+            className="text-sm underline mt-1"
+            style={{ ...body, fontWeight: 600, background: 'none', border: 'none', color: C.brassInk, minHeight: 44, cursor: 'pointer', position: 'relative' }}
           >
             or tap here
           </button>
         </div>
       ) : (
         <div
-          className="rounded-xl p-5 w-full"
+          className="rounded-lg p-5 w-full paper sea-paper-ruled"
           style={{
+            ...body,
             maxWidth: 440,
-            background: C.parchment,
-            color: C.ink,
-            border: `2px solid ${C.gold}`,
-            boxShadow: '0 12px 48px rgba(0,0,0,.6)',
+            boxShadow: paperShadow,
+            border: `1px solid ${C.brassDim}`,
             animation: 'cardRise .35s ease-out',
           }}
         >
-          <p className="text-xs uppercase tracking-widest" style={{ color: C.goldDim }}>
-            {handout.target ? '🤫 For your eyes only' : '✦ The carnival presents'}
-          </p>
+          <PaperEyebrow>{handout.target ? 'For your eyes only' : 'The carnival presents'}</PaperEyebrow>
           {handout.title && (
-            <h2 style={{ ...display, fontSize: 26, fontWeight: 700, marginTop: 4 }}>{handout.title}</h2>
+            <h2 style={{ ...display, fontVariationSettings: "'opsz' 96", fontSize: 26, fontWeight: 700, marginTop: 4, color: C.ink }}>{handout.title}</h2>
           )}
           {handout.imageDataUrl && (
             <img
               src={handout.imageDataUrl}
               alt=""
               className="w-full rounded-lg mt-3"
-              style={{ border: `1px solid ${C.goldDim}` }}
+              style={{ border: `1px solid ${C.brassInk}66` }}
             />
           )}
           {fullText && (
             <p className="mt-3 leading-relaxed" style={{ fontSize: 17, minHeight: 48, whiteSpace: 'pre-wrap' }}>
               {fullText.slice(0, typed)}
-              {typed < fullText.length && <span style={{ color: C.goldDim }}>▎</span>}
+              {typed < fullText.length && <span style={{ color: C.brassInk }}>▎</span>}
             </p>
           )}
           {handout.ephemeral ? (
-            <p className="text-xs mt-3 text-center" style={{ color: '#8E2F3C' }}>
+            <p className="text-xs mt-3 text-center italic" style={{ color: C.wax }}>
               This whisper fades in {secondsLeft}s — like breath on glass.
             </p>
           ) : (
-            <Btn onClick={onDismiss}>Tuck it away</Btn>
+            <Btn tone="paper" secondary onClick={onDismiss}>Tuck it away</Btn>
           )}
         </div>
       )}

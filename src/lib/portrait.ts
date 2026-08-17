@@ -14,8 +14,8 @@ export function portraitPrompt(build: CharacterBuild, appearance: string): strin
     appearance.trim() ? appearance.trim() : null,
     build.bg ? `background as a ${build.bg.replace(' ✦', '')}` : null,
     `bathed in a ${aura.name.toLowerCase()} glow`,
-    'Feywild twilight carnival, floating paper lanterns, fireflies',
-    'deep indigo night, gold and seafoam accents, painterly fairy-tale illustration',
+    'Feywild carnival docked at a harbour at night, hanging brass lanterns, drifting embers',
+    'black-green harbour night, amber lantern light and seafoam accents, painterly fairy-tale illustration',
     'head and shoulders, warm light on the face, gentle and slightly mysterious',
   ]
   return pieces.filter(Boolean).join(', ')

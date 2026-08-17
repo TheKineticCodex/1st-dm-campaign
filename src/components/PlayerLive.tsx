@@ -11,7 +11,8 @@ import type { Bargain, Encounter, FinaleEvent, Handout, RaceEvent, VitalsEvent, 
 import { BargainCeremony, ContractView } from './Contract'
 import { SealedEnvelope } from './SealedEnvelope'
 import { Wheel } from './Wheel'
-import { C, display } from './ui'
+import { C, body, display, eyebrow, goldAction, numerals } from './ui'
+import { Icon, Spark } from './icons'
 
 const RACE_GOAL = 40
 const GamePhoneOverlay = lazy(() => import('./games/GameShell'))
@@ -53,10 +54,10 @@ function WheelResult({ wedge, duration, spunBy, me }: { wedge: string; duration:
   if (!shown) return <p className="text-sm" style={{ color: C.faint }}>…</p>
   return (
     <div className="text-center mt-2" style={{ animation: 'cardRise .5s ease-out' }}>
-      <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+      <p style={{ ...eyebrow, letterSpacing: '0.25em' }}>
         {spunBy === me ? 'your fortune' : `${spunBy ?? 'the'}’s fortune`}
       </p>
-      <p style={{ ...display, fontSize: 22, fontWeight: 700, color: C.gold, maxWidth: 420 }}>{wedge}</p>
+      <p style={{ ...display, fontSize: 22, fontWeight: 700, color: C.gold, maxWidth: 420, textWrap: 'balance' }}>{wedge}</p>
     </div>
   )
 }
@@ -237,24 +238,51 @@ export function PlayerLive({
   return (
     <>
       {encounter && (
+        /* My turn: a lit ember strip under a 2px brass rule — readable from
+           across the table without becoming a second gold-filled action.
+           Up next: the Sea, lit. Anyone else's turn: quiet glass. */
         <div
           role="status"
-          className="fixed left-0 right-0 top-0 text-center py-2 px-4"
+          className="fixed left-0 right-0 top-0 text-center py-2 px-4 flex items-center justify-center gap-2"
           style={{
-            background: myTurn ? C.gold : `${C.night}F2`,
-            color: myTurn ? C.ink : C.parchment,
-            borderBottom: `1px solid ${myTurn ? C.gold : C.panelEdge}`,
+            ...(myTurn
+              ? {
+                  background: `radial-gradient(600px 120px at 50% -40%, rgba(240,181,79,0.30), transparent 70%), linear-gradient(rgba(201,124,74,0.14), rgba(201,124,74,0.14)), ${C.nightDeep}`,
+                  color: C.goldHi,
+                  borderBottom: `2px solid #A8742A`,
+                  boxShadow: `0 2px 0 rgba(255,214,150,0.24), 0 10px 28px rgba(240,181,79,0.16)`,
+                }
+              : upNext
+                ? {
+                    background: `linear-gradient(rgba(139,211,188,0.10), rgba(139,211,188,0.10)), ${C.nightDeep}F2`,
+                    color: C.sea,
+                    borderBottom: `1px solid ${C.sea}66`,
+                  }
+                : { background: `${C.night}F2`, color: C.parchment, borderBottom: `1px solid ${C.panelEdge}` }),
             backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             zIndex: 60,
             ...display,
+            fontSize: 18,
             fontWeight: 600,
           }}
         >
-          {myTurn
-            ? '⚔ Your turn! The table is watching.'
-            : upNext
-              ? `✦ You're up next — ${encounter.order[encounter.activeIndex]?.name} is acting.`
-              : `⚔ ${encounter.order[encounter.activeIndex]?.name}'s turn`}
+          {myTurn ? (
+            <>
+              <Icon name="stage" size={16} style={{ flexShrink: 0 }} />
+              <span>Your turn! The table is watching.</span>
+            </>
+          ) : upNext ? (
+            <>
+              <Spark size={14} style={{ flexShrink: 0 }} />
+              <span>You&rsquo;re up next — {encounter.order[encounter.activeIndex]?.name} is acting.</span>
+            </>
+          ) : (
+            <>
+              <Icon name="table" size={15} style={{ flexShrink: 0, color: C.brassDim }} />
+              <span>{encounter.order[encounter.activeIndex]?.name}&rsquo;s turn</span>
+            </>
+          )}
         </div>
       )}
 
@@ -278,15 +306,15 @@ export function PlayerLive({
       {wheel && (
         <div
           className="fixed inset-0 flex flex-col items-center justify-start p-6"
-          style={{ background: `${C.night}FA`, zIndex: 75, overflowY: 'auto' }}
+          style={{ background: C.nightDeep, zIndex: 75, overflowY: 'auto' }}
           role="dialog"
           aria-label="The Fortune Wheel"
         >
-          <p className="text-xs uppercase tracking-widest mt-4" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+          <p className="mt-4" style={{ ...eyebrow, letterSpacing: '0.25em' }}>
             The carnival presents
           </p>
-          <h2 style={{ ...display, fontSize: 30, fontWeight: 700, color: C.gold, textAlign: 'center' }}>
-            🎡 The Fortune Wheel
+          <h2 className="inline-flex items-center gap-2" style={{ ...display, fontSize: 30, fontWeight: 700, color: C.gold, textAlign: 'center' }}>
+            <Icon name="fortune" size={26} />The Fortune Wheel
           </h2>
           <div className="my-4">
             <Wheel
@@ -305,10 +333,10 @@ export function PlayerLive({
                 channelRef.current?.sendWheel({ wheelId: wheel.wheelId, phase: 'spin', spunBy: playerName })
                 setWheel({ ...wheel, phase: 'spin', spunBy: playerName })
               }}
-              className="rounded-full font-bold"
-              style={{ ...display, fontSize: 22, background: C.gold, color: C.ink, border: 'none', minHeight: 64, minWidth: 220, cursor: 'pointer', boxShadow: `0 0 30px ${C.gold}66` }}
+              className="rounded-full font-bold inline-flex items-center justify-center gap-2"
+              style={{ ...display, fontSize: 22, ...goldAction, minHeight: 64, minWidth: 220, cursor: 'pointer' }}
             >
-              Spin the wheel ✦
+              Spin the wheel <Spark size={18} />
             </button>
           )}
           {wheel.phase === 'arm' && wheel.spinner && wheel.spinner !== playerName && (
@@ -324,7 +352,7 @@ export function PlayerLive({
           {wheel.phase === 'end' && typeof wheel.target === 'number' && (
             <WheelResult wedge={wheel.wedges?.[wheel.target] ?? ''} duration={wheel.duration ?? 5.5} spunBy={wheel.spunBy} me={playerName} />
           )}
-          <p className="text-xs mt-3" style={{ color: C.faint }}>
+          <p className="text-xs mt-3 num text-center" style={{ ...body, ...numerals, color: C.faint }}>
             {(wheel.wedges ?? []).map((w, i) => `${i + 1}. ${w}`).join('  ·  ')}
           </p>
         </div>
@@ -345,21 +373,21 @@ export function PlayerLive({
       {race && (
         <div
           className="fixed inset-0 flex flex-col items-center justify-center p-6"
-          style={{ background: `${C.night}FA`, zIndex: 75 }}
+          style={{ background: C.nightDeep, zIndex: 75 }}
           role="dialog"
           aria-label="The Great Snail Derby"
         >
           {race.phase === 'racing' ? (
             <>
-              <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+              <p style={{ ...eyebrow, letterSpacing: '0.25em' }}>
                 The carnival presents
               </p>
-              <h2 style={{ ...display, fontSize: 32, fontWeight: 700, color: C.gold }}>
-                🐌 The Great Snail Derby!
+              <h2 className="inline-flex items-center gap-2 text-center" style={{ ...display, fontSize: 32, fontWeight: 700, color: C.gold }}>
+                <Icon name="snail" size={28} />The Great Snail Derby!
               </h2>
               <div
                 className="w-full rounded-full mt-6 mb-2"
-                style={{ maxWidth: 420, height: 18, background: C.panel, border: `1px solid ${C.panelEdge}`, overflow: 'hidden' }}
+                style={{ maxWidth: 420, height: 18, background: C.nightDeep, border: `1px solid ${C.panelEdge}`, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden' }}
                 role="progressbar"
                 aria-valuenow={race.myProgress}
                 aria-valuemax={RACE_GOAL}
@@ -372,7 +400,7 @@ export function PlayerLive({
                   }}
                 />
               </div>
-              <p className="text-xs mb-6" style={{ color: C.faint }}>
+              <p className="text-xs mb-6 num" style={{ ...numerals, color: C.faint }}>
                 {race.myProgress >= RACE_GOAL
                   ? 'Your snail slides across the line! The judges confer…'
                   : `${race.myProgress} / ${RACE_GOAL} — your snail believes in you`}
@@ -387,10 +415,9 @@ export function PlayerLive({
                     width: 190,
                     height: 190,
                     fontSize: 26,
-                    background: C.gold,
-                    color: C.ink,
-                    border: `4px solid ${C.parchment}`,
-                    boxShadow: `0 0 34px ${C.gold}77`,
+                    ...goldAction,
+                    border: '2px solid #A8742A',
+                    boxShadow: 'inset 0 2px 0 rgba(255,245,215,0.7), inset 0 -3px 0 rgba(90,55,10,0.25), 0 0 34px rgba(240,181,79,0.4)',
                     cursor: 'pointer',
                     touchAction: 'manipulation',
                     userSelect: 'none',
@@ -404,8 +431,13 @@ export function PlayerLive({
             </>
           ) : (
             <div className="text-center" style={{ animation: 'cardRise .4s ease-out' }}>
-              <p style={{ fontSize: 56 }} aria-hidden="true">
-                {race.place === 1 ? '🥇' : race.place === 2 ? '🥈' : race.place === 3 ? '🥉' : '🐌'}
+              {/* the placing mark, drawn: gold / silver / copper spark, or the snail itself */}
+              <p className="flex justify-center" aria-hidden="true">
+                {race.place && race.place <= 3 ? (
+                  <Spark size={56} style={{ color: race.place === 1 ? C.gold : race.place === 2 ? '#C6CCD8' : C.copper, filter: 'drop-shadow(0 0 16px rgba(240,181,79,0.35))' }} />
+                ) : (
+                  <Icon name="snail" size={56} style={{ color: C.sea }} />
+                )}
               </p>
               <h2 style={{ ...display, fontSize: 28, fontWeight: 700, color: C.gold }}>
                 {race.place === 1

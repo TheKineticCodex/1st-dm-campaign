@@ -14,6 +14,7 @@ import {
   type CheatCard,
 } from '../data/cheatSheet'
 import { C, Eyebrow, Fold, H, Section, display } from './ui'
+import { Icon, Spark } from './icons'
 
 export function CheatSheet() {
   return (
@@ -71,13 +72,14 @@ export function CheatSheet() {
         <Eyebrow>When you freeze</Eyebrow>
         <ul className="mt-2 space-y-1">
           {PANIC_LINES.map((line, i) => (
-            <li key={i} className="text-base" style={{ color: C.parchment }}>
-              <span style={{ color: C.sea }}>✦</span> {line}
+            <li key={i} className="text-base flex items-start gap-2" style={{ color: C.parchment }}>
+              <Spark size={12} style={{ color: C.sea, marginTop: 7, flexShrink: 0 }} />
+              <span>{line}</span>
             </li>
           ))}
         </ul>
-        <p className="text-xs mt-3" style={{ color: C.faint }}>
-          The Book has you. 🏮
+        <p className="text-xs mt-3 inline-flex items-center gap-1.5" style={{ color: C.faint }}>
+          The Book has you. <Icon name="lantern" size={14} style={{ color: C.brassDim }} />
         </p>
       </Section>
     </div>

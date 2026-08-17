@@ -14,13 +14,13 @@ export default defineConfig({
     // caches the app itself. Audio is synthesized, so nothing big to cache.
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/*.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
         name: 'The Song the Sea Forgot',
         short_name: 'Sea Forgot',
         description: 'A campaign companion. The carnival never charges coin.',
-        theme_color: '#181030',
-        background_color: '#181030',
+        theme_color: '#0B1416',
+        background_color: '#0B1416',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',

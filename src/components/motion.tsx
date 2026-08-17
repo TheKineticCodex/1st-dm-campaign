@@ -1,7 +1,10 @@
 // Small pieces of motion the whole player app shares.
 //
 //   <RollingNumber value={hp} />   digits that roll like an odometer when the
-//                                  number changes (HP, slots, coins)
+//                                  number changes (HP, slots, coins) — always
+//                                  lining + tabular figures, so nothing clips
+//   <RollingFraction value={hp} max={36} />  "20/24" with the "/" tightened so
+//                                  the pair reads as one number
 //   <LanternToggle />              ✧ the light that follows the hand — asks
 //                                  iOS for the gyroscope inside the tap
 //   goWithTransition(fn)           wraps a state change in a View Transition
@@ -12,7 +15,8 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { isCalm } from '../lib/storage'
 import { startTilt, stopTilt, tiltPermission, tiltPossible, tiltRunning } from '../lib/tilt'
-import { C } from './ui'
+import { C, numerals } from './ui'
+import { Icon } from './icons'
 
 // ------------------------------------------------------------ view transitions
 
@@ -45,15 +49,26 @@ export function goWithTransition(update: () => void): void {
 export function RollingNumber({ value, style }: { value: number; style?: React.CSSProperties }) {
   const v = Math.max(0, Math.round(value))
   const digits = String(v).split('').map(Number)
-  if (isCalm()) return <span style={style}>{v}</span>
+  if (isCalm()) return <span className="num" style={{ ...numerals, ...style }}>{v}</span>
   return (
-    <span className="rolling-number" style={style}>
+    <span className="rolling-number" style={{ ...numerals, ...style }}>
       {digits.map((d, i) => (
         <span key={digits.length - i} className="rolling-digit">
           <span className="rolling-digit-col" aria-hidden="true" style={{ transform: `translateY(-${d * 10}%)`, transitionDelay: `${(digits.length - 1 - i) * 40}ms` }} />
           <span className="rolling-digit-text">{d}</span>
         </span>
       ))}
+    </span>
+  )
+}
+
+/** "current/max" — the odometer plus a tightened separator and a lining max. */
+export function RollingFraction({ value, max, style }: { value: number; max: number; style?: React.CSSProperties }) {
+  return (
+    <span className="num" style={{ ...numerals, whiteSpace: 'nowrap', ...style }}>
+      <RollingNumber value={value} />
+      <span className="num-sep" aria-hidden="true">/</span>
+      {Math.max(0, Math.round(max))}
     </span>
   )
 }
@@ -81,9 +96,10 @@ export function LanternToggle() {
         setDenied(!ok)
       }}
       className="text-xs"
-      style={{ color: on ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer', whiteSpace: 'nowrap' }}
+      style={{ color: on ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}
     >
-      {on ? '✧ light on' : '✧ light'}
+      <Icon name="sparkOutline" size={13} />
+      {on ? 'light on' : 'light'}
     </button>
   )
 }

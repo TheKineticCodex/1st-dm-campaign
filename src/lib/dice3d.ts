@@ -31,12 +31,14 @@ let loading: Promise<Box | null> | null = null
 let disabled = false
 let cleanup: ReturnType<typeof setTimeout> | null = null
 
-/** Loud, gold, marbled — the Fair's dice. Face numbers in ink. */
+/** Loud, brass, marbled — the Fair's dice. Face numbers in ink.
+ *  Colours = the livery's brass gradient stops (--gold #F0B54F, --gold-hi's
+ *  brass top #FFD88A, brass foot #D59A3A) with --ink #2A1C11 for pips/outline. */
 const COLORSET = {
   name: 'the-fair',
-  foreground: '#241A42',
-  background: ['#E8B84B', '#F2D27A', '#D9A83A'],
-  outline: '#241A42',
+  foreground: '#2A1C11',
+  background: ['#F0B54F', '#FFD88A', '#D59A3A'],
+  outline: '#2A1C11',
   texture: 'marble',
   material: 'glass',
 }

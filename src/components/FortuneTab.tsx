@@ -1,4 +1,4 @@
-// The Witchlight Divination Booth — ported from the prototype's quiz.
+// The Getting Fair Divination Booth — ported from the prototype's quiz.
 // New vs. prototype: results save via the Store (they flow to the DM
 // automatically in Supabase mode); copy button kept as fallback.
 
@@ -8,7 +8,8 @@ import { CLASSES, SPECIES } from '../data/rules'
 import type { Store } from '../lib/store'
 import type { QuizResult } from '../types'
 import { CLASS_SIGILS, SPECIES_GLYPHS } from './glyphs'
-import { Btn, C, Eyebrow, H, Lanterns, Pick, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, H, Lanterns, Pick, TextInput, display, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { Icon, Spark } from './icons'
 
 type Stage = 'intro' | 'quiz' | 'results'
 
@@ -107,7 +108,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
 
   const copy = async () => {
     const lines = [
-      `🎪 WITCHLIGHT DIVINATION — ${name || 'A stranger'}`,
+      `🎪 GETTING FAIR DIVINATION — ${name || 'A stranger'}`,
       ``,
       `Callings: ${topClasses().join(', ')}`,
       `Reflection: ${topSpecies().join(' or ') || '(unread)'}`,
@@ -136,7 +137,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
         <Lanterns />
         <Eyebrow>Admit one · free of charge*</Eyebrow>
         <h1 className="title-glow" style={{ ...display, fontSize: 40, lineHeight: 1.05, fontWeight: 700, color: C.gold }}>
-          The Witchlight
+          The Getting Fair
           <br />
           Divination Booth
         </h1>
@@ -178,19 +179,19 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
           <button
             type="button"
             onClick={() => (idx === 0 ? setStage('intro') : setIdx(idx - 1))}
-            className="text-sm px-3 py-2 rounded-md"
-            style={{ color: C.faint, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+            className="text-sm px-3 py-2 rounded-md inline-flex items-center gap-1.5"
+            style={{ ...panelSurface, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
           >
-            ← Back
+            <Icon name="arrow" size={14} style={{ transform: 'scaleX(-1)' }} />Back
           </button>
-          <div style={{ color: C.gold, letterSpacing: 4, fontSize: 12 }} aria-label={`Question ${idx + 1} of ${QUIZ.length}`}>
+          <div className="flex items-center gap-1" style={{ color: C.gold }} role="img" aria-label={`Question ${idx + 1} of ${QUIZ.length}`}>
             {QUIZ.map((_, i) => (
               <span
                 key={i}
                 className={i <= idx ? 'twinkle' : undefined}
-                style={{ opacity: i <= idx ? 1 : 0.25, animationDelay: `${i * 0.25}s` }}
+                style={{ display: 'inline-flex', opacity: i <= idx ? 1 : 0.3, color: i <= idx ? C.gold : C.brassDim, animationDelay: `${i * 0.25}s` }}
               >
-                ✦
+                <Spark size={10} />
               </span>
             ))}
           </div>
@@ -199,8 +200,9 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
           <Eyebrow>The lanterns ask —</Eyebrow>
           <H>{q.prompt}</H>
           {q.hint && (
-            <p className="text-sm mt-2 italic" style={{ color: C.gold }}>
-              ✦ {q.hint}
+            <p className="text-sm mt-2 italic flex items-start gap-1.5" style={{ color: C.gold }}>
+              <Spark size={11} style={{ marginTop: 5 }} />
+              <span>{q.hint}</span>
             </p>
           )}
           {q.type === 'choice' ? (
@@ -219,7 +221,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 placeholder={q.placeholder}
                 rows={4}
                 className="w-full rounded-lg px-4 py-3 outline-none"
-                style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, resize: 'vertical' }}
+                style={{ ...wellSurface, color: C.parchment, resize: 'vertical' }}
               />
               <Btn onClick={() => submitText()} disabled={!draft.trim()}>
                 Tell the lanterns
@@ -268,9 +270,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 onClick={() => setPickSpecies(sp)}
                 className="rounded-xl p-3 text-center"
                 style={{
-                  background: `linear-gradient(135deg, #2B1E55, ${C.panel})`,
-                  border: `2px solid ${selected ? C.sea : C.panelEdge}`,
-                  boxShadow: selected ? `0 0 18px ${C.sea}66` : 'none',
+                  ...(selected ? seaLit : panelSurface),
                   color: C.parchment,
                   cursor: 'pointer',
                   animation: `cardRise .5s ease-out ${0.15 + i * 0.12}s both`,
@@ -287,8 +287,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.18em' }}>
                   {i === 0 ? 'the mirror shows' : 'or perhaps'}
                 </p>
-                <h3 style={{ ...display, fontSize: 20, fontWeight: 700 }}>
-                  {selected ? '✓ ' : ''}
+                <h3 style={{ ...display, fontSize: 20, fontWeight: 700, color: selected ? C.sea : C.parchment }}>
                   {sp}
                 </h3>
                 <p className="text-xs" style={{ color: C.faint }}>
@@ -311,10 +310,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
               onClick={() => setPickClass(n)}
               className="rounded-xl p-4 flex items-center gap-4 text-left w-full"
               style={{
-                background: selected ? C.parchment : C.panel,
-                color: selected ? C.ink : C.parchment,
-                border: `2px solid ${selected ? C.gold : C.panelEdge}`,
-                boxShadow: selected ? `0 0 22px ${C.gold}55` : 'none',
+                ...(selected ? onState : { ...panelSurface, color: C.parchment }),
                 cursor: 'pointer',
                 animation: `cardRise .5s ease-out ${0.3 + i * 0.18}s both`,
                 transition: 'border-color .2s ease, box-shadow .2s ease',
@@ -324,7 +320,7 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 style={{
                   width: selected ? 60 : 44,
                   height: selected ? 60 : 44,
-                  color: selected ? C.goldDim : C.sea,
+                  color: selected ? C.goldHi : C.sea,
                   flexShrink: 0,
                 }}
                 aria-hidden="true"
@@ -332,8 +328,8 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
                 {CLASS_SIGILS[n]}
               </span>
               <div>
-                <h3 style={{ ...display, fontSize: selected ? 26 : 21, fontWeight: 700 }}>
-                  {selected ? '✦ ' : ''}
+                <h3 className="flex items-center gap-2" style={{ ...display, fontSize: selected ? 26 : 21, fontWeight: 700, color: selected ? C.goldHi : C.parchment }}>
+                  {selected && <Spark size={16} />}
                   {n}
                 </h3>
                 <p className="text-sm" style={{ opacity: 0.9 }}>
@@ -351,10 +347,11 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
       >
         Not seeing yourself here? Every species and every class stays open in the forge.
       </p>
-      <p className="text-sm mt-2" style={{ color: C.sea }}>
-        {store.shared
-          ? '✦ Your fortune has already flown to the Dungeon Master on lantern-light.'
-          : 'Saved on this device. Use the copy button to send it to your DM.'}
+      <p className="text-sm mt-2 flex items-start gap-1.5" style={{ color: C.sea }}>
+        {store.shared && <Spark size={11} style={{ marginTop: 5 }} />}
+        <span>{store.shared
+          ? 'Your fortune has already flown to the Dungeon Master on lantern-light.'
+          : 'Saved on this device. Use the copy button to send it to your DM.'}</span>
       </p>
       <Btn shimmer onClick={() => onBuildFromQuiz(name, chosenClass, chosenSpecies)}>
         {chosenClass || chosenSpecies
@@ -382,8 +379,9 @@ export function FortuneTab({ store, playerName, savedResult, onSaved, onBuildFro
             displayAnswers[x.id] ? (
               <p key={x.id} className="text-sm mb-2" style={{ color: C.faint }}>
                 {x.prompt}
-                <span className="block" style={{ color: C.parchment }}>
-                  → {displayAnswers[x.id]}
+                <span className="block flex items-start gap-1.5" style={{ color: C.parchment }}>
+                  <Icon name="arrow" size={13} style={{ marginTop: 4, color: C.brassDim }} />
+                  <span>{displayAnswers[x.id]}</span>
                 </span>
               </p>
             ) : null,

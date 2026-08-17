@@ -8,8 +8,20 @@ import type { Host } from '../../lib/gameHost'
 import { newBargain, newDraw, newNote, newToll } from '../../lib/gameHost'
 import type { RosterEntry, Store } from '../../lib/store'
 import type { Handout } from '../../types'
-import { Btn, C, TextArea, TextInput, display } from '../ui'
+import { Btn, C, TextArea, TextInput, body, display, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from '../ui'
+import { EMOJI_TO_ICON, Icon, Spark } from '../icons'
 import { DrawCanvas } from './DrawGame'
+
+/** A game title like "🎨 Draw the Missing Piece" → drawn glyph + the words. */
+function GameTitle({ kind, size = 15, glyphColor }: { kind: GameKind; size?: number; glyphColor?: string }) {
+  const [glyph, words] = splitLeadGlyph(GAME_TITLES[kind])
+  return (
+    <span className="inline-flex items-center gap-2">
+      {glyph && <Icon name={glyph} size={size} style={{ color: glyphColor, flexShrink: 0 }} />}
+      <span>{words}</span>
+    </span>
+  )
+}
 
 const BLURB: Record<GameKind, string> = {
   draw: 'One phone draws, the rest guess, the iPad shows the picture forming. Everyone takes a turn with the charcoal. Party score.',
@@ -75,10 +87,16 @@ export function GamesPanel({
     setTimeout(() => setSent(false), 2500)
   }
 
+  // ONE brass action while a game is live: the phase-advance button if the
+  // game offers one, otherwise "Whisper the prize".
+  const hasAdvance = !!game && ((game.kind === 'toll' && (game.phase === 'answer' || game.phase === 'reveal')) || (game.kind === 'bargain' && game.phase === 'bid'))
+
   if (game && host) {
     return (
       <div>
-        <p style={{ ...display, fontSize: 20, color: C.gold }}>{GAME_TITLES[game.kind]} — live</p>
+        <p style={{ ...display, fontSize: 20, fontWeight: 600, color: C.gold }}>
+          <GameTitle kind={game.kind} size={18} glyphColor={C.brassDim} /> — live
+        </p>
 
         {game.kind === 'draw' && (
           <div className="flex gap-4 items-start mt-2">
@@ -130,8 +148,11 @@ export function GamesPanel({
                 {game.order.map((idx, i) => {
                   const a = game.answers[idx]
                   return (
-                    <li key={idx}>
-                      {i < game.revealed ? '✦' : '·'} {a.text} — <strong style={{ color: C.gold }}>{a.by}</strong>
+                    <li key={idx} className="flex items-start gap-1.5">
+                      {i < game.revealed ? <Spark size={11} style={{ color: C.gold, marginTop: 4 }} /> : <span aria-hidden="true" style={{ color: C.brassDim }}>·</span>}
+                      <span>
+                        {a.text} — <strong style={{ color: C.gold }}>{a.by}</strong>
+                      </span>
                     </li>
                   )
                 })}
@@ -172,16 +193,19 @@ export function GamesPanel({
                 const coin = COINS.find((c) => c.id === b.coin)
                 return (
                   <li key={b.by} className="flex flex-wrap items-center gap-2 mb-1">
-                    <span>
-                      {coin?.glyph} <strong style={{ color: taken ? C.gold : C.parchment }}>{b.by}</strong> · {coin?.label}: “{b.text}”
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon name={(coin && EMOJI_TO_ICON[coin.glyph]) || 'spark'} size={13} style={{ color: C.brassDim }} />
+                      <span>
+                        <strong style={{ color: taken ? C.gold : C.parchment }}>{b.by}</strong> · {coin?.label}: “{b.text}”
+                      </span>
                     </span>
                     {game.phase === 'closed' && !open && (
-                      <button type="button" onClick={() => host.act({ type: 'open', by: b.by })} className="rounded px-2 py-1" style={{ background: C.night, border: `1px solid ${C.sea}`, color: C.sea, cursor: 'pointer', minHeight: 32 }}>
+                      <button type="button" onClick={() => host.act({ type: 'open', by: b.by })} className="rounded px-2 py-1" style={{ ...seaLit, cursor: 'pointer', minHeight: 36 }}>
                         open
                       </button>
                     )}
                     {game.phase === 'closed' && (
-                      <button type="button" onClick={() => host.act({ type: 'accept', by: b.by })} className="rounded px-2 py-1" style={{ background: `${C.gold}22`, border: `1px solid ${C.gold}`, color: C.gold, cursor: 'pointer', minHeight: 32 }}>
+                      <button type="button" onClick={() => host.act({ type: 'accept', by: b.by })} className="rounded px-2 py-1" style={{ ...onState, cursor: 'pointer', minHeight: 36 }}>
                         take this one
                       </button>
                     )}
@@ -218,8 +242,8 @@ export function GamesPanel({
               aria-label="Prize to"
               value={prizeTo}
               onChange={(e) => setPrizeTo(e.target.value)}
-              className="rounded-md px-3 py-2"
-              style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+              className="rounded-md px-3 py-2 outline-none"
+              style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
             >
               <option value="">Everyone</option>
               {roster.map((r) => (
@@ -233,8 +257,12 @@ export function GamesPanel({
             </div>
           </div>
           <div className="flex gap-2 mt-2">
-            <Btn onClick={whisper} shimmer>
-              {sent ? 'Prize whispered ✦' : 'Whisper the prize'}
+            <Btn onClick={whisper} shimmer={!hasAdvance} secondary={hasAdvance} style={hasAdvance ? onState : undefined}>
+              {sent ? (
+                <span className="inline-flex items-center gap-2">Prize whispered <Spark size={14} /></span>
+              ) : (
+                'Whisper the prize'
+              )}
             </Btn>
             <Btn secondary onClick={() => host.stop()}>
               Return to the story
@@ -257,10 +285,12 @@ export function GamesPanel({
             type="button"
             onClick={() => setPick(k)}
             className="text-left rounded-lg px-3 py-2"
-            style={{ background: pick === k ? `${C.gold}1A` : C.night, border: `1px solid ${pick === k ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer' }}
+            style={{ ...(pick === k ? onState : { ...panelSurface, color: C.parchment }), minHeight: 44, cursor: 'pointer' }}
             aria-pressed={pick === k}
           >
-            <span style={{ ...display, fontSize: 18, color: pick === k ? C.gold : C.parchment }}>{GAME_TITLES[k]}</span>
+            <span style={{ ...display, fontSize: 18, fontWeight: 600, color: pick === k ? C.goldHi : C.parchment }}>
+              <GameTitle kind={k} size={16} glyphColor={pick === k ? C.gold : C.brassDim} />
+            </span>
             <p className="text-xs" style={{ color: C.faint }}>
               {BLURB[k]}
             </p>
@@ -273,25 +303,25 @@ export function GamesPanel({
           <>
             <label className="text-xs" style={{ color: C.faint }}>
               rounds{' '}
-              <input type="number" min={1} max={12} value={drawRounds} onChange={(e) => setDrawRounds(Math.max(1, Math.min(12, Number(e.target.value) || 1)))} className="rounded-md px-2 py-1 ml-1" style={{ width: 64, background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40 }} />
+              <input type="number" min={1} max={12} value={drawRounds} onChange={(e) => setDrawRounds(Math.max(1, Math.min(12, Number(e.target.value) || 1)))} className="rounded-md px-2 py-1 ml-1" style={{ ...wellSurface, ...numerals, width: 64, color: C.parchment, minHeight: 44 }} />
             </label>
             <label className="text-xs" style={{ color: C.faint }}>
               seconds each{' '}
-              <input type="number" min={15} max={120} value={drawSeconds} onChange={(e) => setDrawSeconds(Math.max(15, Math.min(120, Number(e.target.value) || 45)))} className="rounded-md px-2 py-1 ml-1" style={{ width: 72, background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40 }} />
+              <input type="number" min={15} max={120} value={drawSeconds} onChange={(e) => setDrawSeconds(Math.max(15, Math.min(120, Number(e.target.value) || 45)))} className="rounded-md px-2 py-1 ml-1" style={{ ...wellSurface, ...numerals, width: 72, color: C.parchment, minHeight: 44 }} />
             </label>
           </>
         )}
         {pick === 'note' && (
           <label className="text-xs" style={{ color: C.faint }}>
             seconds{' '}
-            <input type="number" min={10} max={90} value={noteSeconds} onChange={(e) => setNoteSeconds(Math.max(10, Math.min(90, Number(e.target.value) || 25)))} className="rounded-md px-2 py-1 ml-1" style={{ width: 72, background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40 }} />
+            <input type="number" min={10} max={90} value={noteSeconds} onChange={(e) => setNoteSeconds(Math.max(10, Math.min(90, Number(e.target.value) || 25)))} className="rounded-md px-2 py-1 ml-1" style={{ ...wellSurface, ...numerals, width: 72, color: C.parchment, minHeight: 44 }} />
           </label>
         )}
         {pick === 'bargain' && (
           <div className="w-full">
             <div className="flex flex-wrap gap-1 mb-2">
               {BARGAIN_OFFERS.map((o) => (
-                <button key={o} type="button" onClick={() => setOffer(o)} className="text-xs rounded-full px-2 py-1" style={{ background: offer === o ? `${C.gold}22` : 'transparent', border: `1px solid ${offer === o ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer' }}>
+                <button key={o} type="button" aria-pressed={offer === o} onClick={() => setOffer(o)} className="text-xs rounded-full px-3" style={{ ...(offer === o ? onState : { ...wellSurface, color: C.parchment }), borderRadius: 999, minHeight: 36, cursor: 'pointer' }}>
                   {o}
                 </button>
               ))}
@@ -303,7 +333,7 @@ export function GamesPanel({
           <div className="w-full">
             <div className="flex flex-wrap gap-1 mb-2">
               {TOLL_QUESTIONS.map((q) => (
-                <button key={q} type="button" onClick={() => setTollQ(q)} className="text-xs rounded-full px-2 py-1" style={{ background: tollQ === q ? `${C.gold}22` : 'transparent', border: `1px solid ${tollQ === q ? C.gold : C.panelEdge}`, color: C.parchment, cursor: 'pointer' }}>
+                <button key={q} type="button" aria-pressed={tollQ === q} onClick={() => setTollQ(q)} className="text-xs rounded-full px-3" style={{ ...(tollQ === q ? onState : { ...wellSurface, color: C.parchment }), borderRadius: 999, minHeight: 36, cursor: 'pointer' }}>
                   {q}
                 </button>
               ))}
@@ -314,7 +344,9 @@ export function GamesPanel({
       </div>
 
       <Btn onClick={start} disabled={!canStart} shimmer>
-        Start {GAME_TITLES[pick]}
+        <span className="inline-flex items-center gap-2">
+          Start <GameTitle kind={pick} size={16} />
+        </span>
       </Btn>
       {!store.shared && (
         <p className="text-xs mt-1" style={{ color: C.faint }}>

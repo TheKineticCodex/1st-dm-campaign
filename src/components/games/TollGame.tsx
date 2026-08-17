@@ -5,7 +5,8 @@
 
 import { useState } from 'react'
 import type { TollInput, TollState } from '../../lib/games'
-import { C, display } from '../ui'
+import { C, display, goldAction, onState, panelSurface, wellSurface } from '../ui'
+import { Spark } from '../icons'
 
 export function TollPhone({ state, me, send }: { state: TollState; me: string; send: (i: TollInput) => void }) {
   const mine = state.answers.find((a) => a.by === me)
@@ -27,9 +28,10 @@ export function TollPhone({ state, me, send }: { state: TollState; me: string; s
             onChange={(e) => setText(e.target.value)}
             rows={3}
             placeholder="One true answer. Only Hush sees it, for now."
-            className="w-full rounded-md px-3 py-2 mt-3"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${sent ? C.sea : C.panelEdge}` }}
+            className="w-full rounded-md px-3 py-2 mt-3 outline-none"
+            style={{ ...wellSurface, color: C.parchment, ...(sent ? { borderColor: C.sea } : null), resize: 'vertical' }}
           />
+          {/* one brass action while the answer is unsealed; once sealed it drops to a lit state */}
           <button
             type="button"
             onClick={() => {
@@ -37,10 +39,12 @@ export function TollPhone({ state, me, send }: { state: TollState; me: string; s
               send({ type: 'answer', text })
               setSent(true)
             }}
-            className="w-full rounded-md py-3 mt-2"
-            style={{ ...display, fontWeight: 700, background: C.gold, color: C.ink, border: 'none', minHeight: 44, cursor: 'pointer' }}
+            aria-pressed={sent}
+            className="w-full rounded-md py-3 mt-2 inline-flex items-center justify-center gap-2"
+            style={{ ...display, fontSize: 18, fontWeight: 700, ...(sent ? onState : goldAction), minHeight: 44, cursor: 'pointer' }}
           >
-            {sent ? 'Sealed ✦ (tap to change)' : 'Seal it ✦'}
+            <Spark size={14} />
+            {sent ? 'Sealed (tap to change)' : 'Seal it'}
           </button>
           <p className="text-xs mt-2" style={{ color: C.faint }}>
             {state.answers.length}/{state.players.length} sealed
@@ -56,12 +60,12 @@ export function TollPhone({ state, me, send }: { state: TollState; me: string; s
             const a = state.answers[idx]
             const shown = i < state.revealed
             return (
-              <div key={idx} className="rounded-lg px-3 py-2 mb-2" style={{ background: C.panel, border: `1px solid ${shown ? C.gold : C.panelEdge}` }}>
+              <div key={idx} className="rounded-lg px-3 py-2 mb-2" style={shown ? { ...onState } : { ...panelSurface }}>
                 <p className="text-sm" style={{ color: C.parchment }}>
                   {a.text}
                 </p>
                 {shown && (
-                  <p className="text-xs mt-1" style={{ color: C.gold }}>
+                  <p className="text-xs mt-1" style={{ color: C.goldHi }}>
                     — {a.by}
                   </p>
                 )}
@@ -92,9 +96,9 @@ export function TollStage({ state }: { state: TollState }) {
             const a = state.answers[idx]
             const shown = i < state.revealed
             return (
-              <div key={idx} className="rounded-xl px-5 py-4" style={{ background: C.panel, border: `2px solid ${shown ? C.gold : C.panelEdge}`, boxShadow: shown ? `0 0 30px ${C.gold}44` : 'none' }}>
+              <div key={idx} className="rounded-xl px-5 py-4" style={shown ? { ...onState, boxShadow: `${onState.boxShadow}, 0 0 30px rgba(240,181,79,0.22)` } : { ...panelSurface }}>
                 <p style={{ color: C.parchment, fontSize: 20 }}>{a.text}</p>
-                <p className="mt-2" style={{ ...display, fontSize: 22, color: shown ? C.gold : C.faint }}>
+                <p className="mt-2" style={{ ...display, fontSize: 22, color: shown ? C.goldHi : C.faint }}>
                   {shown ? `— ${a.by}` : '— ?'}
                 </p>
               </div>

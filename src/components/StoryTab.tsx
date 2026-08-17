@@ -8,7 +8,8 @@ import { SONGS } from '../data/songPieces'
 import type { Store } from '../lib/store'
 import type { Bargain, Handout, SavedCharacter } from '../types'
 import { LedgerTab } from './LedgerTab'
-import { C, Eyebrow, Fold, H, Section, TextArea, display } from './ui'
+import { C, Eyebrow, Fold, H, Section, TextArea, display, panelSurface, seaLit } from './ui'
+import { Spark } from './icons'
 
 interface StoryTabProps {
   store: Store
@@ -51,7 +52,7 @@ export function StoryTab({ store, character, onUpdate, bargains, onSign }: Story
       <H>What the lanterns remember</H>
 
       {/* ---- The Song ---- */}
-      <Section style={{ border: `1px solid ${C.gold}55` }}>
+      <Section style={{ borderColor: `${C.gold}55` }}>
         <div className="flex items-baseline justify-between">
           <Eyebrow>🎵 the song</Eyebrow>
           <span className="text-xs" style={{ color: C.faint }}>
@@ -81,20 +82,23 @@ export function StoryTab({ store, character, onUpdate, bargains, onSign }: Story
                 {song.line}
               </p>
               <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                {/* song pips: unlit = a hairline ring, lit = the Sea's glow with a drawn spark */}
                 {mine.map((p) => (
                   <span
                     key={p.key}
                     title={p.label}
-                    className="rounded-full text-xs px-2 py-0.5"
+                    aria-label={p.on ? `${p.label} — home` : 'not yet home'}
+                    className="rounded-full text-xs inline-flex items-center gap-1"
                     style={{
-                      background: p.on ? `${C.gold}33` : 'transparent',
-                      border: `1px solid ${p.on ? C.gold : C.panelEdge}`,
-                      color: p.on ? C.gold : C.faint,
+                      ...(p.on
+                        ? { ...seaLit, boxShadow: `${seaLit.boxShadow}, 0 0 12px rgba(139,211,188,0.28)`, padding: '1px 9px 1px 7px' }
+                        : { background: 'transparent', border: `1px solid ${C.brassDim}66`, color: C.faint, width: 22, justifyContent: 'center' }),
+                      minHeight: 22,
                       lineHeight: '20px',
                     }}
                   >
-                    {p.on ? '✦ ' : '· '}
-                    {p.on ? p.label : '—'}
+                    {p.on ? <Spark size={10} /> : null}
+                    {p.on ? p.label : null}
                   </span>
                 ))}
               </div>
@@ -113,7 +117,7 @@ export function StoryTab({ store, character, onUpdate, bargains, onSign }: Story
         {kept.map((h) => {
           const isOpen = open === h.id
           return (
-            <div key={h.id} className="rounded-lg mb-2 overflow-hidden" style={{ border: `1px solid ${isOpen ? C.gold : C.panelEdge}`, background: C.night }}>
+            <div key={h.id} className="rounded-lg mb-2 overflow-hidden" style={{ ...panelSurface, background: C.nightDeep, ...(isOpen ? { borderColor: C.gold } : {}) }}>
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : h.id)}
@@ -128,7 +132,7 @@ export function StoryTab({ store, character, onUpdate, bargains, onSign }: Story
                     {h.level ? ` · level ${h.level}` : ''}
                   </span>
                 </span>
-                <span style={{ color: C.gold }}>{isOpen ? '−' : '+'}</span>
+                <span aria-hidden="true" style={{ color: C.brassDim, fontSize: 18, lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
               </button>
               {isOpen && (
                 <div className="px-3 pb-3">

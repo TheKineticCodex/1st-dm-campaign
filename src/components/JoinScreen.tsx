@@ -1,7 +1,13 @@
-import { useState } from 'react'
+// The Gate — the ticket booth at the edge of the Getting Fair. One string of
+// bulbs along the top, the lantern hung over the Sea, the title lit from
+// above, one brass action. The card is the only thing with brass corner
+// marks; the legal line sits clear of the card's shadow at full --faint.
+
+import { useEffect, useState } from 'react'
 import { mintDeviceToken, saveDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
-import { Btn, C, Lanterns, TextInput, body, display } from './ui'
+import { Btn, C, Lanterns, TextInput, body, display, eyebrow, nightGround, panelSurface, wellSurface } from './ui'
+import { Lantern, SparkRule } from './icons'
 
 interface JoinScreenProps {
   onJoined: (session: DeviceSession) => void
@@ -12,6 +18,14 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
   const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  // The Gate hangs one more lantern over the ground — through the CSS variable
+  // theme.css reads (html.gate sets --gate-glow), never a second fixed layer.
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.add('gate')
+    return () => root.classList.remove('gate')
+  }, [])
 
   async function handleJoin() {
     const trimmedCode = code.trim().toUpperCase()
@@ -46,37 +60,81 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
     <main
       style={{
         minHeight: '100dvh',
-        background: `radial-gradient(1200px 600px at 50% -10%, #2B1E55 0%, ${C.night} 55%)`,
+        background: nightGround,
         ...body,
         color: C.parchment,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: 24,
+        padding: '24px 24px 28px',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* the fair's string of bulbs — top edge only, faded at both ends */}
+      <div
+        aria-hidden="true"
+        className="bulb-row"
+        style={{ position: 'absolute', top: 'calc(10px + env(safe-area-inset-top))', left: 0, right: 0, opacity: 0.7 }}
+      />
       <Lanterns />
-      <div className="w-full mx-auto" style={{ maxWidth: 480 }}>
-        <div className="text-center mb-7" style={{ animation: 'cardRise .45s ease-out' }}>
-          <div className="spark" style={{ fontSize: 28 }} aria-hidden="true">
-            ✦
+      <div className="w-full mx-auto" style={{ maxWidth: 480, position: 'relative' }}>
+        <div className="text-center mb-6" style={{ animation: 'cardRise .45s var(--ease-lantern)' }}>
+          {/* the emblem: the lantern hung over two lines of the Sea */}
+          <div className="mx-auto" style={{ display: 'inline-block', filter: 'drop-shadow(0 0 18px rgba(240,181,79,0.28))' }} aria-hidden="true">
+            <Lantern size={84} waves />
           </div>
-          <h1 className="title-glow" style={{ ...display, fontSize: 36, fontWeight: 700, color: C.gold, marginTop: 8 }}>
+          <p style={{ ...eyebrow, letterSpacing: '0.3em', marginTop: 8 }}>The Getting Fair · Saltmere</p>
+          <h1
+            className="title-glow"
+            style={{
+              ...display,
+              fontVariationSettings: "'opsz' 144",
+              fontSize: 42,
+              fontWeight: 700,
+              color: C.gold,
+              marginTop: 4,
+              lineHeight: 1.05,
+              letterSpacing: '-0.01em',
+              textWrap: 'balance',
+            }}
+          >
             The Song the Sea Forgot
           </h1>
-          <p className="mt-3 italic" style={{ color: C.faint }}>
+          <SparkRule style={{ maxWidth: 220, margin: '14px auto 0' }} />
+          <p className="mt-3" style={{ ...display, fontStyle: 'italic', fontWeight: 600, fontSize: 18, lineHeight: 1.4, color: C.faint, textWrap: 'balance' }}>
             The carnival never charges coin. What it does charge is another matter.
           </p>
         </div>
 
         <div
           className="rounded-xl p-5 grid gap-4 gate-card"
-          style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, animation: 'cardRise .55s ease-out' }}
+          style={{ ...panelSurface, borderRadius: 14, animation: 'cardRise .55s var(--ease-lantern)', position: 'relative' }}
         >
+          {/* brass corner marks — the ticket booth. On the card only. */}
+          {(['nw', 'ne', 'sw', 'se'] as const).map((k) => (
+            <span
+              key={k}
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                width: 14,
+                height: 14,
+                top: k[0] === 'n' ? 6 : undefined,
+                bottom: k[0] === 's' ? 6 : undefined,
+                left: k[1] === 'w' ? 6 : undefined,
+                right: k[1] === 'e' ? 6 : undefined,
+                borderTop: k[0] === 'n' ? `1px solid ${C.brassDim}` : undefined,
+                borderBottom: k[0] === 's' ? `1px solid ${C.brassDim}` : undefined,
+                borderLeft: k[1] === 'w' ? `1px solid ${C.brassDim}` : undefined,
+                borderRight: k[1] === 'e' ? `1px solid ${C.brassDim}` : undefined,
+                opacity: 0.85,
+                pointerEvents: 'none',
+              }}
+            />
+          ))}
           <label className="grid gap-1">
-            <span className="text-sm" style={{ color: C.sea }}>
-              Invitation code
-            </span>
+            <span style={{ ...eyebrow, letterSpacing: '0.18em' }}>Invitation code</span>
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -87,19 +145,19 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
               spellCheck={false}
               className="w-full rounded-lg px-4 py-3 outline-none uppercase"
               style={{
-                background: C.night,
-                border: `1px solid ${C.panelEdge}`,
-                color: C.parchment,
-                letterSpacing: '0.12em',
-                minHeight: 44,
+                ...body,
+                ...wellSurface,
+                color: C.goldHi,
+                letterSpacing: '0.18em',
+                fontWeight: 600,
+                fontSize: 17,
+                minHeight: 46,
               }}
             />
           </label>
 
           <label className="grid gap-1">
-            <span className="text-sm" style={{ color: C.sea }}>
-              Your name
-            </span>
+            <span style={{ ...eyebrow, letterSpacing: '0.18em' }}>Your name</span>
             <TextInput
               value={name}
               onChange={setName}
@@ -119,7 +177,8 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
           </Btn>
         </div>
 
-        <p className="text-center mt-6" style={{ color: C.faint, fontSize: 11, lineHeight: 1.5 }}>
+        {/* the legal line — full --faint, 11px, clear of the card's shadow */}
+        <p className="text-center" style={{ color: C.faint, fontSize: 11, lineHeight: 1.5, marginTop: 40, position: 'relative' }}>
           Unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by
           Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards
           of the Coast LLC. Includes content from the SRD 5.2, © Wizards of the Coast, licensed

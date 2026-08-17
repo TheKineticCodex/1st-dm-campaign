@@ -4,6 +4,7 @@
 // sections including the private "What I lost".
 
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { ABILITIES, CONDITIONS, SKILL_ABILITY, fmt, mod, type AbilityKey } from '../data/rules'
 import type { BagItem } from '../types'
 import { computeSheet, saveMod, skillMod } from '../lib/compute'
@@ -19,7 +20,44 @@ import { buzz, heartbeat } from '../lib/phoneSound'
 import { LevelUp } from './LevelUp'
 import type { Feature } from '../data/levels'
 import { SpellChips, SpellsSection } from './SpellsSection'
-import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display, Fold } from './ui'
+import { Btn, C, Eyebrow, H, HintOnce, Section, TextArea, display, Fold, body, bloodLit, eyebrow, goldAction, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { Icon, Spark } from './icons'
+
+/** Text for screen readers and tests only (the glyph beside it is the visible mark). */
+const SR_ONLY: CSSProperties = { position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }
+
+/** The HP / AC / Speed cards: the artifact material (.paper) with a brass-ink label and lining numerals.
+ *  Layout is unchanged for now (the re-layout waits until after session 3). */
+const TILE: CSSProperties = { position: 'relative', overflow: 'hidden', border: `1px solid ${C.brassDim}55`, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35), 0 6px 18px rgba(0,0,0,0.35)' }
+const TILE_LABEL: CSSProperties = { ...eyebrow, color: C.brassInk, letterSpacing: '0.18em' }
+const TILE_NUM: CSSProperties = { ...body, ...numerals, fontSize: 28, fontWeight: 600, color: C.ink, lineHeight: 1.25, whiteSpace: 'nowrap' }
+
+/** A pip you spend: unspent = lit ember + the drawn ✦; spent = a dashed brass-dim rim. Never solid gold. */
+function Pip({ spent, size = 40, label, onClick }: { spent: boolean; size?: number; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      aria-pressed={spent}
+      onClick={onClick}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 10,
+        ...(spent
+          ? { background: 'transparent', border: `1px dashed ${C.brassDim}`, color: C.brassDim, boxShadow: 'none' }
+          : { ...onState, boxShadow: `${onState.boxShadow}, 0 0 12px -2px rgba(240,181,79,0.35)` }),
+        cursor: 'pointer',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 0,
+      }}
+    >
+      {spent ? <span aria-hidden="true" style={{ width: 5, height: 5, borderRadius: '50%', background: C.brassDim, opacity: 0.7 }} /> : <Spark size={Math.round(size * 0.4)} />}
+    </button>
+  )
+}
 
 interface SheetTabProps {
   character: SavedCharacter | null
@@ -93,7 +131,7 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
 
   return (
     <Section style={{ marginTop: 16 }}>
-      <Eyebrow>🎒 the bag</Eyebrow>
+      <Eyebrow><Icon name="bag" size={14} style={{ marginRight: 6, marginTop: -2 }} />the bag</Eyebrow>
       <p className="text-xs" style={{ color: C.faint }}>
         Tap a weapon to equip or put it away. No weapon in hand = unarmed strikes.
       </p>
@@ -108,22 +146,21 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
                 aria-pressed={item.kind === 'weapon' ? item.equipped : undefined}
                 className="w-full rounded-lg px-1 py-2 text-center"
                 style={{
-                  background: lit ? `${C.gold}1f` : C.night,
-                  border: `1.5px solid ${lit ? C.gold : C.panelEdge}`,
-                  boxShadow: lit ? `0 0 10px ${C.gold}44` : 'none',
+                  ...(lit ? { ...onState, boxShadow: `${onState.boxShadow}, 0 0 12px -2px rgba(240,181,79,0.3)` } : { ...wellSurface, color: C.parchment }),
                   minHeight: 76,
                   cursor: 'pointer',
                 }}
               >
+                {/* item.icon is the player's own data (their chosen emoji) — content, not chrome */}
                 <span style={{ fontSize: 26, display: 'block', filter: item.kind === 'weapon' && !item.equipped ? 'grayscale(1) opacity(0.6)' : 'none' }}>
                   {item.icon}
                 </span>
-                <span className="text-xs block mt-1" style={{ color: lit ? C.gold : C.parchment, lineHeight: 1.15 }}>
+                <span className="text-xs block mt-1" style={{ color: lit ? C.goldHi : C.parchment, lineHeight: 1.15 }}>
                   {item.name}
                 </span>
                 {item.kind !== 'trinket' && (
-                  <span className="text-[10px] block" style={{ color: lit ? C.gold : C.faint }}>
-                    {item.equipped ? '✦ equipped' : 'put away'}
+                  <span className="text-[10px] block" style={{ color: lit ? C.goldHi : C.faint, fontWeight: lit ? 600 : 400 }}>
+                    {item.equipped ? <><Spark size={9} style={{ marginRight: 3, marginTop: -1 }} />equipped</> : 'put away'}
                   </span>
                 )}
               </button>
@@ -132,10 +169,10 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
                   type="button"
                   aria-label={`Drop ${item.name}`}
                   onClick={() => onChange(bag.filter((i) => i.id !== item.id))}
-                  className="absolute -top-1.5 -right-1.5 rounded-full"
-                  style={{ width: 22, height: 22, fontSize: 11, background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.faint, cursor: 'pointer' }}
+                  className="absolute -top-1.5 -right-1.5 rounded-full inline-flex items-center justify-center"
+                  style={{ width: 22, height: 22, background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.faint, cursor: 'pointer', padding: 0 }}
                 >
-                  ✕
+                  <Icon name="cross" size={11} />
                 </button>
               )}
             </div>
@@ -152,7 +189,7 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
           value={newIcon}
           onChange={(e) => setNewIcon(e.target.value)}
           aria-label="Icon for the new thing"
-          style={{ background: C.night, border: `1px solid ${C.panelEdge}`, borderRadius: 8, color: C.parchment, fontSize: 18, minHeight: 44, padding: '0 6px' }}
+          style={{ ...wellSurface, borderRadius: 8, color: C.parchment, fontSize: 18, minHeight: 44, padding: '0 6px' }}
         >
           {BAG_EMOJI.map((e) => (
             <option key={e} value={e}>
@@ -166,13 +203,13 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
           onKeyDown={(e) => e.key === 'Enter' && addItem()}
           placeholder="Something the story handed you…"
           className="flex-1 rounded-lg px-3"
-          style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44 }}
+          style={{ ...wellSurface, color: C.parchment, minHeight: 44, minWidth: 0 }}
         />
         <button
           type="button"
           onClick={addItem}
           className="rounded-lg px-3"
-          style={{ background: `${C.gold}22`, border: `1px solid ${C.gold}`, color: C.gold, minHeight: 44, cursor: 'pointer' }}
+          style={{ ...body, fontWeight: 600, ...onState, minHeight: 44, cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           + keep it
         </button>
@@ -182,10 +219,10 @@ export function BagSection({ bag, onChange }: { bag: BagItem[]; onChange: (next:
 }
 
 export type Coins = { gp: number; sp: number; cp: number }
-const COIN_META: { key: keyof Coins; name: string; glyph: string; tint: string }[] = [
-  { key: 'gp', name: 'Gold', glyph: '🪙', tint: '#E8B84B' },
-  { key: 'sp', name: 'Silver', glyph: '⚪', tint: '#C6CCD8' },
-  { key: 'cp', name: 'Copper', glyph: '🟤', tint: '#C08B5A' },
+const COIN_META: { key: keyof Coins; name: string; tint: string }[] = [
+  { key: 'gp', name: 'Gold', tint: C.gold },
+  { key: 'sp', name: 'Silver', tint: '#C6CCD8' },
+  { key: 'cp', name: 'Copper', tint: C.copper },
 ]
 
 /** The Purse: gold / silver / copper with big ± taps. 10 sp = 1 gp, 10 cp = 1 sp. */
@@ -194,21 +231,21 @@ export function PurseSection({ coins, onChange }: { coins: Coins; onChange: (nex
     onChange({ ...coins, [key]: Math.max(0, (coins[key] ?? 0) + delta) })
   return (
     <Section style={{ marginTop: 16 }}>
-      <Eyebrow>🪙 the purse</Eyebrow>
+      <Eyebrow><Icon name="purse" size={14} style={{ marginRight: 6, marginTop: -2 }} />the purse</Eyebrow>
       <p className="text-xs" style={{ color: C.faint }}>
         10 copper = 1 silver · 10 silver = 1 gold
       </p>
       <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        {COIN_META.map(({ key, name, glyph, tint }) => (
+        {COIN_META.map(({ key, name, tint }) => (
           <div
             key={key}
             className="rounded-lg p-2 text-center"
-            style={{ background: C.night, border: `1.5px solid ${tint}55` }}
+            style={{ ...wellSurface, border: `1px solid ${tint}55` }}
           >
-            <p className="text-xs" style={{ color: tint }}>
-              {glyph} {name}
+            <p className="text-xs inline-flex items-center gap-1" style={{ ...body, fontWeight: 600, color: tint }}>
+              <Icon name="coin" size={13} /> {name}
             </p>
-            <p style={{ ...display, fontSize: 30, fontWeight: 700, color: tint, lineHeight: 1.2 }}>
+            <p className="num" style={{ ...body, ...numerals, fontSize: 28, fontWeight: 600, color: tint, lineHeight: 1.2 }}>
               {coins[key] ?? 0}
             </p>
             <div className="flex justify-center gap-1 mt-1">
@@ -217,7 +254,7 @@ export function PurseSection({ coins, onChange }: { coins: Coins; onChange: (nex
                 aria-label={`Spend one ${name.toLowerCase()}`}
                 onClick={() => bump(key, -1)}
                 className="rounded-md"
-                style={{ minWidth: 44, minHeight: 40, background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, fontSize: 20, cursor: 'pointer' }}
+                style={{ minWidth: 44, minHeight: 44, ...panelSurface, color: C.parchment, fontSize: 20, cursor: 'pointer' }}
               >
                 −
               </button>
@@ -226,7 +263,7 @@ export function PurseSection({ coins, onChange }: { coins: Coins; onChange: (nex
                 aria-label={`Gain one ${name.toLowerCase()}`}
                 onClick={() => bump(key, 1)}
                 className="rounded-md"
-                style={{ minWidth: 44, minHeight: 40, background: `${tint}22`, border: `1px solid ${tint}88`, color: tint, fontSize: 20, cursor: 'pointer' }}
+                style={{ minWidth: 44, minHeight: 44, background: `linear-gradient(${tint}1f, ${tint}1f), ${C.nightDeep}`, border: `1px solid ${tint}99`, color: tint, fontSize: 20, cursor: 'pointer' }}
               >
                 +
               </button>
@@ -267,35 +304,24 @@ function FeatureUses({
               <strong className="text-sm" style={{ color: C.parchment }}>
                 {f.name}
                 {t && (
-                  <span className="text-xs ml-2 rounded-full px-2" style={{ background: `${C.sea}22`, color: C.sea, border: `1px solid ${C.sea}55` }}>
+                  <span className="text-xs ml-2 rounded-full px-2" style={{ ...body, fontWeight: 600, background: `${C.sea}1f`, color: C.sea, border: `1px solid ${C.sea}66` }}>
                     {t}
                   </span>
                 )}
               </strong>
-              <span className="text-xs" style={{ color: C.faint }}>
+              <span className="text-xs num" style={{ ...numerals, color: C.faint }}>
                 {n - spent} of {n} · {f.uses!.per} rest
               </span>
             </div>
-            <div className="flex gap-2 mt-1">
+            <div className="flex flex-wrap gap-2 mt-1">
               {Array.from({ length: n }, (_, i) => (
-                <button
+                <Pip
                   key={i}
-                  type="button"
-                  aria-label={`${f.name} use ${i + 1} ${i < spent ? 'spent' : 'available'}`}
+                  size={44}
+                  spent={i < spent}
+                  label={`${f.name} use ${i + 1} ${i < spent ? 'spent' : 'available'}`}
                   onClick={() => onChange(f.name, i < spent ? i : i + 1)}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    border: `2px solid ${C.gold}`,
-                    background: i < spent ? 'transparent' : C.gold,
-                    color: i < spent ? C.faint : C.ink,
-                    fontSize: 16,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {i < spent ? '·' : '✦'}
-                </button>
+                />
               ))}
             </div>
             {f.text && (
@@ -523,36 +549,42 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
       >
         <div
           className="flex items-center gap-2 rounded-xl px-2.5 py-1.5"
-          style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}
+          style={{ ...panelSurface, boxShadow: 'inset 0 1px 0 rgba(255,214,150,0.09), 0 8px 24px rgba(0,0,0,0.35)' }}
         >
+          {/* vitals: the Sea when healthy, blood when low — lit, never filled */}
           <span
-            className="rounded-full px-2.5 py-1 text-sm"
+            className="rounded-full px-2.5 py-1 text-sm inline-flex items-center gap-1 num"
             style={{
-              ...display,
-              fontWeight: 700,
-              background:
-                hpCurrent === 0 ? '#3d2030' : hpCurrent <= sheet.hpMax / 3 ? '#4a2a35' : `${C.sea}1a`,
-              color: hpCurrent === 0 ? '#C96A6A' : hpCurrent <= sheet.hpMax / 3 ? '#E0928F' : C.sea,
-              border: `1px solid ${hpCurrent <= sheet.hpMax / 3 ? '#C96A6A66' : `${C.sea}55`}`,
+              ...body,
+              ...numerals,
+              fontSize: 15,
+              fontWeight: 600,
+              ...(hpCurrent <= sheet.hpMax / 3 ? bloodLit : seaLit),
               whiteSpace: 'nowrap',
+              lineHeight: 1.2,
             }}
           >
-            ♥ <RollingNumber value={hpCurrent} />/{sheet.hpMax}
+            <Icon name="heart" size={13} />
+            <span>
+              <span style={SR_ONLY}>♥ </span>
+              <RollingNumber value={hpCurrent} />/{sheet.hpMax}
+            </span>
           </span>
-          <span className="text-sm" style={{ color: C.faint, whiteSpace: 'nowrap' }}>
-            🛡 {sheet.ac.val}
+          <span className="text-sm inline-flex items-center gap-1 num" style={{ ...numerals, color: C.faint, whiteSpace: 'nowrap' }}>
+            <Icon name="shield" size={14} /> {sheet.ac.val}
           </span>
           <span className="flex-1 flex flex-wrap gap-1 overflow-hidden" style={{ maxHeight: 26 }}>
             {state.conditions.map((c) => (
               <span
                 key={c}
                 className="rounded-full px-2 text-xs"
-                style={{ background: `${C.gold}1a`, border: `1px solid ${C.gold}55`, color: C.gold, lineHeight: '22px' }}
+                style={{ ...onState, lineHeight: '20px', boxShadow: 'none' }}
               >
                 {c}
               </span>
             ))}
           </span>
+          {/* the ONE brass action on the idle sheet; when the tray is open it goes sea-lit ("alive") */}
           <button
             type="button"
             aria-expanded={quickRoll}
@@ -560,22 +592,30 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             className="rounded-lg px-3 py-1.5 text-sm"
             style={{
               ...display,
+              fontSize: 18,
               fontWeight: 700,
-              background: quickRoll ? C.gold : `${C.gold}22`,
-              color: quickRoll ? C.ink : C.gold,
-              border: `1px solid ${C.gold}`,
-              minHeight: 38,
+              ...(quickRoll
+                ? { ...seaLit, boxShadow: `${seaLit.boxShadow}, 0 0 14px rgba(139,211,188,0.25)` }
+                : dying || concPrompt
+                  ? { ...panelSurface, color: C.gold, border: `1px solid ${C.brassDim}` } // the death save / the concentration check is the one gold then
+                  : goldAction),
+              minHeight: 40,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            🎲 Roll
+            {/* the die is drawn; the emoji stays for the a11y name only */}
+            <span style={SR_ONLY}>🎲 </span>
+            <Icon name="die" size={17} /> Roll
           </button>
         </div>
         {quickRoll && (
           <div
             className="grid grid-cols-6 gap-1 mt-1 rounded-xl p-1.5"
-            style={{ background: C.panel, border: `1px solid ${C.gold}44` }}
+            style={{ ...panelSurface, border: `1px solid ${C.brassDim}55` }}
           >
             {ABILITIES.map((a) => (
               <button
@@ -586,12 +626,12 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
                   setQuickRoll(false)
                 }}
                 className="rounded-lg py-1.5 text-center"
-                style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 48, cursor: 'pointer' }}
+                style={{ ...wellSurface, color: C.parchment, minHeight: 48, cursor: 'pointer' }}
               >
-                <span className="text-xs block" style={{ color: C.sea }}>
+                <span className="text-xs block" style={{ ...body, fontWeight: 600, color: C.sea }}>
                   {a}
                 </span>
-                <span className="text-sm block" style={{ ...display, fontWeight: 700 }}>
+                <span className="text-sm block num" style={{ ...body, ...numerals, fontWeight: 600 }}>
                   {fmt(mod(sheet.A[a as AbilityKey]))}
                 </span>
               </button>
@@ -616,8 +656,13 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <CharacterCard build={build} size="full" />
       </div>
       <p className="text-xs text-center" style={{ color: C.faint }}>
-        Level {sheet.level}
-        {build.subclass === null ? ` · subclass unlocks at level ${sheet.K.subclassAt} 🔒` : ` · ${build.subclass}`}
+        {build.subclass === null ? (
+          <>
+            Level {sheet.level} · subclass unlocks at level {sheet.K.subclassAt} <Icon name="lost" size={12} style={{ marginTop: -2, color: C.brassDim }} />
+          </>
+        ) : (
+          `Level ${sheet.level} · ${build.subclass}`
+        )}
       </p>
 
       {(announcedLevel > sheet.level || sheet.subclassDue || sheet.featDue) && (
@@ -632,13 +677,13 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
       {/* HP / AC / Speed */}
       <div className="grid grid-cols-3 gap-2 mt-3">
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+        <div className="rounded-lg py-3 text-center paper" style={TILE}>
           <span className="parchment-sheen" aria-hidden="true" />
-          <p className="text-xs" style={{ color: C.goldDim }}>
-            HP
-          </p>
-          <p style={{ ...display, fontSize: 26, fontWeight: 700 }}>
-            <RollingNumber value={hpCurrent} />/{sheet.hpMax}
+          <p style={TILE_LABEL}>HP</p>
+          <p className="num" style={TILE_NUM}>
+            <RollingNumber value={hpCurrent} />
+            <span className="num-sep" aria-hidden="true">/</span>
+            {sheet.hpMax}
           </p>
           <div className="flex justify-center gap-2 mt-1">
             <button
@@ -646,7 +691,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               aria-label="Take 1 damage"
               onClick={() => changeHp(-1)}
               className="rounded-md px-3"
-              style={{ background: C.ink, color: C.parchment, minWidth: 44, minHeight: 32, cursor: 'pointer' }}
+              style={{ background: 'transparent', color: C.ink, border: `1.5px solid ${C.brassInk}`, minWidth: 44, minHeight: 32, cursor: 'pointer', fontWeight: 700 }}
             >
               −
             </button>
@@ -655,7 +700,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               aria-label="Heal 1 HP"
               onClick={() => changeHp(1)}
               className="rounded-md px-3"
-              style={{ background: C.ink, color: C.parchment, minWidth: 44, minHeight: 32, cursor: 'pointer' }}
+              style={{ background: C.brassInk, color: C.parchment, border: `1.5px solid ${C.brassInk}`, minWidth: 44, minHeight: 32, cursor: 'pointer', fontWeight: 700 }}
             >
               +
             </button>
@@ -664,24 +709,20 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             type="button"
             onClick={() => setHpMore(!hpMore)}
             className="text-xs mt-1 underline"
-            style={{ color: C.goldDim, background: 'none', border: 'none', cursor: 'pointer', minHeight: 24 }}
+            style={{ ...body, fontWeight: 600, color: C.brassInk, background: 'none', border: 'none', cursor: 'pointer', minHeight: 24 }}
           >
             {hpMore ? 'less' : 'more…'}
           </button>
         </div>
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+        <div className="rounded-lg py-3 text-center paper" style={TILE}>
           <span className="parchment-sheen" aria-hidden="true" />
-          <p className="text-xs" style={{ color: C.goldDim }}>
-            AC
-          </p>
-          <p style={{ ...display, fontSize: 26, fontWeight: 700 }}>{sheet.ac.val}</p>
+          <p style={TILE_LABEL}>AC</p>
+          <p className="num" style={TILE_NUM}>{sheet.ac.val}</p>
         </div>
-        <div className="rounded-lg py-3 text-center" style={{ background: C.parchment, color: C.ink, position: 'relative', overflow: 'hidden' }}>
+        <div className="rounded-lg py-3 text-center paper" style={TILE}>
           <span className="parchment-sheen" aria-hidden="true" />
-          <p className="text-xs" style={{ color: C.goldDim }}>
-            Speed
-          </p>
-          <p style={{ ...display, fontSize: 26, fontWeight: 700 }}>{sheet.S.speed} ft</p>
+          <p style={TILE_LABEL}>Speed</p>
+          <p className="num" style={TILE_NUM}>{sheet.S.speed} ft</p>
         </div>
       </div>
       <p className="text-xs mt-1" style={{ color: C.faint }}>
@@ -695,7 +736,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </button>
       </p>
       {hpMore && (
-        <div className="flex items-center gap-2 mt-2 rounded-lg p-2" style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}>
+        <div className="flex items-center gap-2 mt-2 rounded-lg p-2" style={panelSurface}>
           <input
             inputMode="numeric"
             pattern="[0-9]*"
@@ -703,8 +744,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             onChange={(e) => setHpAmt(e.target.value.replace(/[^0-9]/g, ''))}
             placeholder="how much?"
             aria-label="Amount of damage or healing"
-            className="rounded-md px-3 py-2 text-base"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44, width: 110 }}
+            className="rounded-md px-3 py-2 text-base num"
+            style={{ ...wellSurface, ...numerals, color: C.parchment, minHeight: 44, width: 110 }}
           />
           <button
             type="button"
@@ -714,7 +755,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               setHpAmt('')
             }}
             className="flex-1 rounded-md px-3 py-2 text-sm font-semibold"
-            style={{ background: '#4a2a35', color: '#E0928F', border: '1px solid #C96A6A66', minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.5 }}
+            style={{ ...bloodLit, minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.55 }}
           >
             − hurt
           </button>
@@ -726,7 +767,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               setHpAmt('')
             }}
             className="flex-1 rounded-md px-3 py-2 text-sm font-semibold"
-            style={{ background: `${C.sea}1a`, color: C.sea, border: `1px solid ${C.sea}55`, minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.5 }}
+            style={{ ...seaLit, minHeight: 44, cursor: 'pointer', opacity: hpAmt ? 1 : 0.55 }}
           >
             + heal
           </button>
@@ -735,54 +776,48 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
 
       {/* Death saves at 0 HP */}
       {dying && (
-        <Section style={{ marginTop: 12, border: `2px solid #C96A6A`, boxShadow: '0 0 28px #C96A6A44', animation: 'dyingPulse 1.6s ease-in-out infinite' }}>
-          <Eyebrow>Death saving throws — hold on</Eyebrow>
+        <Section style={{ marginTop: 12, background: `linear-gradient(rgba(216,128,120,0.06), rgba(216,128,120,0.06)), ${C.nightDeep}`, border: `2px solid ${C.blood}`, boxShadow: `0 0 28px rgba(216,128,120,0.25)`, animation: 'dyingPulse 1.6s ease-in-out infinite' }}>
+          <Eyebrow style={{ color: C.blood }}>Death saving throws — hold on</Eyebrow>
           <div className="flex items-center justify-between mt-1">
             <span className="text-sm">Successes</span>
-            <span>
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  aria-label={`Death save success ${i + 1}`}
-                  onClick={() => deathPip('successes', i)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    fontSize: 22,
-                    cursor: 'pointer',
-                    color: i < state.deathSaves.successes ? C.sea : C.panelEdge,
-                    minWidth: 44,
-                    minHeight: 44,
-                  }}
-                >
-                  ●
-                </button>
-              ))}
+            <span className="inline-flex">
+              {[0, 1, 2].map((i) => {
+                const on = i < state.deathSaves.successes
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Death save success ${i + 1}`}
+                    aria-pressed={on}
+                    onClick={() => deathPip('successes', i)}
+                    className="inline-flex items-center justify-center"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', minWidth: 44, minHeight: 44, padding: 0 }}
+                  >
+                    <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: '50%', ...(on ? { ...seaLit, boxShadow: `${seaLit.boxShadow}, 0 0 10px rgba(139,211,188,0.45)`, background: `linear-gradient(rgba(139,211,188,0.5), rgba(139,211,188,0.5)), ${C.nightDeep}` } : { background: 'transparent', border: `1px dashed ${C.brassDim}`, opacity: 0.8 }) }} />
+                  </button>
+                )
+              })}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm">Failures</span>
-            <span>
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  aria-label={`Death save failure ${i + 1}`}
-                  onClick={() => deathPip('failures', i)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    fontSize: 22,
-                    cursor: 'pointer',
-                    color: i < state.deathSaves.failures ? '#C96A6A' : C.panelEdge,
-                    minWidth: 44,
-                    minHeight: 44,
-                  }}
-                >
-                  ●
-                </button>
-              ))}
+            <span className="inline-flex">
+              {[0, 1, 2].map((i) => {
+                const on = i < state.deathSaves.failures
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Death save failure ${i + 1}`}
+                    aria-pressed={on}
+                    onClick={() => deathPip('failures', i)}
+                    className="inline-flex items-center justify-center"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', minWidth: 44, minHeight: 44, padding: 0 }}
+                  >
+                    <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: '50%', ...(on ? { ...bloodLit, boxShadow: `${bloodLit.boxShadow}, 0 0 10px rgba(216,128,120,0.45)`, background: `linear-gradient(rgba(216,128,120,0.5), rgba(216,128,120,0.5)), ${C.nightDeep}` } : { background: 'transparent', border: `1px dashed ${C.brassDim}`, opacity: 0.8 }) }} />
+                  </button>
+                )
+              })}
             </span>
           </div>
           <Btn onClick={() => doRoll('Death save (10+ succeeds)', 0)}>Roll a death save</Btn>
@@ -812,9 +847,9 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <p
           role="status"
           className="text-sm mt-2 text-center italic"
-          style={{ color: concOutcome === 'held' ? C.sea : '#C96A6A' }}
+          style={{ color: concOutcome === 'held' ? C.sea : C.blood }}
         >
-          {concOutcome === 'held' ? '✦ The spell holds.' : 'The spell slips away like water…'}
+          {concOutcome === 'held' ? <><Spark size={12} style={{ marginRight: 4, marginTop: -2 }} />The spell holds.</> : 'The spell slips away like water…'}
         </p>
       )}
 
@@ -835,10 +870,10 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               <button
                 type="button"
                 onClick={() => updateState({ conditions: state.conditions.filter((x) => x !== c) })}
-                className="text-xs"
-                style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+                className="text-xs inline-flex items-center gap-1"
+                style={{ ...body, fontWeight: 600, color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
               >
-                clear ✕
+                clear <Icon name="cross" size={11} />
               </button>
             </div>
             <p className="text-xs" style={{ color: C.parchment, opacity: 0.85 }}>
@@ -867,7 +902,7 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
                     setShowConditionPicker(false)
                   }}
                   className="text-xs rounded-md px-3 py-2"
-                  style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 40, cursor: 'pointer' }}
+                  style={{ ...body, ...wellSurface, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
                 >
                   {c}
                 </button>
@@ -876,21 +911,28 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         )}
       </Section>
 
-      <p className="uppercase text-xs tracking-widest mt-5 mb-1" style={{ color: C.gold, letterSpacing: '0.25em' }}>
-        on your turn
+      <p className="mt-5 mb-1">
+        <span style={eyebrow}>on your turn</span>
       </p>
-      {/* Advantage toggle */}
+      {/* Advantage toggle — lit, never filled: the Sea for advantage, blood for disadvantage, ember for Normal */}
       <div className="flex gap-2 mt-3" role="group" aria-label="Roll mode">
         {(['disadvantage', 'normal', 'advantage'] as RollMode[]).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setRollMode(m)}
+            aria-pressed={rollMode === m}
             className="flex-1 rounded-md py-2 text-sm"
             style={{
-              background: rollMode === m ? (m === 'advantage' ? C.sea : m === 'disadvantage' ? '#B36B6B' : C.gold) : C.panel,
-              color: rollMode === m ? C.ink : C.faint,
-              border: `1px solid ${C.panelEdge}`,
+              ...body,
+              ...(rollMode === m
+                ? m === 'advantage'
+                  ? seaLit
+                  : m === 'disadvantage'
+                    ? bloodLit
+                    : onState
+                : { ...panelSurface, color: C.faint }),
+              fontWeight: rollMode === m ? 600 : 400,
               minHeight: 44,
               cursor: 'pointer',
             }}
@@ -911,18 +953,22 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <button
           type="button"
           onClick={rollAttack}
-          className="text-left w-full rounded-lg px-3 py-2"
-          style={{ background: C.night, border: `1px solid ${C.panelEdge}`, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
+          className="text-left w-full rounded-lg px-3 py-2 num"
+          style={{ ...wellSurface, ...numerals, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
         >
           {weaponInHand ? (
             <>
               <strong>{sheet.K.weapon.name}</strong>: d20 {fmt(sheet.atkMod)} to hit · damage{' '}
-              {sheet.K.weapon.die} {fmt(mod(sheet.A[sheet.K.weapon.ab]))} 🎲
+              {sheet.K.weapon.die} {fmt(mod(sheet.A[sheet.K.weapon.ab]))}{' '}
+              <Icon name="die" size={14} style={{ marginTop: -2, color: C.gold }} />
             </>
           ) : (
             <>
-              <strong>👊 Unarmed strike</strong>: d20 {fmt(unarmedMod)} to hit · damage{' '}
-              {Math.max(1, 1 + mod(sheet.A.STR))} flat 🎲
+              <strong className="inline-flex items-center gap-1.5">
+                <Icon name="fist" size={15} style={{ color: C.brassDim }} />Unarmed strike
+              </strong>
+              : d20 {fmt(unarmedMod)} to hit · damage {Math.max(1, 1 + mod(sheet.A.STR))} flat{' '}
+              <Icon name="die" size={14} style={{ marginTop: -2, color: C.gold }} />
             </>
           )}
         </button>
@@ -948,7 +994,8 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           />
           {sheet.level < 3 && (
             <p className="text-xs mt-2" style={{ color: C.faint }}>
-              Faerie Fire wakes in your blood at level 3 — once per long rest. 🔒
+              Faerie Fire wakes in your blood at level 3 — once per long rest.{' '}
+              <Icon name="lost" size={12} style={{ marginTop: -2, color: C.brassDim }} />
             </p>
           )}
         </Section>
@@ -977,16 +1024,18 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
               setConcPrompt(false)
               setConcOutcome(null)
             }}
-            className="mt-3 rounded-md px-3 py-2 text-sm"
+            className="mt-3 rounded-md px-3 py-2 text-sm inline-flex items-center gap-2 text-left"
             style={{
-              background: state.concentrating ? C.gold : C.night,
-              color: state.concentrating ? C.ink : C.faint,
-              border: `1px solid ${state.concentrating ? C.gold : C.panelEdge}`,
+              ...body,
+              // concentration is the Sea holding on: a seafoam outline, never a fill
+              ...(state.concentrating ? seaLit : { ...wellSurface, color: C.faint }),
+              fontWeight: state.concentrating ? 600 : 400,
               minHeight: 44,
               cursor: 'pointer',
             }}
           >
-            ◐ {state.concentrating ? 'Concentrating — tap when the spell ends' : 'Tap when you cast a concentration spell'}
+            <Icon name="half" size={15} style={{ flexShrink: 0 }} />
+            <span>{state.concentrating ? 'Concentrating — tap when the spell ends' : 'Tap when you cast a concentration spell'}</span>
           </button>
           {sheet.slotCount > 0 && (
             <div className="mt-3">
@@ -998,29 +1047,18 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
                 const used = usedSlots(lvl)
                 return (
                   <div key={lvl} className="flex items-center gap-2 mb-2">
-                    <span className="text-xs" style={{ color: C.faint, width: 44 }}>
+                    <span className="text-xs num" style={{ ...body, ...numerals, fontWeight: 600, color: C.faint, width: 44 }}>
                       {ordinal(lvl)}
                     </span>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {Array.from({ length: count }, (_, i) => (
-                        <button
+                        <Pip
                           key={i}
-                          type="button"
-                          aria-label={`Level ${lvl} spell slot ${i + 1} ${i < used ? 'used' : 'available'}`}
+                          size={44}
+                          spent={i < used}
+                          label={`Level ${lvl} spell slot ${i + 1} ${i < used ? 'used' : 'available'}`}
                           onClick={() => toggleSlot(i, lvl)}
-                          style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 10,
-                            border: `2px solid ${C.gold}`,
-                            background: i < used ? 'transparent' : C.gold,
-                            color: i < used ? C.faint : C.ink,
-                            fontSize: 18,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {i < used ? '·' : '✦'}
-                        </button>
+                        />
                       ))}
                     </div>
                   </div>
@@ -1041,43 +1079,44 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         </Btn>
       </div>
 
-      <p className="uppercase text-xs tracking-widest mt-5 mb-1" style={{ color: C.gold, letterSpacing: '0.25em' }}>
-        the rest of the sheet
+      <p className="mt-6 mb-2">
+        <span style={{ ...eyebrow, letterSpacing: '0.25em' }}>the rest of the sheet</span>
       </p>
       <Fold id="sheet-rolls" title="🎯 Abilities, saves & skills" defaultOpen>
-      {/* Abilities (tap = save roll) */}
+      {/* Abilities (tap = save roll). Proficient = lit, with the drawn mark. */}
       <div className="grid grid-cols-3 gap-2 mt-3">
-        {ABILITIES.map((a) => (
-          <button
-            key={a}
-            type="button"
-            onClick={() => doRoll(`${a} save`, saveMod(sheet, a as AbilityKey))}
-            className="rounded-lg py-3 text-center"
-            style={{
-              background: C.panel,
-              border: `1px solid ${sheet.K.saves.includes(a) ? C.gold : C.panelEdge}`,
-              color: C.parchment,
-              cursor: 'pointer',
-            }}
-          >
-            <p className="text-xs" style={{ color: C.faint }}>
-              {a}
-              {sheet.K.saves.includes(a) ? ' ◈' : ''}
-            </p>
-            <p style={{ ...display, fontSize: 24, fontWeight: 700 }}>{fmt(mod(sheet.A[a]))}</p>
-            <p className="text-xs" style={{ color: C.faint }}>
-              {sheet.A[a]}
-            </p>
-          </button>
-        ))}
+        {ABILITIES.map((a) => {
+          const proficient = sheet.K.saves.includes(a)
+          return (
+            <button
+              key={a}
+              type="button"
+              onClick={() => doRoll(`${a} save`, saveMod(sheet, a as AbilityKey))}
+              className="rounded-lg py-3 text-center"
+              style={{
+                ...(proficient ? onState : { ...panelSurface, color: C.parchment }),
+                cursor: 'pointer',
+              }}
+            >
+              <p className="text-xs inline-flex items-center gap-1" style={{ ...body, fontWeight: 600, color: proficient ? C.goldHi : C.faint }}>
+                {a}
+                {proficient && <Spark size={9} />}
+              </p>
+              <p className="num" style={{ ...display, ...numerals, fontSize: 24, fontWeight: 700, color: proficient ? C.goldHi : C.parchment }}>{fmt(mod(sheet.A[a]))}</p>
+              <p className="text-xs num" style={{ ...numerals, color: C.faint }}>
+                {sheet.A[a]}
+              </p>
+            </button>
+          )
+        })}
       </div>
-      <p className="text-xs mt-1" style={{ color: C.faint }}>
-        ◈ = proficient saving throw (add +{sheet.prof}) · tap to roll a save
+      <p className="text-xs mt-1 inline-flex items-center gap-1 flex-wrap" style={{ color: C.faint }}>
+        <Spark size={9} style={{ color: C.brassDim }} /> = proficient saving throw (add +{sheet.prof}) · tap to roll a save
       </p>
 
       {/* Skills (tap = check) */}
       <Section>
-        <Eyebrow>Skills — tap to roll (add +{sheet.prof} when ◈)</Eyebrow>
+        <Eyebrow>Skills — tap to roll (add +{sheet.prof} when marked)</Eyebrow>
         <div className="flex flex-wrap gap-2">
           {Object.keys(SKILL_ABILITY).map((s) => {
             const proficient = sheet.allSkills.includes(s)
@@ -1086,16 +1125,17 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
                 key={s}
                 type="button"
                 onClick={() => doRoll(s, skillMod(sheet, s))}
-                className="text-xs rounded-md px-3 py-2"
+                className="text-xs rounded-md px-3 py-2 inline-flex items-center gap-1.5 num"
                 style={{
-                  background: proficient ? C.panel : C.night,
-                  color: proficient ? C.parchment : C.faint,
-                  border: `1px solid ${proficient ? C.gold : C.panelEdge}`,
-                  minHeight: 40,
+                  ...body,
+                  ...numerals,
+                  ...(proficient ? onState : { ...wellSurface, color: C.faint }),
+                  fontWeight: proficient ? 600 : 400,
+                  minHeight: 44,
                   cursor: 'pointer',
                 }}
               >
-                {proficient ? '◈ ' : ''}
+                {proficient && <Spark size={9} />}
                 {s} {fmt(skillMod(sheet, s))}
               </button>
             )
@@ -1145,8 +1185,10 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
         <Eyebrow>Personality</Eyebrow>
         <TextArea rows={3} value={notes.personality} onChange={(v) => updateNotes({ personality: v })} placeholder="How you talk, what you love, what you can't resist…" />
       </Section>
-      <Section style={{ border: `1px solid ${C.gold}` }}>
-        <Eyebrow>What I lost 🔒 private</Eyebrow>
+      <Section style={{ border: `1px solid ${C.brassDim}` }}>
+        <Eyebrow>
+          What I lost <Icon name="lost" size={12} style={{ marginTop: -2 }} /> private
+        </Eyebrow>
         <p className="text-xs mb-2" style={{ color: C.faint }}>
           Only you and the Dungeon Master can read this. The carnival keeps its secrets.
         </p>
@@ -1180,9 +1222,14 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
             bottom: 'calc(76px + env(safe-area-inset-bottom))',
             maxWidth: 520,
             margin: '0 auto',
-            background: roll.isNat20 ? C.gold : roll.isNat1 ? '#3d2030' : C.panel,
+            // a nat 20 is the brass moment; a nat 1 is blood on night-deep
+            background: roll.isNat20
+              ? 'linear-gradient(180deg, #FFD88A 0%, #F0B54F 42%, #D59A3A 100%)'
+              : roll.isNat1
+                ? `linear-gradient(rgba(216,128,120,0.12), rgba(216,128,120,0.12)), ${C.nightDeep}`
+                : C.panelLift,
             color: roll.isNat20 ? C.ink : C.parchment,
-            border: `1px solid ${roll.isNat20 ? C.gold : roll.isNat1 ? '#C96A6A' : C.panelEdge}`,
+            border: `1px solid ${roll.isNat20 ? '#A8742A' : roll.isNat1 ? C.blood : C.panelEdge}`,
             boxShadow: '0 8px 32px rgba(0,0,0,.5)',
             animation: roll.isNat20 ? 'cardRise .3s ease-out, natTwentyGlow 1.6s ease-in-out infinite' : roll.isNat1 ? 'cardRise .3s ease-out, natOneGutter .5s ease-out' : 'cardRise .3s ease-out',
             zIndex: 46,
@@ -1195,15 +1242,15 @@ export function SheetTab({ character, onUpdate, onEdit, onGoFortune, store, play
           }}
         >
           {roll.isNat20 && <GoldBurst />}
-          <p className="text-xs uppercase tracking-widest" style={{ opacity: 0.8 }}>
+          <p className="text-xs uppercase" style={{ ...body, fontWeight: 600, letterSpacing: '0.2em', opacity: 0.85 }}>
             {roll.label}
             {roll.mode !== 'normal' ? ` · ${roll.mode}` : ''}
           </p>
-          <p style={{ ...display, fontSize: 52, fontWeight: 700, lineHeight: 1.1 }}>
+          <p className="num inline-flex items-center justify-center gap-1" style={{ ...display, ...numerals, fontSize: 52, fontWeight: 700, lineHeight: 1.1 }}>
             {roll.total}
-            {roll.isNat20 ? ' ✦!' : roll.isNat1 ? ' …oh no' : ''}
+            {roll.isNat20 ? <Spark size={30} /> : roll.isNat1 ? <span style={{ fontSize: 26 }}> …oh no</span> : null}
           </p>
-          <p className="text-xs" style={{ opacity: 0.8 }}>
+          <p className="text-xs num" style={{ ...numerals, opacity: 0.85 }}>
             d20: {roll.mode === 'normal' ? roll.dice[0] : `${roll.dice[0]} / ${roll.dice[1]} → kept ${roll.kept}`}
             {roll.modifier !== 0 ? ` ${fmt(roll.modifier)}` : ''}
             {damage ? ` · damage: ${damage.total} (${damage.rolls.join('+')}${damage.total - damage.rolls.reduce((s, r) => s + r, 0) !== 0 ? fmt(damage.total - damage.rolls.reduce((s, r) => s + r, 0)) : ''})` : ''}

@@ -7,7 +7,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { PARTY_SIZE, partyWord } from '../data/campaign'
 import { readCache, writeCache } from '../lib/storage'
 import type { RosterEntry, Store } from '../lib/store'
-import { C, display } from './ui'
+import { C, display, eyebrow, numerals, panelSurface, wellSurface } from './ui'
+import { Icon, Spark, type IconName } from './icons'
 
 interface ManualItem {
   id: string
@@ -17,7 +18,7 @@ interface ManualItem {
 interface Group {
   id: string
   title: string
-  glyph: string
+  glyph: IconName
   /** [done, total] pairs contributed by automatic measurements. */
   auto: { label: string; done: number; total: number }[]
   manual: ManualItem[]
@@ -27,7 +28,7 @@ function Bar({ pct, height = 10, gold = false }: { pct: number; height?: number;
   return (
     <div
       className="w-full rounded-full overflow-hidden"
-      style={{ height, background: C.night, border: `1px solid ${C.panelEdge}` }}
+      style={{ ...wellSurface, height }}
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
@@ -81,7 +82,7 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
       {
         id: 'party',
         title: `The ${partyWord} travelers`,
-        glyph: '❖',
+        glyph: 'roster',
         auto: [
           { label: 'walked through the gate', done: roster.length, total: PARTY_SIZE },
           { label: 'told the lanterns their fortune', done: roster.filter((r) => r.quiz).length, total: PARTY_SIZE },
@@ -92,14 +93,14 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
       {
         id: 'lost',
         title: 'The Lost Things',
-        glyph: '🔒',
+        glyph: 'lost',
         auto: [{ label: 'secrets written (what was taken / believed / true)', done: lostFilled, total: PARTY_SIZE }],
         manual: [],
       },
       {
         id: 'threads',
         title: "The Book's threads",
-        glyph: '🕯',
+        glyph: 'clues',
         auto: [{ label: 'Witchlight threads laid in the clue tracker', done: threadsLaid ? 1 : 0, total: 1 }],
         manual: [
           { id: 'ch1', label: "Skimmed Chapter 1's eight attractions" },
@@ -110,7 +111,7 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
       {
         id: 'witness',
         title: 'The witness protocol (two devices)',
-        glyph: '👁',
+        glyph: 'stage',
         auto: [],
         manual: [
           { id: 'w-whisper', label: 'A sealed whisper crossed devices' },
@@ -123,7 +124,7 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
       {
         id: 'table',
         title: 'The table itself',
-        glyph: '🕰',
+        glyph: 'table',
         auto: [],
         manual: [
           { id: 't-wifi', label: 'Wifi (or hotspot) confirmed where you play' },
@@ -149,19 +150,19 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
   const overall = groups.reduce((s, g) => s + groupPct(g), 0) / groups.length
 
   return (
-    <div className="rounded-xl p-4 mb-4" style={{ background: C.panel, border: `1px solid ${C.gold}66` }}>
+    <div className="rounded-xl p-4 mb-4" style={{ ...panelSurface, border: `1px solid ${C.brassDim}` }}>
       <div className="flex items-baseline justify-between">
-        <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+        <p style={{ ...eyebrow, letterSpacing: '0.22em' }}>
           The road to Night One
         </p>
-        <p style={{ ...display, fontSize: 26, fontWeight: 700, color: overall >= 100 ? C.sea : C.gold }}>
+        <p style={{ ...display, ...numerals, fontSize: 26, fontWeight: 700, color: overall >= 100 ? C.sea : C.gold }}>
           {Math.round(overall)}%
         </p>
       </div>
       <Bar pct={overall} height={14} gold />
       {overall >= 100 && (
-        <p className="text-sm mt-2 italic" style={{ color: C.sea }}>
-          ✦ The lanterns are lit, the chairs are full, the Book is ready. Play.
+        <p className="text-sm mt-2 italic flex items-center gap-1.5" style={{ color: C.sea }}>
+          <Spark size={12} /> The lanterns are lit, the chairs are full, the Book is ready. Play.
         </p>
       )}
 
@@ -180,9 +181,9 @@ export function NightOne({ store, roster }: { store: Store; roster: RosterEntry[
               >
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span>
-                    <span aria-hidden="true">{g.glyph}</span> {g.title}
+                    <Icon name={g.glyph} size={15} style={{ color: C.brassDim, marginRight: 6, marginTop: -2 }} />{g.title}
                   </span>
-                  <span style={{ color: pct >= 100 ? C.sea : C.faint }}>
+                  <span style={{ ...numerals, color: pct >= 100 ? C.sea : C.faint }}>
                     {pct >= 100 ? '✓' : `${Math.round(pct)}%`} {open ? '−' : '+'}
                   </span>
                 </div>

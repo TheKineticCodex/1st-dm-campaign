@@ -23,7 +23,13 @@ import {
 import { SUBCLASSES, maxSpellLevel } from '../data/levels'
 import type { ComputedSheet } from '../lib/compute'
 import type { CharacterBuild, CharacterState } from '../types'
-import { C, Eyebrow, Section, display } from './ui'
+import { C, Eyebrow, Section, display, goldAction, onState, wellSurface } from './ui'
+import { Icon, Spark } from './icons'
+
+/** A chip at rest: a small well inside the panel. */
+const chipRest = { ...wellSurface, boxShadow: 'none', color: C.parchment }
+/** The concentration mark, drawn. */
+const Conc = ({ color = C.faint }: { color?: string }) => <Icon name="half" size={12} style={{ color, marginLeft: 4, verticalAlign: '-0.1em' }} />
 
 interface SpellsSectionProps {
   build: CharacterBuild
@@ -71,10 +77,10 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
   }
   const levels = [...byLevel.keys()].sort()
 
+  // selected = lit (ember), never filled; at rest = a small well
   const chip = (selected: boolean, disabled = false) => ({
-    background: selected ? `${C.gold}22` : C.night,
-    border: `1px solid ${selected ? C.gold : C.panelEdge}`,
-    color: disabled ? C.faint : selected ? C.gold : C.parchment,
+    ...(selected ? onState : chipRest),
+    ...(disabled ? { color: C.faint } : {}),
     minHeight: 36,
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.6 : 1,
@@ -96,7 +102,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
     const isCantrip = (sp?.level ?? (starter.cantrips.includes(name) ? 0 : 1)) === 0
     const castable = !isCantrip && sp ? sheet.slotsByLevel.map((n, i) => ({ lvl: i + 1, free: n - usedSlots(i + 1) })).filter((s) => s.lvl >= sp.level && s.free > 0) : []
     return (
-      <div className="mt-2 rounded-lg px-3 py-3" style={{ background: C.night, border: `1px solid ${C.gold}44` }}>
+      <div className="mt-2 rounded-lg px-3 py-3" style={{ background: C.nightDeep, border: `1px solid ${C.gold}44` }}>
         <div className="flex items-baseline justify-between">
           <strong style={{ ...display, fontSize: 18, color: C.gold }}>{name}</strong>
           {sp && (
@@ -108,7 +114,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
         {sp && (
           <p className="text-xs mt-1" style={{ color: C.sea }}>
             {sp.time} · {sp.range} · {sp.duration}
-            {sp.tags?.includes('C') ? ' · ◐ concentration' : ''}
+            {sp.tags?.includes('C') ? <> · <Conc color={C.sea} />concentration</> : ''}
             {sp.tags?.includes('R') ? ' · ritual' : ''}
           </p>
         )}
@@ -122,13 +128,13 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
         )}
         <div className="flex flex-wrap gap-2 mt-3">
           {isCantrip ? (
-            <button type="button" onClick={() => cast(sp, name, null)} className="rounded-md px-3 py-2 text-sm" style={{ ...chip(true), minHeight: 44 }}>
-              ✦ Cast (free)
+            <button type="button" onClick={() => cast(sp, name, null)} className="rounded-md px-3 py-2 text-sm font-semibold" style={{ ...goldAction, minHeight: 44, cursor: 'pointer' }}>
+              Cast (free) ✦
             </button>
           ) : castable.length ? (
-            castable.map((s) => (
-              <button key={s.lvl} type="button" onClick={() => cast(sp, name, s.lvl)} className="rounded-md px-3 py-2 text-sm" style={{ ...chip(true), minHeight: 44 }}>
-                ✦ Cast with a {ordinal(s.lvl)} slot ({s.free} left)
+            castable.map((s, i) => (
+              <button key={s.lvl} type="button" onClick={() => cast(sp, name, s.lvl)} className="rounded-md px-3 py-2 text-sm font-semibold" style={{ ...(i === 0 ? goldAction : chip(true)), minHeight: 44, cursor: 'pointer' }}>
+                Cast with a {ordinal(s.lvl)} slot ({s.free} left){i === 0 ? ' ✦' : ''}
               </button>
             ))
           ) : (
@@ -153,7 +159,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
         return (
           <button key={n} type="button" aria-expanded={open === n} onClick={() => setOpen(open === n ? null : n)} className="rounded-md px-2.5 py-1.5 text-sm" style={chip(open === n)}>
             {n}
-            {sp?.tags?.includes('C') ? <span style={{ color: C.faint }}> ◐</span> : null}
+            {sp?.tags?.includes('C') ? <Conc /> : null}
           </button>
         )
       })}
@@ -195,8 +201,8 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
           <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
             {casting.lvl ? `${ordinal(casting.lvl)}-level slot spent` : 'cantrip'}
           </p>
-          <p style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>
-            ✦ {casting.name}
+          <p className="flex items-center justify-center gap-2" style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>
+            <Spark size={18} /> {casting.name}
           </p>
         </div>
       )}
@@ -209,10 +215,10 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
               setEditing(!editing)
               setOpen(null)
             }}
-            className="text-xs underline"
-            style={{ color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            className="text-sm underline inline-flex items-center gap-1"
+            style={{ color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer', fontWeight: 600 }}
           >
-            {editing ? 'done ✓' : '✎ change spells'}
+            {editing ? 'done' : <><Icon name="notes" size={14} />change spells</>}
           </button>
         )}
       </div>
@@ -248,7 +254,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
           ))}
           {open && card(open)}
           <p className="text-xs mt-2" style={{ color: C.faint }}>
-            Tap a spell to read it and cast it. ◐ marks concentration.
+            Tap a spell to read it and cast it. <Icon name="half" size={12} style={{ verticalAlign: '-0.1em' }} /> marks concentration.
           </p>
         </>
       )}
@@ -265,7 +271,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Search spells…"
             className="w-full rounded-md px-3 py-2 text-sm mb-2"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+            style={{ ...wellSurface, color: C.parchment, minHeight: 44 }}
           />
           <div className="flex gap-1 mb-2">
             {[0, ...Array.from({ length: maxLvl }, (_, i) => i + 1)].map((l) => (
@@ -293,7 +299,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
                   className="rounded-md px-2.5 py-1.5 text-sm"
                   style={chip(on, full)}
                 >
-                  {on ? '✦ ' : ''}
+                  {on ? <Spark size={11} style={{ marginRight: 4 }} /> : null}
                   {s.name}
                 </button>
               )
@@ -323,7 +329,7 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
                       className="rounded-md px-2.5 py-1.5 text-sm"
                       style={chip(on, full)}
                     >
-                      {on ? '📖 ' : ''}
+                      {on ? <Icon name="story" size={13} style={{ marginRight: 4 }} /> : null}
                       {s.name} <span style={{ color: C.faint }}>{ordinal(s.level)}</span>
                     </button>
                   )
@@ -350,9 +356,9 @@ export function SpellsSection({ build, sheet, usedSlots, castSpell, updateBuild,
                   className="rounded-md px-2.5 py-1.5 text-sm"
                   style={chip(on, full)}
                 >
-                  {on ? '✦ ' : ''}
+                  {on ? <Spark size={11} style={{ marginRight: 4 }} /> : null}
                   {s.name} <span style={{ color: C.faint }}>{ordinal(s.level)}</span>
-                  {s.tags?.includes('C') ? <span style={{ color: C.faint }}> ◐</span> : null}
+                  {s.tags?.includes('C') ? <Conc /> : null}
                 </button>
               )
             })}
@@ -387,9 +393,7 @@ export function SpellChips({ label, names }: { label: string; names: string[] })
             onClick={() => setOpen(open === n ? null : n)}
             className="rounded-md px-2.5 py-1.5 text-sm"
             style={{
-              background: open === n ? `${C.gold}22` : C.night,
-              border: `1px solid ${open === n ? C.gold : C.panelEdge}`,
-              color: open === n ? C.gold : C.parchment,
+              ...(open === n ? onState : chipRest),
               minHeight: 36,
               cursor: 'pointer',
             }}
@@ -399,7 +403,7 @@ export function SpellChips({ label, names }: { label: string; names: string[] })
         ))}
       </div>
       {open && (
-        <p className="text-sm mt-2 rounded-lg px-3 py-2 leading-relaxed" style={{ background: C.night, border: `1px solid ${C.gold}44`, color: C.parchment }}>
+        <p className="text-sm mt-2 rounded-lg px-3 py-2 leading-relaxed" style={{ background: C.nightDeep, border: `1px solid ${C.gold}44`, color: C.parchment }}>
           <span style={{ color: C.gold, fontStyle: 'italic' }}>{open} · </span>
           {(spellByName(open)?.text ?? SPELL_NOTES[open] ?? 'Ask the Lantern-Keeper — this one isn’t in the pocket-book yet.').replace(/\s*\/\/ VERIFY.*$/, '')}
         </p>

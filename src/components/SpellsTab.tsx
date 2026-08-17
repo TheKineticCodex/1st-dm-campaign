@@ -9,7 +9,8 @@ import { maxSpellLevel } from '../data/levels'
 import { computeSheet } from '../lib/compute'
 import type { SavedCharacter } from '../types'
 import { SpellChips, SpellsSection } from './SpellsSection'
-import { C, Eyebrow, H, Section, display } from './ui'
+import { C, Eyebrow, H, Section, display, onState, panelSurface, wellSurface } from './ui'
+import { Icon } from './icons'
 
 const ordinal = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`)
 
@@ -75,7 +76,7 @@ export function SpellsTab({ character, onUpdate }: { character: SavedCharacter |
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name, school, or what it does…"
             className="w-full rounded-md px-3 py-2 text-sm mt-1"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+            style={{ ...wellSurface, color: C.parchment, minHeight: 44 }}
           />
           <div className="flex gap-1 mt-2 flex-wrap">
             {[-1, 0, 1, 2, 3].map((l) => (
@@ -84,7 +85,8 @@ export function SpellsTab({ character, onUpdate }: { character: SavedCharacter |
                 type="button"
                 onClick={() => setLvl(l)}
                 className="rounded-md px-2 py-1 text-xs"
-                style={{ background: lvl === l ? C.gold : C.night, color: lvl === l ? C.ink : C.parchment, border: `1px solid ${lvl === l ? C.gold : C.panelEdge}`, minHeight: 36, cursor: 'pointer', opacity: l > maxLvl && l > 0 ? 0.5 : 1 }}
+                aria-pressed={lvl === l}
+                style={{ ...(lvl === l ? onState : { ...wellSurface, boxShadow: 'none', color: C.parchment }), minHeight: 36, cursor: 'pointer', opacity: l > maxLvl && l > 0 ? 0.5 : 1 }}
               >
                 {l < 0 ? 'all' : l === 0 ? 'cantrips' : ordinal(l)}
               </button>
@@ -97,7 +99,7 @@ export function SpellsTab({ character, onUpdate }: { character: SavedCharacter |
             {pool.map((s) => {
               const isOpen = open === s.name
               return (
-                <div key={s.name} className="rounded-lg mb-1.5 overflow-hidden" style={{ border: `1px solid ${isOpen ? C.gold : C.panelEdge}`, background: C.night }}>
+                <div key={s.name} className="rounded-lg mb-1.5 overflow-hidden" style={{ ...panelSurface, ...(isOpen ? { borderColor: C.gold } : {}) }}>
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : s.name)}
@@ -108,11 +110,11 @@ export function SpellsTab({ character, onUpdate }: { character: SavedCharacter |
                       <strong style={{ ...display, fontSize: 16 }}>{s.name}</strong>
                       <span className="text-xs ml-2" style={{ color: C.faint }}>
                         {s.level === 0 ? 'cantrip' : ordinal(s.level)} · {s.school}
-                        {s.tags?.includes('C') ? ' · ◐' : ''}
+                        {s.tags?.includes('C') ? <> · <Icon name="half" size={12} style={{ verticalAlign: '-0.1em' }} /></> : ''}
                         {s.tags?.includes('R') ? ' · ritual' : ''}
                       </span>
                     </span>
-                    <span style={{ color: C.gold }}>{isOpen ? '−' : '+'}</span>
+                    <span aria-hidden="true" style={{ color: C.brassDim, fontSize: 18, lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
                   </button>
                   {isOpen && (
                     <div className="px-3 pb-3">

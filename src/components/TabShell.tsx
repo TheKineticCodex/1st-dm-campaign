@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, Suspense, lazy } from 'react'
-import { clearDeviceSession, type DeviceSession, readCache, writeCache } from '../lib/storage'
+import { clearDeviceSession, type DeviceSession, isCalm, readCache, writeCache } from '../lib/storage'
 import { CLASSES } from '../data/rules'
 import { getStore } from '../lib/store'
 import { keepGlassLit } from '../lib/wakeLock'
@@ -30,26 +30,27 @@ const GuideTab = lazy(() => import('./GuideTab').then((m) => ({ default: m.Guide
 const StoryTab = lazy(() => import('./StoryTab').then((m) => ({ default: m.StoryTab })))
 const SpellsTab = lazy(() => import('./SpellsTab').then((m) => ({ default: m.SpellsTab })))
 const BagTab = lazy(() => import('./BagTab').then((m) => ({ default: m.BagTab })))
-import { C, CalmToggle, body } from './ui'
+import { C, CalmToggle, body, display, nightGround } from './ui'
+import { Icon, type IconName } from './icons'
 
 export type TabId = 'fortune' | 'build' | 'sheet' | 'spells' | 'bag' | 'story' | 'guide'
 
 // Quiet Interface law 2: the tab bar shows only the current chapter of a
 // player's story. Before the forge seals: the path to a character. After:
 // the tools of play. Build stays reachable via "Edit character".
-const TABS_CREATION: [TabId, string, string][] = [
-  ['fortune', '✦', 'Fortune'],
-  ['build', '⚒', 'Build'],
-  ['sheet', '❖', 'Sheet'],
-  ['guide', '✧', 'Guide'],
+const TABS_CREATION: [TabId, IconName, string][] = [
+  ['fortune', 'fortune', 'Fortune'],
+  ['build', 'build', 'Build'],
+  ['sheet', 'sheet', 'Sheet'],
+  ['guide', 'guide', 'Guide'],
 ]
 
-const TABS_PLAY: [TabId, string, string][] = [
-  ['sheet', '❖', 'Sheet'],
-  ['spells', '✦', 'Spells'],
-  ['bag', '🎒', 'Bag'],
-  ['story', '📖', 'Story'],
-  ['guide', '✧', 'Guide'],
+const TABS_PLAY: [TabId, IconName, string][] = [
+  ['sheet', 'sheet', 'Sheet'],
+  ['spells', 'spells', 'Spells'],
+  ['bag', 'bag', 'Bag'],
+  ['story', 'story', 'Story'],
+  ['guide', 'guide', 'Guide'],
 ]
 
 interface TabShellProps {
@@ -213,7 +214,7 @@ export function TabShell({ session, onLeave }: TabShellProps) {
     <div
       style={{
         minHeight: '100dvh',
-        background: `radial-gradient(1200px 600px at 50% -10%, #2B1E55 0%, ${C.night} 55%)`,
+        background: nightGround,
         ...body,
         color: C.parchment,
       }}
@@ -266,19 +267,44 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         <YourTurn character={character} sheet={liveSheet} onGo={() => setTurnSeen(true)} />
       )}
       <div className="w-full" style={{ maxWidth: 560 }}>
-        <div className="flex items-center justify-between mb-4" style={{ viewTransitionName: 'topbar' }}>
-          <p className="text-xs" style={{ color: C.faint }}>
-            ✦ {session.playerName} · {session.campaignCode}
-            {!store.shared && ' · offline'}
+        {/* The top bar wraps rather than truncates: at 390px the controls drop to
+            their own line so the player's name and the connection state both survive. */}
+        <div className="flex flex-wrap items-center justify-between gap-y-1 mb-4" style={{ viewTransitionName: 'topbar' }}>
+          <p className="text-xs flex items-center gap-1.5" style={{ ...body, fontWeight: 600, color: C.faint, flex: '1 1 190px', minWidth: 0, marginRight: 8 }}>
+            <Icon name="spark" size={12} style={{ color: C.gold, flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+              {session.playerName} · {session.campaignCode}
+            </span>
+            {/* the connection state lives OUTSIDE the truncating span so it survives 390px */}
+            {!store.shared && (
+              <span
+                title="Offline — this phone keeps its own copy"
+                className="inline-flex items-center gap-1"
+                style={{
+                  flexShrink: 0,
+                  color: C.brassDim,
+                  fontSize: 11,
+                  letterSpacing: '0.08em',
+                  lineHeight: 1,
+                  padding: '3px 7px 2px',
+                  borderRadius: 999,
+                  border: `1px solid ${C.brassDim}66`,
+                  background: `${C.nightDeep}`,
+                }}
+              >
+                <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: '50%', background: C.brassDim, boxShadow: `0 0 6px ${C.brassDim}` }} />
+                offline
+              </span>
+            )}
           </p>
-          <span className="flex items-center gap-3">
+          <span className="flex items-center gap-3" style={{ flexShrink: 0, marginLeft: 'auto' }}>
             {character && <LanternToggle />}
             <CalmToggle />
             <button
               type="button"
               onClick={handleLeave}
               className="text-xs"
-              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              style={{ ...body, fontWeight: 600, color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
             >
               leave
             </button>
@@ -353,32 +379,38 @@ export function TabShell({ session, onLeave }: TabShellProps) {
           role="status"
           aria-label="The forge seals"
           className="fixed inset-0 flex flex-col items-center justify-center"
-          style={{ background: `${C.night}F5`, zIndex: 80 }}
+          style={{
+            // fully opaque night-deep, lit from above like every ceremony
+            background: `radial-gradient(700px 360px at 50% -10%, rgba(240,181,79,0.16) 0%, transparent 70%), ${C.nightDeep}`,
+            zIndex: 80,
+          }}
         >
           <div style={{ position: 'relative' }}>
-            {[0, 0.35, 0.7].map((delay) => (
-              <div
-                key={delay}
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: -20,
-                  borderRadius: '50%',
-                  border: `2px solid ${C.gold}`,
-                  animation: `ring-burst 1.6s ease-out ${delay}s both`,
-                }}
-              />
-            ))}
+            {!isCalm() &&
+              [0, 0.35, 0.7].map((delay) => (
+                <div
+                  key={delay}
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: -20,
+                    borderRadius: '50%',
+                    border: `2px solid ${C.gold}`,
+                    animation: `ring-burst 1.6s ease-out ${delay}s both`,
+                  }}
+                />
+              ))}
             <CharacterCard build={draftBuild} size="full" />
           </div>
           <p
-            className="mt-6 text-center px-8"
+            className="mt-6 text-center px-8 title-glow"
             style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              ...display,
               fontSize: 24,
               fontWeight: 600,
               color: C.gold,
-              animation: 'ceremony-fade 2.1s ease-out both',
+              // under calm the line simply stays (ceremony-fade would end at opacity 0)
+              animation: isCalm() ? 'none' : 'ceremony-fade 2.1s ease-out both',
             }}
           >
             The Feywild takes notice of you.
@@ -390,18 +422,21 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         <button
           type="button"
           onClick={() => setTab('sheet')}
-          className="fixed left-4 text-sm rounded-lg px-4 py-2"
+          className="fixed left-4 text-sm rounded-lg px-4 py-2 inline-flex items-center gap-1.5"
           style={{
             top: 'calc(8px + env(safe-area-inset-top))',
-            background: C.panel,
+            ...body,
+            fontWeight: 600,
+            background: C.panelLift,
             border: `1px solid ${C.panelEdge}`,
+            boxShadow: `inset 0 1px 0 ${C.hairline}`,
             color: C.sea,
             minHeight: 44,
             cursor: 'pointer',
             zIndex: 55,
           }}
         >
-          ← back to your sheet
+          <Icon name="arrow" size={14} style={{ transform: 'scaleX(-1)' }} /> back to your sheet
         </button>
       )}
 
@@ -409,9 +444,12 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         <nav
         className="fixed bottom-0 left-0 right-0 flex justify-center"
         style={{
-          background: `${C.night}F2`,
+          // the glass shelf: 90% night, blurred, a warm hairline along its top edge
+          background: `linear-gradient(180deg, ${C.night}E6 0%, ${C.nightDeep}F0 100%)`,
           borderTop: `1px solid ${C.panelEdge}`,
-          backdropFilter: 'blur(8px)',
+          boxShadow: `inset 0 1px 0 ${C.hairline}, 0 -10px 30px rgba(0,0,0,0.35)`,
+          backdropFilter: 'blur(12px) saturate(1.1)',
+          WebkitBackdropFilter: 'blur(12px) saturate(1.1)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           zIndex: 50,
           viewTransitionName: 'tabbar',
@@ -419,21 +457,44 @@ export function TabShell({ session, onLeave }: TabShellProps) {
         aria-label="Sections"
       >
         <div className="flex w-full" style={{ maxWidth: 560 }}>
-          {(character ? TABS_PLAY.filter(([id]) => id !== 'spells' || isCaster(character)) : TABS_CREATION).map(([id, icon, label]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => go(id)}
-              className="flex-1 py-3 text-center"
-              style={{ color: tab === id ? C.gold : C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
-              aria-current={tab === id ? 'page' : undefined}
-            >
-              <span className="block text-lg" aria-hidden="true">
-                {icon}
-              </span>
-              <span className="text-xs">{label}</span>
-            </button>
-          ))}
+          {(character ? TABS_PLAY.filter(([id]) => id !== 'spells' || isCaster(character)) : TABS_CREATION).map(([id, icon, label]) => {
+            const on = tab === id
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => go(id)}
+                className="flex-1 text-center"
+                style={{
+                  color: on ? C.goldHi : C.faint,
+                  background: 'none',
+                  border: 'none',
+                  minHeight: 52,
+                  padding: '9px 2px 7px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'color .18s var(--ease-lantern)',
+                }}
+                aria-current={on ? 'page' : undefined}
+              >
+                {/* the glowing brass bar over the active tab */}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)',
+                    width: on ? 30 : 0, height: 2, borderRadius: 2,
+                    background: on ? 'linear-gradient(90deg, #D59A3A, #FFD98A 50%, #D59A3A)' : 'transparent',
+                    boxShadow: on ? `0 0 10px ${C.gold}, 0 0 22px ${C.gold}66` : 'none',
+                    transition: 'width .22s var(--ease-lantern)',
+                  }}
+                />
+                <span className="block" style={{ lineHeight: 0, filter: on ? `drop-shadow(0 0 6px ${C.gold}66)` : 'none' }}>
+                  <Icon name={icon} size={22} />
+                </span>
+                <span className="block" style={{ ...body, fontSize: 12, fontWeight: 600, marginTop: 3, letterSpacing: '0.02em', lineHeight: 1.2 }}>{label}</span>
+              </button>
+            )
+          })}
         </div>
       </nav>
       )}

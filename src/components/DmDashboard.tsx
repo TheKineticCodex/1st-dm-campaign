@@ -18,22 +18,23 @@ import { NightOne } from './NightOne'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
 import { TonightSection } from './TonightSection'
-import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display } from './ui'
+import { Btn, C, CalmToggle, Eyebrow, H, Section, TextArea, TextInput, body, display, eyebrow, nightGround, panelSurface, onState, seaLit, bloodLit, wellSurface, numerals } from './ui'
+import { Icon, Lantern, Spark, type IconName } from './icons'
 
 type DmSection = 'home' | 'tonight' | 'run' | 'cheat' | 'roster' | 'vault' | 'lost' | 'notes' | 'npcs' | 'clues' | 'table'
 
-const SECTIONS: [DmSection, string, string][] = [
-  ['home', '✦', 'Book'],
-  ['tonight', '⚑', 'Tonight'],
-  ['run', '🧭', 'Run'],
-  ['cheat', '📜', 'Cheat'],
-  ['roster', '❖', 'Roster'],
-  ['vault', '☾', 'Vault'],
-  ['lost', '🔒', 'Lost'],
-  ['notes', '✎', 'Notes'],
-  ['npcs', '🎭', 'NPCs'],
-  ['clues', '🕯', 'Clues'],
-  ['table', '⚔', 'Table'],
+const SECTIONS: [DmSection, IconName, string][] = [
+  ['home', 'book', 'Book'],
+  ['tonight', 'tonight', 'Tonight'],
+  ['run', 'run', 'Run'],
+  ['cheat', 'cheat', 'Cheat'],
+  ['roster', 'roster', 'Roster'],
+  ['vault', 'vault', 'Vault'],
+  ['lost', 'lost', 'Lost'],
+  ['notes', 'notes', 'Notes'],
+  ['npcs', 'npcs', 'NPCs'],
+  ['clues', 'clues', 'Clues'],
+  ['table', 'table', 'Table'],
 ]
 
 export interface WhisperPrefill {
@@ -101,38 +102,46 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
     <div
       style={{
         minHeight: '100dvh',
-        background: `radial-gradient(1200px 600px at 50% -10%, #2B1E55 0%, ${C.night} 55%)`,
+        background: nightGround,
         ...body,
         color: C.parchment,
       }}
       className="flex flex-col items-center px-4 pt-4 pb-24"
     >
       <div className="w-full" style={{ maxWidth: 900 }}>
-        <div className="flex items-center justify-between mb-1">
-          <h1 style={{ ...display, fontSize: 28, fontWeight: 700, color: C.gold }}>
-            ✦ The Lantern-Keeper's Book
+        {/* the Book's plate: emblem, Fraunces title, a hairline rule beneath */}
+        <div
+          className="flex items-center justify-between gap-x-4 gap-y-1 flex-wrap mb-1"
+          style={{ borderBottom: `1px solid ${C.panelEdge}`, boxShadow: `0 1px 0 ${C.hairline}`, paddingBottom: 8 }}
+        >
+          <h1
+            className="flex items-center gap-3"
+            style={{ ...display, fontVariationSettings: "'opsz' 96", fontSize: 'clamp(21px, 4.4vw, 28px)', fontWeight: 700, color: C.gold, textShadow: '0 1px 0 rgba(90,55,10,0.4), 0 0 18px rgba(240,181,79,0.16)', minWidth: 0, flex: '1 1 auto' }}
+          >
+            <Lantern size={34} style={{ flexShrink: 0 }} />
+            The Lantern-Keeper's Book
           </h1>
-          <span className="flex items-center gap-3">
+          <span className="flex items-center gap-3 flex-shrink-0">
             <button
               type="button"
               onClick={() => setAmbient(true)}
-              className="text-xs"
-              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              className="inline-flex items-center gap-1.5"
+              style={{ ...body, ...onState, fontSize: 12, fontWeight: 600, borderRadius: 999, padding: '0 14px', minHeight: 36, cursor: 'pointer' }}
             >
-              🎭 stage
+              <Icon name="stage" size={15} /> stage
             </button>
             <CalmToggle />
             <button
               type="button"
               onClick={handleLeave}
               className="text-xs"
-              style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+              style={{ ...body, fontWeight: 600, color: C.faint, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
             >
               leave
             </button>
           </span>
         </div>
-        <p className="text-xs mb-4" style={{ color: C.faint }}>
+        <p className="mb-4 mt-2" style={{ ...eyebrow, letterSpacing: '0.18em' }}>
           Dungeon Master view · {store.shared ? 'campaign-wide' : 'offline — showing this device only'}
         </p>
 
@@ -164,37 +173,54 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
       <nav
         className="fixed bottom-0 left-0 right-0 flex justify-center"
         style={{
-          background: `${C.night}F2`,
+          background: `linear-gradient(180deg, ${C.panel}F2, ${C.nightDeep}F8)`,
           borderTop: `1px solid ${C.panelEdge}`,
-          backdropFilter: 'blur(8px)',
+          boxShadow: 'inset 0 1px 0 rgba(255,214,150,0.08), 0 -10px 30px rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(10px)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           zIndex: 50,
         }}
         aria-label="DM sections"
       >
         <div className="flex w-full overflow-x-auto" style={{ maxWidth: 900 }}>
-          {SECTIONS.map(([id, glyph, label]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setSection(id)}
-              className="flex-1 py-2 text-center text-xs"
-              style={{
-                color: section === id ? C.gold : C.faint,
-                background: 'none',
-                border: 'none',
-                minHeight: 44,
-                minWidth: 64,
-                cursor: 'pointer',
-              }}
-              aria-current={section === id ? 'page' : undefined}
-            >
-              <span className="block" aria-hidden="true" style={{ fontSize: 15 }}>
-                {glyph}
-              </span>
-              {label}
-            </button>
-          ))}
+          {SECTIONS.map(([id, glyph, label]) => {
+            const on = section === id
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setSection(id)}
+                className="flex-1 pt-2 pb-1.5 text-center"
+                style={{
+                  ...body,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: on ? C.goldHi : C.faint,
+                  background: 'none',
+                  border: 'none',
+                  minHeight: 52,
+                  minWidth: 64,
+                  cursor: 'pointer',
+                  position: 'relative',
+                }}
+                aria-current={on ? 'page' : undefined}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                    width: 24, height: 2, borderRadius: 2,
+                    background: on ? C.gold : 'transparent',
+                    boxShadow: on ? `0 0 10px ${C.gold}` : 'none',
+                  }}
+                />
+                <span className="block" aria-hidden="true" style={{ lineHeight: 0, filter: on ? `drop-shadow(0 0 6px ${C.gold}66)` : 'none' }}>
+                  <Icon name={glyph} size={19} />
+                </span>
+                <span className="block" style={{ marginTop: 2 }}>{label}</span>
+              </button>
+            )
+          })}
         </div>
       </nav>
     </div>
@@ -257,14 +283,14 @@ function HomeSection({
 
       <Section>
         <div className="flex items-center justify-between">
-          <p className="uppercase text-xs tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+          <p style={{ ...eyebrow, letterSpacing: '0.22em' }}>
             The {partyWord} chairs
           </p>
           <button
             type="button"
             onClick={onRefresh}
             className="text-xs underline"
-            style={{ color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
+            style={{ ...body, fontWeight: 600, color: C.sea, background: 'none', border: 'none', minHeight: 44, cursor: 'pointer' }}
           >
             look again
           </button>
@@ -274,11 +300,11 @@ function HomeSection({
             <div
               key={r?.playerId ?? `empty-${i}`}
               className="rounded-xl p-3 text-center"
-              style={{
-                background: C.night,
-                border: `1px dashed ${r ? C.gold : C.panelEdge}`,
-                borderStyle: r ? 'solid' : 'dashed',
-              }}
+              style={
+                r
+                  ? { ...onState, color: C.parchment }
+                  : { ...wellSurface, border: `1px dashed ${C.panelEdge}` }
+              }
             >
               {r ? (
                 <>
@@ -290,8 +316,8 @@ function HomeSection({
                       style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${C.gold}` }}
                     />
                   ) : (
-                    <span className="block" style={{ fontSize: 26 }} aria-hidden="true">
-                      {r.character ? '❖' : '☾'}
+                    <span className="block" style={{ lineHeight: 0, color: C.gold }} aria-hidden="true">
+                      <Icon name={r.character ? 'roster' : 'vault'} size={26} />
                     </span>
                   )}
                   <p className="text-sm mt-1" style={{ color: C.parchment, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -303,8 +329,8 @@ function HomeSection({
                 </>
               ) : (
                 <>
-                  <span className="block" style={{ fontSize: 26, opacity: 0.4 }} aria-hidden="true">
-                    ✦
+                  <span className="block" style={{ lineHeight: 0, opacity: 0.4, color: C.gold }} aria-hidden="true">
+                    <Spark size={26} />
                   </span>
                   <p className="text-xs mt-1 italic" style={{ color: C.faint }}>
                     an empty chair,
@@ -318,23 +344,26 @@ function HomeSection({
         </div>
       </Section>
 
-      <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
-        {[
-          ['vault' as DmSection, '☾ Vault', `${roster.filter((r) => r.quiz).length} divinations kept`],
-          ['clues' as DmSection, '🕯 Clue paths', counts ? `${counts.clues} conclusions tracked` : '…'],
-          ['npcs' as DmSection, '🎭 NPCs', counts ? `${counts.npcs} souls in the book` : '…'],
-          ['notes' as DmSection, '✎ Sessions', counts ? `${counts.notes} nights recorded` : '…'],
-          ['roster' as DmSection, '⚖ Bargains', `${activeBargains} in force`],
-          ['table' as DmSection, '⚔ The Table', 'derby · dice · whispers · map'],
-        ].map(([id, label, detail]) => (
+      <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', alignContent: 'start', alignItems: 'start' }}>
+        {([
+          ['vault', 'vault', 'Vault', `${roster.filter((r) => r.quiz).length} divinations kept`],
+          ['clues', 'clues', 'Clue paths', counts ? `${counts.clues} conclusions tracked` : '…'],
+          ['npcs', 'npcs', 'NPCs', counts ? `${counts.npcs} souls in the book` : '…'],
+          ['notes', 'notes', 'Sessions', counts ? `${counts.notes} nights recorded` : '…'],
+          ['roster', 'roster', 'Bargains', `${activeBargains} in force`],
+          ['table', 'table', 'The Table', 'derby · dice · whispers · map'],
+        ] as [DmSection, IconName, string, string][]).map(([id, icon, label, detail]) => (
           <button
-            key={label as string}
+            key={label}
             type="button"
-            onClick={() => onGo(id as DmSection)}
+            onClick={() => onGo(id)}
             className="rounded-xl p-4 text-left"
-            style={{ background: C.panel, border: `1px solid ${C.panelEdge}`, color: C.parchment, cursor: 'pointer', minHeight: 44 }}
+            style={{ ...panelSurface, color: C.parchment, cursor: 'pointer', minHeight: 44 }}
           >
-            <p style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>{label}</p>
+            <p className="flex items-center gap-2" style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>
+              <Icon name={icon} size={18} style={{ color: C.goldDim }} />
+              {label}
+            </p>
             <p className="text-xs mt-1" style={{ color: C.faint }}>
               {detail}
             </p>
@@ -351,13 +380,13 @@ function HomeSection({
             of the song, the proof, the Ones Below, and the Moon.
           </p>
           <Btn onClick={() => void seedBook()} disabled={seeding}>
-            {seeding ? 'Threading the needle…' : 'Lay the threads ✦ (cast + clues)'}
+            {seeding ? 'Threading the needle…' : <>Lay the threads <Spark size={14} /> (cast + clues)</>}
           </Btn>
         </Section>
       )}
       {seeded && (
-        <p role="status" className="text-sm mt-3" style={{ color: C.sea }}>
-          ✦ The threads are laid — see Clues and NPCs. Edit everything; it's your book.
+        <p role="status" className="text-sm mt-3 flex items-center gap-1.5" style={{ color: C.sea }}>
+          <Spark size={12} /> The threads are laid — see Clues and NPCs. Edit everything; it's your book.
         </p>
       )}
     </div>
@@ -469,8 +498,8 @@ function RosterSection({
                           height: 54,
                           borderRadius: '50%',
                           objectFit: 'cover',
-                          border: `2px solid ${hp === 0 ? '#C96A6A' : C.gold}`,
-                          boxShadow: `0 0 10px ${hp === 0 ? '#C96A6A44' : `${C.gold}33`}`,
+                          border: `2px solid ${hp === 0 ? C.blood : C.gold}`,
+                          boxShadow: `0 0 10px ${hp === 0 ? `${C.blood}44` : `${C.gold}33`}`,
                         }}
                       />
                     )}
@@ -481,18 +510,18 @@ function RosterSection({
                     {r.character.build.bg}
                   </p>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="flex-1 rounded-full" style={{ height: 7, background: C.night, overflow: 'hidden' }}>
+                    <div className="flex-1 rounded-full" style={{ height: 7, background: C.nightDeep, border: `1px solid ${C.panelEdge}`, overflow: 'hidden' }}>
                       <div
                         style={{
                           width: `${((hp ?? 0) / sheet.hpMax) * 100}%`,
                           height: '100%',
-                          background: hp === 0 ? '#C96A6A' : (hp ?? 0) <= sheet.hpMax / 3 ? '#E0928F' : C.sea,
+                          background: hp === 0 ? C.blood : (hp ?? 0) <= sheet.hpMax / 3 ? C.blood : C.sea,
                           transition: 'width .3s ease',
                         }}
                       />
                     </div>
-                    <span className="text-xs" style={{ color: hp === 0 ? '#C96A6A' : C.sea, whiteSpace: 'nowrap' }}>
-                      ♥ {hp}/{sheet.hpMax}
+                    <span className="text-xs inline-flex items-center gap-1" style={{ ...numerals, color: hp === 0 ? C.blood : C.sea, whiteSpace: 'nowrap' }}>
+                      <Icon name="heart" size={12} /> {hp}/{sheet.hpMax}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
@@ -511,8 +540,8 @@ function RosterSection({
                       </span>
                     )}
                     {r.character.state.coins && (
-                      <span style={{ color: C.faint }}>
-                        🪙 <strong style={{ color: C.gold }}>{r.character.state.coins.gp}</strong>g{' '}
+                      <span className="inline-flex items-center gap-1" style={{ ...numerals, color: C.faint }}>
+                        <Icon name="purse" size={13} /> <strong style={{ color: C.gold }}>{r.character.state.coins.gp}</strong>g{' '}
                         {r.character.state.coins.sp}s {r.character.state.coins.cp}c
                       </span>
                     )}
@@ -523,11 +552,11 @@ function RosterSection({
                         key={c}
                         type="button"
                         onClick={() => sendCondition(r.playerName, c, false)}
-                        className="text-xs rounded-md px-2 py-1"
-                        style={{ background: C.night, color: C.gold, border: `1px solid ${C.gold}`, minHeight: 32, cursor: 'pointer' }}
+                        className="text-xs rounded-md px-2 py-1 inline-flex items-center gap-1"
+                        style={{ ...onState, minHeight: 32, cursor: 'pointer' }}
                         title={`Lift ${c}`}
                       >
-                        {c} ✕
+                        {c} <Icon name="cross" size={11} />
                       </button>
                     ))}
                     <button
@@ -549,7 +578,7 @@ function RosterSection({
                             type="button"
                             onClick={() => sendCondition(r.playerName, c, true)}
                             className="text-xs rounded-md px-2 py-1"
-                            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 32, cursor: 'pointer' }}
+                            style={{ ...wellSurface, color: C.parchment, minHeight: 32, cursor: 'pointer' }}
                           >
                             {c}
                           </button>
@@ -558,15 +587,15 @@ function RosterSection({
                   )}
                   {(r.character.notes.bargains ?? []).length > 0 && (
                     <div className="mt-2">
-                      <p className="text-xs uppercase tracking-widest" style={{ color: C.gold, letterSpacing: '0.15em' }}>
-                        ⚖ Bargains
-                      </p>
+                      <Eyebrow style={{ letterSpacing: '0.15em' }}>⚖ Bargains</Eyebrow>
                       {r.character.notes.bargains!.map((b) => (
                         <div key={b.id} className="flex items-center justify-between text-xs mt-1">
-                          <span style={{ color: b.status === 'broken' ? '#C96A6A' : C.parchment }}>
-                            {b.status === 'fulfilled' ? '✦ ' : b.status === 'broken' ? '💔 ' : ''}
-                            {b.title}
-                            <span style={{ color: C.faint }}> · {b.status}</span>
+                          <span className="inline-flex items-center gap-1" style={{ color: b.status === 'broken' ? C.blood : C.parchment }}>
+                            {b.status === 'fulfilled' ? <Spark size={11} style={{ color: C.gold }} /> : b.status === 'broken' ? <Icon name="heartBroken" size={12} /> : null}
+                            <span>
+                              {b.title}
+                              <span style={{ color: C.faint }}> · {b.status}</span>
+                            </span>
                           </span>
                           {b.status === 'sealed' && (
                             <span className="flex gap-1">
@@ -574,7 +603,7 @@ function RosterSection({
                                 type="button"
                                 onClick={() => void resolveBargain(r.playerName, b, 'fulfilled')}
                                 className="rounded px-2"
-                                style={{ background: C.gold, color: C.ink, border: 'none', minHeight: 30, cursor: 'pointer' }}
+                                style={{ ...onState, minHeight: 30, cursor: 'pointer' }}
                               >
                                 fulfill
                               </button>
@@ -582,7 +611,7 @@ function RosterSection({
                                 type="button"
                                 onClick={() => void resolveBargain(r.playerName, b, 'broken')}
                                 className="rounded px-2"
-                                style={{ background: '#3d2030', color: '#C96A6A', border: '1px solid #C96A6A', minHeight: 30, cursor: 'pointer' }}
+                                style={{ ...bloodLit, minHeight: 30, cursor: 'pointer' }}
                               >
                                 break
                               </button>
@@ -593,8 +622,8 @@ function RosterSection({
                     </div>
                   )}
                   {r.character.notes.lost && (
-                    <p className="text-xs mt-2" style={{ color: C.faint }}>
-                      🔒 What they lost: <em style={{ color: C.parchment }}>{r.character.notes.lost}</em>
+                    <p className="text-xs mt-2 flex items-center gap-1" style={{ color: C.faint }}>
+                      <Icon name="lost" size={12} /> <span>What they lost: <em style={{ color: C.parchment }}>{r.character.notes.lost}</em></span>
                     </p>
                   )}
                 </>
@@ -623,7 +652,7 @@ function VaultSection({
     <div style={{ animation: 'cardRise .4s ease-out' }}>
       <H>The quiz vault</H>
       <p className="text-sm mb-3" style={{ color: C.faint }}>
-        Raw material for each Lost Thing — the gold ✦ questions most of all. The ✉ beside any
+        Raw material for each Lost Thing — the gold <Spark size={12} style={{ color: C.gold }} /> questions most of all. The <Icon name="envelope" size={13} style={{ color: C.sea }} /> beside any
         answer forges it into a sealed whisper, their own words returned to them.
       </p>
       {withQuiz.length === 0 && <p style={{ color: C.faint }}>No divinations recorded yet.</p>}
@@ -643,23 +672,24 @@ function VaultSection({
             const key = KEY_QUESTIONS.has(q.id)
             return (
               <div key={q.id} className="mt-2">
-                <p className="text-xs" style={{ color: key ? C.gold : C.faint }}>
-                  {key ? '✦ ' : ''}
-                  {q.prompt}
+                <p className="text-xs flex items-center gap-1" style={{ color: key ? C.gold : C.faint }}>
+                  {key && <Spark size={11} />}
+                  <span>{q.prompt}</span>
                 </p>
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm" style={{ color: C.parchment }}>
-                    → {a}
+                  <p className="text-sm flex items-start gap-1.5" style={{ color: C.parchment }}>
+                    <Icon name="arrow" size={13} style={{ color: C.brassDim, marginTop: 4 }} /> <span>{a}</span>
                   </p>
                   <button
                     type="button"
                     onClick={() => onForgeWhisper(r.playerName, a)}
                     aria-label={`Forge this answer into a whisper for ${r.playerName}`}
                     title="Forge into a sealed whisper"
-                    className="text-sm flex-shrink-0"
-                    style={{ background: 'none', border: 'none', color: C.sea, minWidth: 40, minHeight: 40, cursor: 'pointer' }}
+                    className="text-sm flex-shrink-0 inline-flex items-center justify-center gap-0.5"
+                    style={{ background: 'none', border: 'none', color: C.sea, minWidth: 44, minHeight: 44, cursor: 'pointer' }}
                   >
-                    ✉✦
+                    <Icon name="envelope" size={16} />
+                    <Spark size={10} />
                   </button>
                 </div>
               </div>
@@ -961,16 +991,24 @@ function NpcSection({ store }: { store: Store }) {
                 “{n.pronunciation}”
               </p>
             )}
-            {n.trait && <p className="text-sm mt-1">🎭 {n.trait}</p>}
-            {n.motivation && <p className="text-sm">✦ {n.motivation}</p>}
+            {n.trait && (
+              <p className="text-sm mt-1 flex items-start gap-1.5">
+                <Icon name="mask" size={14} style={{ color: C.brassDim, marginTop: 3 }} /> <span>{n.trait}</span>
+              </p>
+            )}
+            {n.motivation && (
+              <p className="text-sm flex items-start gap-1.5">
+                <Spark size={12} style={{ color: C.gold, marginTop: 4 }} /> <span>{n.motivation}</span>
+              </p>
+            )}
             {n.secret && (
-              <p className="text-sm" style={{ color: C.faint }}>
-                🔒 {n.secret}
+              <p className="text-sm flex items-start gap-1.5" style={{ color: C.faint }}>
+                <Icon name="lost" size={14} style={{ marginTop: 3 }} /> <span>{n.secret}</span>
               </p>
             )}
             {n.connection && (
-              <p className="text-xs mt-1" style={{ color: C.sea }}>
-                ↪ {n.connection}
+              <p className="text-xs mt-1 flex items-start gap-1.5" style={{ color: C.sea }}>
+                <Icon name="arrow" size={12} style={{ marginTop: 3 }} /> <span>{n.connection}</span>
               </p>
             )}
           </Section>
@@ -1053,7 +1091,7 @@ function ClueSection({ store }: { store: Store }) {
               aria-label="Delete this conclusion"
               style={{ color: C.faint, background: 'none', border: 'none', minHeight: 44, minWidth: 44, cursor: 'pointer' }}
             >
-              ✕
+              <Icon name="cross" size={16} />
             </button>
           </div>
           {c.clues.map((cl, i) => (
@@ -1075,10 +1113,9 @@ function ClueSection({ store }: { store: Store }) {
                   width: 44,
                   height: 44,
                   borderRadius: 10,
-                  border: `2px solid ${cl.found ? C.sea : C.panelEdge}`,
-                  background: cl.found ? C.sea : 'transparent',
-                  color: C.ink,
+                  ...(cl.found ? seaLit : { ...wellSurface, border: `1px dashed ${C.brassDim}` }),
                   fontSize: 18,
+                  fontWeight: 700,
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}

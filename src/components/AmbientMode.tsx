@@ -5,7 +5,8 @@
 
 import type { RosterEntry } from '../lib/store'
 import { AURAS, DEFAULT_AURA } from './glyphs'
-import { C, Lanterns, display } from './ui'
+import { C, Lanterns, body, display } from './ui'
+import { Lantern, SparkRule } from './icons'
 
 interface AmbientModeProps {
   roster: RosterEntry[]
@@ -33,10 +34,16 @@ export function AmbientMode({ roster, onClose }: AmbientModeProps) {
         zIndex: 90,
         border: 'none',
         cursor: 'pointer',
-        background: `radial-gradient(1400px 800px at 50% -20%, #2B1E55 0%, ${C.night} 60%, #0D0820 100%)`,
+        background: `radial-gradient(1200px 700px at 50% -18%, rgba(240,181,79,0.22) 0%, rgba(240,181,79,0.06) 40%, transparent 68%), radial-gradient(1600px 1000px at 50% 115%, ${C.nightDeep} 0%, transparent 60%), ${C.night}`,
         color: C.parchment,
       }}
     >
+      {/* the fair's string of bulbs — the top edge only */}
+      <span
+        aria-hidden="true"
+        className="bulb-row"
+        style={{ position: 'absolute', top: 'calc(14px + env(safe-area-inset-top))', left: 0, right: 0, display: 'block' }}
+      />
       <Lanterns />
 
       {/* the party drifts like gallery paintings */}
@@ -77,25 +84,31 @@ export function AmbientMode({ roster, onClose }: AmbientModeProps) {
         className="absolute left-0 right-0"
         style={{ top: '38%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
       >
-        <span className="spark block" style={{ fontSize: 30 }} aria-hidden="true">
-          ✦
+        {/* the emblem: the lantern hanging over the Sea, breathing */}
+        <span className="spark inline-flex justify-center w-full" aria-hidden="true">
+          <Lantern size={96} waves />
+        </span>
+        {/* the place-line — the Fair, and where it has docked */}
+        <span className="block uppercase mt-4" style={{ ...body, fontSize: 'clamp(12px, 1.2vw, 15px)', letterSpacing: '0.4em', color: C.brassDim, fontWeight: 600 }}>
+          The Getting Fair · Saltmere
         </span>
         <span
-          className="title-glow block mt-3"
-          style={{ ...display, fontSize: 'clamp(38px, 7vw, 72px)', fontWeight: 700, color: C.gold, lineHeight: 1.1 }}
+          className="title-glow block mt-1"
+          style={{ ...display, fontVariationSettings: "'opsz' 144", fontSize: 'clamp(40px, 7.5vw, 84px)', fontWeight: 700, color: C.gold, lineHeight: 1.05, letterSpacing: '-0.01em' }}
         >
           The Song
           <br />
           the Sea Forgot
         </span>
-        <span className="block mt-4 italic" style={{ color: C.faint, fontSize: 18 }}>
+        <SparkRule style={{ maxWidth: 320, margin: '20px auto 0' }} />
+        <span className="block mt-4 italic" style={{ ...display, fontWeight: 600, color: C.parchment, fontSize: 'clamp(18px, 1.6vw, 22px)' }}>
           The carnival never charges coin. What it does charge is another matter.
         </span>
       </span>
 
       <span
         className="absolute left-0 right-0 text-xs"
-        style={{ bottom: 'calc(18px + env(safe-area-inset-bottom))', color: `${C.faint}88`, pointerEvents: 'none' }}
+        style={{ ...body, bottom: 'calc(18px + env(safe-area-inset-bottom))', color: C.faint, pointerEvents: 'none' }}
       >
         tap anywhere to open the Book
       </span>

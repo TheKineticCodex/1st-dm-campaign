@@ -5,7 +5,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { NoteInput, NoteState } from '../../lib/games'
-import { C, display } from '../ui'
+import { C, bloodLit, display, eyebrow, numerals } from '../ui'
+import { Icon } from '../icons'
 
 // A soft sustained tone on the phone while you hold. Needs audio unlocked —
 // which the hold itself provides (it is a tap).
@@ -45,7 +46,8 @@ function stopTone() {
 }
 
 const NOTE_NAMES: Record<number, string> = { 62: 'D', 67: 'G', 69: 'A', 71: 'B', 72: 'C', 74: 'D', 79: 'G' }
-const COLORS = [C.gold, C.sea, '#C08BE0', '#E08BA8', '#8BB8E0', '#E8B84B', '#7FD4C1']
+// one voice per phone, all from the Fair's own paint
+const COLORS = [C.gold, C.sea, C.copper, C.blood, C.goldHi, C.parchment, C.brassDim]
 
 export function NotePhone({ state, me, send }: { state: NoteState; me: string; send: (i: NoteInput) => void }) {
   const mine = state.notes[me]
@@ -83,7 +85,7 @@ export function NotePhone({ state, me, send }: { state: NoteState; me: string; s
 
   return (
     <div className="w-full flex flex-col items-center" onPointerUp={up} onPointerCancel={up}>
-      <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+      <p style={{ ...eyebrow, ...numerals, color: C.sea }}>
         {state.phase === 'holding' ? `${Math.ceil(state.timeLeft)}s · chord ${Math.round(state.chord)}%` : state.phase === 'intro' ? 'listen…' : 'the end'}
       </p>
       {state.phase === 'intro' && (
@@ -97,7 +99,7 @@ export function NotePhone({ state, me, send }: { state: NoteState; me: string; s
         </p>
       )}
       {distracted && state.phase === 'holding' && (
-        <div className="mt-2 rounded-lg px-4 py-3 text-center" style={{ background: '#3d2030', border: '1px solid #C96A6A', color: '#E0928F', animation: 'dyingPulse .6s ease-in-out infinite', maxWidth: 320 }}>
+        <div className="mt-2 rounded-lg px-4 py-3 text-center" style={{ ...bloodLit, animation: 'dyingPulse .6s ease-in-out infinite', maxWidth: 320 }}>
           <strong>{state.distract?.text}</strong>
           <p className="text-xs" style={{ color: C.faint }}>…don’t let go.</p>
         </div>
@@ -115,9 +117,10 @@ export function NotePhone({ state, me, send }: { state: NoteState; me: string; s
             width: 220,
             height: 220,
             border: `6px solid ${color}`,
-            background: holding ? color : C.panel,
-            color: holding ? C.ink : color,
-            boxShadow: holding ? `0 0 60px ${color}99` : 'none',
+            // held = LIT (a wash of your voice's colour over night-deep + a glow), never a fill
+            background: holding ? `linear-gradient(${color}2E, ${color}2E), ${C.nightDeep}` : C.panel,
+            color,
+            boxShadow: holding ? `0 0 60px ${color}99, inset 0 0 0 2px ${color}55` : 'none',
             ...display,
             fontSize: 44,
             fontWeight: 700,
@@ -130,7 +133,7 @@ export function NotePhone({ state, me, send }: { state: NoteState; me: string; s
           aria-pressed={holding}
           aria-label={`Hold your note${mine ? ` (${NOTE_NAMES[mine] ?? ''})` : ''}`}
         >
-          {holding ? '♪' : 'HOLD'}
+          {holding ? <Icon name="note" size={64} /> : 'HOLD'}
         </button>
       )}
       <p className="text-xs mt-3" style={{ color: C.faint }}>
@@ -144,7 +147,7 @@ export function NoteStage({ state }: { state: NoteState }) {
   const n = Math.max(1, state.players.length)
   return (
     <div className="w-full h-full flex flex-col items-center justify-center px-10">
-      <p className="text-sm uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.3em' }}>
+      <p style={{ ...eyebrow, fontSize: 14, letterSpacing: '0.3em' }}>
         the carnival presents
       </p>
       <h1 style={{ ...display, fontSize: 48, fontWeight: 700, color: C.gold }}>Hold the Note</h1>
@@ -168,7 +171,7 @@ export function NoteStage({ state }: { state: NoteState }) {
         <div className="rounded-full" style={{ height: 14, background: C.panel, overflow: 'hidden', border: `1px solid ${C.panelEdge}` }}>
           <div style={{ width: `${state.chord}%`, height: '100%', background: `linear-gradient(90deg, ${C.sea}, ${C.gold})`, transition: 'width .12s linear' }} />
         </div>
-        <p className="mt-2 text-center" style={{ color: C.parchment, fontSize: 22 }}>
+        <p className="mt-2 text-center" style={{ ...numerals, color: C.parchment, fontSize: 22 }}>
           {state.phase === 'holding' && `${Math.ceil(state.timeLeft)}s · held together ${state.heldTogether.toFixed(0)}s of ${Math.ceil(state.totalSeconds * 0.55)} needed`}
           {state.phase === 'intro' && 'Everyone: find the HOLD button. On the count of three.'}
           {state.phase === 'end' && (state.won ? 'The tune came — all but one note. Nobody says why.' : 'It fell apart. The Fair smiles.')}

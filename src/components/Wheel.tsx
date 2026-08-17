@@ -4,7 +4,8 @@
 // same numbers. Pure presentation — no network in here.
 
 import { useEffect, useState } from 'react'
-import { C, display } from './ui'
+import { C } from './ui'
+import { SPARK_PATH } from './icons'
 
 interface WheelProps {
   wedges: string[]
@@ -18,7 +19,8 @@ interface WheelProps {
   size?: number
 }
 
-const PALETTE = ['#E8B84B', '#3A2C66', '#7FD4C1', '#251A48', '#C08BE0', '#181030', '#E08BA8', '#2B1E55']
+// the Fair's own paint: gold, panel-edge, the Sea, panel, copper, night, wax, panel-lift
+const PALETTE = [C.gold, C.panelEdge, C.sea, C.panel, C.copper, C.night, C.wax, C.panelLift]
 
 export function Wheel({ wedges, target, turns = 5, duration = 5.5, spinKey = '', size = 300 }: WheelProps) {
   const n = Math.max(1, wedges.length)
@@ -80,14 +82,14 @@ export function Wheel({ wedges, target, turns = 5, duration = 5.5, spinKey = '',
             <path d={arc(i)} fill={PALETTE[i % PALETTE.length]} stroke={C.night} strokeWidth={2} />
             {(() => {
               const p = labelPos(i)
-              const dark = ['#E8B84B', '#7FD4C1', '#C08BE0', '#E08BA8'].includes(PALETTE[i % PALETTE.length])
+              const dark = [C.gold, C.sea].includes(PALETTE[i % PALETTE.length])
               return (
                 <text
                   x={p.x}
                   y={p.y}
                   fill={dark ? C.ink : C.parchment}
                   fontSize={Math.max(10, size / 24)}
-                  fontFamily="'Cormorant Garamond', Georgia, serif"
+                  fontFamily="'Fraunces', Georgia, serif"
                   fontWeight={700}
                   textAnchor="middle"
                   dominantBaseline="middle"
@@ -100,9 +102,8 @@ export function Wheel({ wedges, target, turns = 5, duration = 5.5, spinKey = '',
           </g>
         ))}
         <circle cx={cx} cy={cy} r={size * 0.08} fill={C.night} stroke={C.gold} strokeWidth={3} />
-        <text x={cx} y={cy} fill={C.gold} fontSize={size * 0.08} textAnchor="middle" dominantBaseline="middle" style={display as React.CSSProperties}>
-          ✦
-        </text>
+        {/* the hub: the ✦ drawn (SPARK_PATH is on a 24-grid) */}
+        <path d={SPARK_PATH} fill={C.gold} transform={`translate(${cx - size * 0.05} ${cy - size * 0.05}) scale(${(size * 0.1) / 24})`} />
       </svg>
     </div>
   )

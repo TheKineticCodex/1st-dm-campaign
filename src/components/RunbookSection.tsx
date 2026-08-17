@@ -8,7 +8,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { RUN_CAST, RUN_PRIMER, RUN_SCENES, type Battle, type Foe, type RunScene } from '../data/runbook'
 import type { Store } from '../lib/store'
 import type { StoryNode } from '../types'
-import { Btn, C, Eyebrow, Fold, H, display } from './ui'
+import { Btn, C, Eyebrow, Fold, H, display, eyebrow, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { Icon, Spark } from './icons'
 
 const ACT_NAMES: Record<number, string> = { 1: 'Act 1 — Saltmere and the Fair', 2: 'Act 2 — the Three Roads', 3: 'Act 3 — the Moon-Night' }
 
@@ -35,8 +36,8 @@ function FoeTable({ foes }: { foes: Foe[] }) {
                 <br />
                 <span style={{ color: C.faint, fontSize: 11 }}>{f.block}</span>
               </td>
-              <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, ...display, fontSize: 18, fontWeight: 700 }}>{f.ac}</td>
-              <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, ...display, fontSize: 18, fontWeight: 700 }}>{f.hp}</td>
+              <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, ...display, ...numerals, fontSize: 18, fontWeight: 700 }}>{f.ac}</td>
+              <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, ...display, ...numerals, fontSize: 18, fontWeight: 700 }}>{f.hp}</td>
               <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, whiteSpace: 'nowrap' }}>{f.speed}</td>
               <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, minWidth: 150 }}>{f.attack}</td>
               <td style={{ padding: '6px 8px', borderBottom: `1px solid ${C.panelEdge}44`, color: C.faint, minWidth: 150 }}>{f.special ?? '—'}</td>
@@ -51,10 +52,11 @@ function FoeTable({ foes }: { foes: Foe[] }) {
 
 function BattleCard({ b }: { b: Battle }) {
   return (
-    <div className="rounded-lg px-3 py-3 mt-2" style={{ background: C.night, border: `1px solid ${b.major ? C.gold : C.panelEdge}`, boxShadow: b.major ? `0 0 18px ${C.gold}22` : 'none' }}>
+    <div className="rounded-lg px-3 py-3 mt-2" style={{ ...wellSurface, border: `1px solid ${b.major ? C.gold : C.panelEdge}`, boxShadow: b.major ? `inset 3px 0 0 ${C.gold}, 0 0 18px ${C.gold}22` : 'inset 0 1px 3px rgba(0,0,0,0.5)' }}>
       <div className="flex flex-wrap items-baseline gap-2">
-        <span className="text-xs rounded-full px-2" style={{ border: `1px solid ${b.major ? C.gold : C.panelEdge}`, color: b.major ? C.gold : C.faint }}>
-          {b.major ? '⚔ MAJOR BATTLE' : 'skirmish'} · {b.code}
+        <span className="text-xs rounded-full px-2.5 py-0.5 inline-flex items-center gap-1.5" style={{ borderRadius: 999, border: `1px solid ${b.major ? C.gold : C.panelEdge}`, color: b.major ? C.gold : C.faint }}>
+          {b.major && <Icon name="swords" size={12} />}
+          {b.major ? 'MAJOR BATTLE' : 'skirmish'} · {b.code}
         </span>
         <strong style={{ ...display, fontSize: 19, color: C.gold }}>{b.name}</strong>
         <span className="text-xs" style={{ color: C.faint }}>
@@ -80,7 +82,7 @@ function BattleCard({ b }: { b: Battle }) {
           {b.goal}
         </p>
         <p>
-          <span style={{ color: '#E0928F' }}>retreat (your throttle) · </span>
+          <span style={{ color: C.blood }}>retreat (your throttle) · </span>
           {b.retreat}
         </p>
         <p>
@@ -106,7 +108,7 @@ function BattleCard({ b }: { b: Battle }) {
 function SceneCard({ s, here, onHere }: { s: RunScene; here: boolean; onHere?: () => void }) {
   const level3 = s.key.includes('LEVEL 3')
   const major = s.battles.some((b) => b.major)
-  const title = `${here ? '📍 ' : ''}${s.key}${s.played ? '  · played' : ''}${major ? '  · ⚔ major battle' : ''}`
+  const title = `${here ? '🎯 ' : ''}${s.key}${s.played ? '  · played' : ''}${major ? '  · major battle' : ''}`
   return (
     <Fold id={`run-${s.key}`} title={title} forceOpen={here}>
       <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -115,17 +117,17 @@ function SceneCard({ s, here, onHere }: { s: RunScene; here: boolean; onHere?: (
           {s.timing ? ` · ${s.timing}` : ''}
         </span>
         {level3 && (
-          <span className="text-xs rounded-full px-2" style={{ border: `1px solid ${C.gold}`, color: C.gold }}>
-            ✦ LEVEL 3 here
+          <span className="text-xs rounded-full px-2.5 py-0.5 inline-flex items-center gap-1.5" style={{ ...onState, borderRadius: 999 }}>
+            <Spark size={11} /> LEVEL 3 here
           </span>
         )}
         {here ? (
-          <span className="text-xs rounded-full px-2" style={{ background: `${C.sea}22`, border: `1px solid ${C.sea}`, color: C.sea }}>
-            you are here
+          <span className="text-xs rounded-full px-2.5 py-0.5 inline-flex items-center gap-1.5" style={{ ...onState, borderRadius: 999 }}>
+            <Icon name="target" size={12} /> you are here
           </span>
         ) : (
           onHere && (
-            <button type="button" onClick={onHere} className="text-xs underline" style={{ color: C.faint, background: 'none', border: 'none', cursor: 'pointer', minHeight: 32 }}>
+            <button type="button" onClick={onHere} className="text-xs underline" style={{ color: C.sea, background: 'none', border: 'none', cursor: 'pointer', minHeight: 32 }}>
               make this the scene
             </button>
           )
@@ -154,7 +156,7 @@ function SceneCard({ s, here, onHere }: { s: RunScene; here: boolean; onHere?: (
           </Eyebrow>
           <div className="grid gap-1">
             {s.theyMight.map((t, i) => (
-              <div key={i} className="grid gap-x-3 text-sm rounded-md px-3 py-1.5" style={{ gridTemplateColumns: 'minmax(140px, 1fr) 2fr', background: C.night, border: `1px solid ${C.panelEdge}` }}>
+              <div key={i} className="grid gap-x-3 text-sm rounded-md px-3 py-1.5" style={{ gridTemplateColumns: 'minmax(140px, 1fr) 2fr', ...wellSurface }}>
                 <span style={{ color: C.gold }}>{t.if}</span>
                 <span style={{ color: C.parchment }}>{t.then}</span>
               </div>
@@ -170,7 +172,7 @@ function SceneCard({ s, here, onHere }: { s: RunScene; here: boolean; onHere?: (
           </Eyebrow>
           <div className="flex flex-wrap gap-2">
             {s.players.map((p, i) => (
-              <div key={i} className="text-sm rounded-md px-3 py-1.5" style={{ background: `${C.gold}12`, border: `1px solid ${C.gold}55`, maxWidth: 420 }}>
+              <div key={i} className="text-sm rounded-md px-3 py-1.5" style={{ ...seaLit, color: C.parchment, maxWidth: 420 }}>
                 <strong style={{ color: C.gold }}>{p.who}</strong> <span style={{ color: C.parchment }}>— {p.note}</span>
               </div>
             ))}
@@ -228,8 +230,8 @@ export function RunbookSection({ store }: { store: Store }) {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <H>Run the campaign</H>
         {current && (
-          <span className="text-sm rounded-full px-3 py-1" style={{ background: `${C.sea}22`, border: `1px solid ${C.sea}`, color: C.sea }}>
-            📍 {current.title}
+          <span className="text-sm rounded-full px-3 py-1 inline-flex items-center gap-1.5" style={{ ...onState, borderRadius: 999 }}>
+            <Icon name="target" size={14} /> {current.title}
           </span>
         )}
       </div>
@@ -238,12 +240,12 @@ export function RunbookSection({ store }: { store: Store }) {
         {upNext ? ` Up next after this: ${upNext.key}.` : ''}
       </p>
 
-      <div className="rounded-xl p-4 mt-3" style={{ background: C.panel, border: `1px solid ${C.gold}55` }}>
+      <div className="rounded-xl p-4 mt-3" style={{ ...panelSurface, border: `1px solid ${C.gold}55` }}>
         <Eyebrow>how to run this — one page, five minutes</Eyebrow>
         <div className="grid gap-2 mt-1" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
           {RUN_PRIMER.map((p) => (
-            <div key={p.title} className="rounded-lg px-3 py-2" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
-              <p style={{ ...display, fontSize: 17, color: C.gold }}>{p.title}</p>
+            <div key={p.title} className="rounded-lg px-3 py-2" style={wellSurface}>
+              <p style={{ ...display, fontSize: 18, fontWeight: 600, color: C.gold }}>{p.title}</p>
               <ul className="text-sm mt-1" style={{ color: C.parchment, paddingLeft: 16, listStyle: 'disc' }}>
                 {p.lines.map((l, i) => (
                   <li key={i} className="mb-0.5">
@@ -264,7 +266,7 @@ export function RunbookSection({ store }: { store: Store }) {
             onClick={() => setAct(a)}
             aria-pressed={act === a}
             className="rounded-full px-3 py-1 text-sm"
-            style={{ background: act === a ? `${C.gold}22` : 'transparent', border: `1px solid ${act === a ? C.gold : C.panelEdge}`, color: act === a ? C.gold : C.parchment, cursor: 'pointer', minHeight: 36 }}
+            style={{ ...(act === a ? onState : { ...wellSurface, color: C.parchment }), borderRadius: 999, cursor: 'pointer', minHeight: 40 }}
           >
             {a === 0 ? 'every scene' : ACT_NAMES[a]}
           </button>
@@ -275,7 +277,7 @@ export function RunbookSection({ store }: { store: Store }) {
         .filter((a) => !act || a === act)
         .map((a) => (
           <div key={a} className="mt-3">
-            <p className="text-xs uppercase tracking-widest mb-1" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+            <p className="mb-1" style={{ ...eyebrow, color: C.sea, letterSpacing: '0.22em' }}>
               {ACT_NAMES[a]}
               {a === 2 ? ' — walk all three, in any order; each road is 2–3 nights' : ''}
             </p>
@@ -291,7 +293,7 @@ export function RunbookSection({ store }: { store: Store }) {
         <Fold id="run-cast" title="🎭 The cast, one line each">
           <div className="grid gap-1">
             {RUN_CAST.map((c) => (
-              <div key={c.who} className="grid gap-x-3 text-sm rounded-md px-3 py-1.5" style={{ gridTemplateColumns: 'minmax(180px, 1fr) 2fr minmax(120px, .7fr)', background: C.night, border: `1px solid ${C.panelEdge}` }}>
+              <div key={c.who} className="grid gap-x-3 text-sm rounded-md px-3 py-1.5" style={{ gridTemplateColumns: 'minmax(180px, 1fr) 2fr minmax(120px, .7fr)', ...wellSurface }}>
                 <strong style={{ color: C.gold }}>{c.who}</strong>
                 <span style={{ color: C.parchment }}>{c.line}</span>
                 <span style={{ color: C.faint }}>{c.where}</span>

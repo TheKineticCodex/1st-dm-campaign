@@ -16,7 +16,8 @@ import type { CharacterBuild } from '../types'
 import { mintPortraitUrl, portraitPrompt } from '../lib/portrait'
 import { CharacterCard } from './CharacterCard'
 import { AURAS, CLASS_SIGILS, DEFAULT_AURA, SPECIES_GLYPHS } from './glyphs'
-import { Btn, C, Eyebrow, H, Pick, Section, TextArea, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, H, Pick, Section, TextArea, TextInput, display, onState, panelSurface, seaLit } from './ui'
+import { Icon, Spark } from './icons'
 
 const STEPS = ['Name', 'Species', 'Class', 'Background', 'Scores', 'Skills', 'Done']
 
@@ -65,7 +66,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
       {step > 0 && step < 6 && (
         <div
           className="rounded-xl px-4 py-3 mb-4"
-          style={{ background: `${C.panel}CC`, border: `1px solid ${C.panelEdge}` }}
+          style={panelSurface}
         >
           <CharacterCard build={ch} size="compact" />
         </div>
@@ -90,7 +91,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
         <div>
           <H>What did the Feywild find, when it found you?</H>
           <p className="text-sm mb-3" style={{ color: C.faint }}>
-            ✦ marks Witchlight-book options — very welcome here. Tap a sigil to choose it.
+            <Spark size={12} style={{ color: C.gold, marginRight: 4 }} />marks the Fair's own options — very welcome here. Tap a sigil to choose it.
           </p>
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(SPECIES).map(([n, s]) => {
@@ -104,10 +105,9 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                     setSpeciesDetail(n)
                   }}
                   className="rounded-xl p-3 text-center"
+                  aria-pressed={selected}
                   style={{
-                    background: selected ? `linear-gradient(180deg, #2B1E55, ${C.panel})` : C.panel,
-                    border: `1px solid ${selected ? C.gold : C.panelEdge}`,
-                    boxShadow: selected ? `0 0 16px ${C.gold}44` : 'none',
+                    ...(selected ? onState : panelSurface),
                     color: C.parchment,
                     cursor: 'pointer',
                     minHeight: 44,
@@ -116,7 +116,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                 >
                   <span
                     className="block mx-auto mb-1"
-                    style={{ width: 52, height: 52, color: selected ? C.gold : C.sea }}
+                    style={{ width: 52, height: 52, color: selected ? C.goldHi : C.sea }}
                     aria-hidden="true"
                   >
                     {SPECIES_GLYPHS[n]}
@@ -133,8 +133,9 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
             <Section style={{ marginTop: 12, border: `1px solid ${C.gold}55` }}>
               <Eyebrow>The {ch.species}'s gifts</Eyebrow>
               {SPECIES[ch.species].traits.map((t) => (
-                <p key={t} className="text-sm mb-1">
-                  ✦ {t}
+                <p key={t} className="text-sm mb-1 flex items-start gap-1.5">
+                  <Spark size={11} style={{ color: C.brassDim, marginTop: 5 }} />
+                  <span>{t}</span>
                 </p>
               ))}
               <p className="text-sm" style={{ color: C.faint }}>
@@ -160,10 +161,9 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                   type="button"
                   onClick={() => setCh({ ...ch, klass: n, skills: ch.klass === n ? ch.skills : [] })}
                   className="rounded-xl p-3 text-center"
+                  aria-pressed={selected}
                   style={{
-                    background: selected ? `linear-gradient(180deg, #2B1E55, ${C.panel})` : C.panel,
-                    border: `1px solid ${selected ? C.gold : C.panelEdge}`,
-                    boxShadow: selected ? `0 0 16px ${C.gold}44` : 'none',
+                    ...(selected ? onState : panelSurface),
                     color: C.parchment,
                     cursor: 'pointer',
                     minHeight: 44,
@@ -172,7 +172,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                 >
                   <span
                     className="block mx-auto mb-1"
-                    style={{ width: 52, height: 52, color: selected ? C.gold : C.sea }}
+                    style={{ width: 52, height: 52, color: selected ? C.goldHi : C.sea }}
                     aria-hidden="true"
                   >
                     {CLASS_SIGILS[n]}
@@ -191,7 +191,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
           {kl && (
             <Section style={{ marginTop: 12 }}>
               <p className="text-sm" style={{ color: C.faint }}>
-                <span style={{ color: C.gold }}>Subclass — unlocks at level {kl.subclassAt} 🔒</span>
+                <span className="inline-flex items-center gap-1.5" style={{ color: C.gold }}>Subclass — unlocks at level {kl.subclassAt} <Icon name="lost" size={14} /></span>
                 <span className="block mt-1">
                   Every {ch.klass} chooses a path at level {kl.subclassAt}. The Feywild will offer
                   yours when the time comes.
@@ -241,12 +241,13 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                       else if (!ch.bump2) setCh({ ...ch, bump2: a, bump1: ch.bump1 === a ? null : ch.bump1 })
                       else setCh({ ...ch, bump1: ch.bump1 === a ? null : a })
                     }}
-                    className="px-3 py-2 rounded-md text-sm"
+                    aria-pressed={ch.bump2 === a || ch.bump1 === a}
+                    className="px-3 py-2 rounded-md text-sm num"
                     style={{
-                      background: ch.bump2 === a ? C.gold : ch.bump1 === a ? C.sea : C.panel,
-                      color: ch.bump2 === a || ch.bump1 === a ? C.ink : C.parchment,
-                      border: `1px solid ${C.panelEdge}`,
+                      ...(ch.bump2 === a ? onState : ch.bump1 === a ? seaLit : { ...panelSurface, color: C.parchment }),
+                      fontWeight: 600,
                       minHeight: 44,
+                      minWidth: 44,
                       cursor: 'pointer',
                     }}
                   >
@@ -280,11 +281,11 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
               <div
                 key={a}
                 className="flex items-center justify-between rounded-lg px-4 py-2"
-                style={{ background: C.panel, border: `1px solid ${C.panelEdge}` }}
+                style={panelSurface}
               >
-                <span style={{ ...display, fontSize: 20, fontWeight: 600 }}>
+                <span className="flex items-center gap-1.5" style={{ ...display, fontSize: 20, fontWeight: 600 }}>
                   {a}
-                  {kl?.prime === a ? ' ★' : ''}
+                  {kl?.prime === a ? <Spark size={12} style={{ color: C.gold }} /> : null}
                 </span>
                 <select
                   aria-label={`Score for ${a}`}
@@ -295,8 +296,8 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                       assign: { ...ch.assign, [a]: e.target.value ? Number(e.target.value) : null },
                     })
                   }
-                  className="rounded-md px-3 py-2"
-                  style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+                  className="rounded-md px-3 py-2 num"
+                  style={{ background: C.nightDeep, color: C.parchment, border: `1px solid ${C.panelEdge}`, boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)', minHeight: 44 }}
                 >
                   <option value="">—</option>
                   {[...(ch.assign[a] !== null ? [ch.assign[a]!] : []), ...remaining]
@@ -388,7 +389,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
           </p>
 
           {/* The Mirror — one look, and it's final */}
-          <Section style={{ border: `1px solid ${C.gold}55` }}>
+          <Section style={{ borderColor: `${C.gold}55` }}>
             <Eyebrow>The mirror waits</Eyebrow>
             {mirror !== 'seen' && (
               <>
@@ -403,17 +404,18 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
                   onChange={setAppearance}
                   placeholder="e.g. Silver braids threaded with tiny bells, patched sailor's coat, one eye green and one gold, always clutching a cracked seashell…"
                 />
-                <p className="text-xs mt-2 italic" style={{ color: C.gold }}>
-                  ⚠ The mirror shows you once, and does not repent. When you look, that is who
-                  you are.
+                <p className="text-xs mt-2 italic flex items-start gap-1.5" style={{ color: C.gold }}>
+                  <Icon name="mirror" size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>The mirror shows you once, and does not repent. When you look, that is who
+                  you are.</span>
                 </p>
               </>
             )}
 
             {mirror === 'gazing' && ch.portraitUrl && (
               <div className="text-center mt-3">
-                <p className="text-sm spark" style={{ color: C.gold }}>
-                  ✦ The mirror gathers its silver…
+                <p className="text-sm spark flex items-center justify-center gap-1.5" style={{ color: C.gold }}>
+                  <Spark size={12} /> The mirror gathers its silver…
                 </p>
                 <img
                   src={ch.portraitUrl}
@@ -429,7 +431,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
             )}
 
             {mirror === 'failed' && (
-              <p className="text-sm mt-2" style={{ color: '#C96A6A' }}>
+              <p className="text-sm mt-2" style={{ color: C.blood }}>
                 The mirror clouded over — the fault is the mist's, not yours. Try again, or forge
                 without a portrait.
               </p>
@@ -506,7 +508,7 @@ export function BuildTab({ build: ch, onChange, onForged, quizLook }: BuildTabPr
 
       {step > 0 && step < 6 && (
         <Btn secondary onClick={() => setStep(step - 1)}>
-          ← Back a step
+          <Icon name="arrow" size={16} style={{ transform: 'scaleX(-1)', marginRight: 6, verticalAlign: '-0.15em' }} />Back a step
         </Btn>
       )}
     </div>

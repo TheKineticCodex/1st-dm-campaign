@@ -18,7 +18,8 @@ import { FinalePanel } from './Finale'
 import { playWhole } from '../lib/song'
 import { duck } from '../lib/ambience'
 import { DEFAULT_WEDGES, Wheel } from './Wheel'
-import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, display } from './ui'
+import { Btn, C, Eyebrow, Fold, H, HintOnce, TextArea, TextInput, bloodLit, body, display, numerals, onState, panelSurface, seaLit, wellSurface } from './ui'
+import { Icon, Spark } from './icons'
 
 interface DmRace {
   raceId: string
@@ -59,31 +60,31 @@ function PartyGlance({ roster, live }: { roster: RosterEntry[]; live: Record<str
         const hpMax = v?.hpMax ?? sheet.hpMax
         const hp = Math.max(0, hpMax - (st?.damage ?? 0))
         const frac = hp / hpMax
-        const barColor = hp === 0 ? '#C96A6A' : frac <= 1 / 3 ? '#E0928F' : C.sea
+        const barColor = hp === 0 || frac <= 1 / 3 ? C.blood : C.sea
         return (
           <div
             key={r.playerId}
             className="rounded-lg px-3 py-2 shrink-0"
-            style={{ background: C.panel, border: `1px solid ${hp === 0 ? '#C96A6A' : C.panelEdge}`, minWidth: 150 }}
+            style={{ ...panelSurface, border: `1px solid ${hp === 0 ? C.blood : C.panelEdge}`, minWidth: 150 }}
           >
             <div className="flex items-baseline justify-between gap-2">
-              <p className="text-sm" style={{ ...display, fontWeight: 700, color: C.gold, whiteSpace: 'nowrap' }}>
+              <p className="text-sm" style={{ ...display, fontSize: 18, fontWeight: 700, color: C.gold, whiteSpace: 'nowrap' }}>
                 {r.character!.build.name || r.playerName}
               </p>
-              <p className="text-xs" style={{ color: C.faint, whiteSpace: 'nowrap' }}>
-                🛡 {sheet.ac.val}
+              <p className="text-xs inline-flex items-center gap-1" style={{ ...numerals, color: C.faint, whiteSpace: 'nowrap' }}>
+                <Icon name="shield" size={12} /> {sheet.ac.val}
               </p>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <div className="flex-1 rounded-full" style={{ height: 7, background: C.night, overflow: 'hidden' }}>
+              <div className="flex-1 rounded-full" style={{ height: 7, background: C.nightDeep, border: `1px solid ${C.panelEdge}`, overflow: 'hidden' }}>
                 <div style={{ width: `${frac * 100}%`, height: '100%', background: barColor, transition: 'width .3s ease' }} />
               </div>
-              <p className="text-xs" style={{ color: barColor, whiteSpace: 'nowrap' }}>
+              <p className="text-xs" style={{ ...numerals, color: barColor, whiteSpace: 'nowrap' }}>
                 {hp}/{hpMax}
               </p>
             </div>
             {hp === 0 && (
-              <p className="text-xs mt-1" style={{ color: '#E0928F' }}>
+              <p className="text-xs mt-1" style={{ color: C.blood }}>
                 dying · {'✦'.repeat(st?.deathSaves?.successes ?? 0)}{'·'.repeat(3 - (st?.deathSaves?.successes ?? 0))} saves ·{' '}
                 {'✕'.repeat(st?.deathSaves?.failures ?? 0)}{'·'.repeat(3 - (st?.deathSaves?.failures ?? 0))} fails
               </p>
@@ -91,12 +92,12 @@ function PartyGlance({ roster, live }: { roster: RosterEntry[]; live: Record<str
             {((st?.conditions?.length ?? 0) > 0 || st?.concentrating) && (
               <div className="flex flex-wrap gap-1 mt-1">
                 {st?.concentrating && (
-                  <span className="text-xs rounded-full px-1.5" style={{ border: `1px solid ${C.sea}66`, color: C.sea }}>
-                    ◐ conc.
+                  <span className="text-xs rounded-full px-2 inline-flex items-center gap-1" style={{ ...seaLit, borderRadius: 999 }}>
+                    <Icon name="half" size={11} /> conc.
                   </span>
                 )}
                 {(st?.conditions ?? []).map((c) => (
-                  <span key={c} className="text-xs rounded-full px-1.5" style={{ border: `1px solid ${C.gold}66`, color: C.gold }}>
+                  <span key={c} className="text-xs rounded-full px-2" style={{ ...onState, borderRadius: 999 }}>
                     {c}
                   </span>
                 ))}
@@ -251,7 +252,7 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
               glory; the carnival remembers.
             </p>
             <Btn shimmer onClick={startRace} disabled={roster.length === 0 || !store.shared}>
-              Start the Snail Derby ✦
+              <span className="inline-flex items-center gap-2">Start the Snail Derby <Spark size={14} /></span>
             </Btn>
             {!store.shared && (
               <p className="text-xs" style={{ color: C.faint }}>
@@ -269,34 +270,41 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
                   <div className="flex justify-between text-xs mb-1">
                     <span>
                       {name}
-                      {place === 0 ? ' 🥇' : place === 1 ? ' 🥈' : place === 2 ? ' 🥉' : ''}
+                      {place >= 0 && place < 3 && (
+                        <span style={{ color: C.gold }}> · {place === 0 ? '1st' : place === 1 ? '2nd' : '3rd'}</span>
+                      )}
                     </span>
-                    <span style={{ color: C.faint }}>
+                    <span style={{ ...numerals, color: C.faint }}>
                       {progress}/{RACE_GOAL}
                     </span>
                   </div>
                   <div
                     className="relative rounded-full"
-                    style={{ height: 22, background: C.night, border: `1px solid ${C.panelEdge}` }}
+                    style={{ ...wellSurface, height: 24, borderRadius: 999 }}
                   >
                     <span
                       aria-hidden="true"
                       style={{
                         position: 'absolute',
                         left: `${Math.min(96, (progress / RACE_GOAL) * 96)}%`,
-                        top: -1,
-                        fontSize: 17,
+                        top: 2,
+                        lineHeight: 0,
+                        color: place >= 0 ? C.gold : C.sea,
                         transition: 'left .2s linear',
                       }}
                     >
-                      🐌
+                      <Icon name="snail" size={18} />
                     </span>
                   </div>
                 </div>
               )
             })}
             {!race.ended ? (
-              <Btn onClick={endRace}>Call the race — judges' decision 🏁</Btn>
+              <Btn onClick={endRace}>
+                <span className="inline-flex items-center gap-2">
+                  Call the race — judges' decision <Icon name="pennant" size={16} />
+                </span>
+              </Btn>
             ) : (
               <>
                 <p className="text-sm mt-2" style={{ color: C.gold }}>
@@ -322,10 +330,9 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
               key={`${r.at}-${i}`}
               className="flex items-center justify-between rounded-lg px-3 py-2 mb-1"
               style={{
-                background: r.isNat20 ? C.gold : r.isNat1 ? '#3d2030' : C.night,
-                color: r.isNat20 ? C.ink : C.parchment,
-                border: `1px solid ${r.isNat20 ? C.gold : r.isNat1 ? '#C96A6A' : C.panelEdge}`,
-                boxShadow: r.isNat20 && i === 0 ? `0 0 22px ${C.gold}88` : 'none',
+                // lit, never filled: a nat 20 is an ember with gold-hi lettering
+                ...(r.isNat20 ? onState : r.isNat1 ? bloodLit : { ...wellSurface, color: C.parchment }),
+                ...(r.isNat20 && i === 0 ? { boxShadow: `inset 0 0 0 1px rgba(240,181,79,0.22), inset 0 1px 0 rgba(255,214,150,0.12), 0 0 22px ${C.gold}44` } : null),
               }}
             >
               <span className="text-sm">
@@ -333,9 +340,9 @@ export function TableSection({ store, roster, whisperPrefill }: TableSectionProp
                 <span style={{ opacity: 0.75 }}>· {r.label}</span>
                 {r.mode !== 'normal' && <span style={{ opacity: 0.6 }}> · {r.mode}</span>}
               </span>
-              <span style={{ ...display, fontSize: 22, fontWeight: 700 }}>
+              <span className="inline-flex items-center gap-1.5" style={{ ...display, ...numerals, fontSize: 22, fontWeight: 700 }}>
                 {r.total}
-                {r.isNat20 ? ' ✦' : r.isNat1 ? ' 🎺' : ''}
+                {r.isNat20 ? <Spark size={15} /> : r.isNat1 ? <Icon name="heartBroken" size={15} /> : null}
               </span>
             </div>
           ))
@@ -461,24 +468,28 @@ function InitiativePanel({
     return (
       <div>
         <Eyebrow>Initiative — round order</Eyebrow>
-        {encounter.order.map((r, i) => (
-          <div
-            key={r.id}
-            className="flex items-center justify-between rounded-lg px-3 py-2 mb-1"
-            style={{
-              background: i === encounter.activeIndex ? C.gold : C.night,
-              color: i === encounter.activeIndex ? C.ink : C.parchment,
-              border: `1px solid ${C.panelEdge}`,
-            }}
-          >
-            <span style={{ ...display, fontSize: 18, fontWeight: 600 }}>
-              {i === encounter.activeIndex ? '➤ ' : ''}
-              {r.name}
-              {r.isPc ? '' : ' 🗡'}
-            </span>
-            <span>{r.init}</span>
-          </div>
-        ))}
+        {encounter.order.map((r, i) => {
+          const on = i === encounter.activeIndex
+          return (
+            <div
+              key={r.id}
+              className="flex items-center justify-between rounded-lg px-3 py-2 mb-1"
+              style={
+                on
+                  ? // the current row: ember + a 3px brass LEFT rule, never a gold fill
+                    { ...onState, borderLeft: `3px solid ${C.gold}`, boxShadow: 'inset 0 1px 0 rgba(255,214,150,0.12)' }
+                  : { ...wellSurface, color: C.parchment }
+              }
+            >
+              {/* foes read in blood; the party reads in parchment */}
+              <span className="inline-flex items-center gap-2" style={{ ...display, fontSize: 19, fontWeight: on ? 700 : 600, color: on ? C.goldHi : r.isPc ? C.parchment : C.blood }}>
+                {on && <Icon name="arrow" size={15} />}
+                {r.name}
+              </span>
+              <span style={numerals}>{r.init}</span>
+            </div>
+          )
+        })}
         <p className="text-xs mt-1" style={{ color: C.faint }}>
           {current?.name} is up · {next?.name} is on deck
         </p>
@@ -513,9 +524,8 @@ function InitiativePanel({
       )}
       {draft.map((r) => (
         <div key={r.id} className="flex items-center gap-2 mb-1">
-          <span className="flex-1 text-sm">
+          <span className="flex-1 text-sm" style={{ color: r.isPc ? C.parchment : C.blood }}>
             {r.name}
-            {r.isPc ? '' : ' 🗡'}
           </span>
           <input
             type="number"
@@ -525,8 +535,8 @@ function InitiativePanel({
             onChange={(e) =>
               setDraft(draft.map((x) => (x.id === r.id ? { ...x, init: Number(e.target.value) || 0 } : x)))
             }
-            className="rounded-md px-2 py-2 text-center"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, width: 64, minHeight: 44 }}
+            className="rounded-md px-2 py-2 text-center outline-none"
+            style={{ ...wellSurface, ...numerals, color: C.parchment, width: 64, minHeight: 44 }}
           />
           {!r.isPc && (
             <button
@@ -535,7 +545,7 @@ function InitiativePanel({
               onClick={() => setDraft(draft.filter((x) => x.id !== r.id))}
               style={{ color: C.faint, background: 'none', border: 'none', minWidth: 44, minHeight: 44, cursor: 'pointer' }}
             >
-              ✕
+              <Icon name="cross" size={16} />
             </button>
           )}
         </div>
@@ -555,7 +565,7 @@ function InitiativePanel({
             setEnemyName('')
           }}
           className="rounded-md px-4"
-          style={{ background: C.panelEdge, color: C.parchment, border: 'none', minHeight: 44, cursor: 'pointer' }}
+          style={{ ...panelSurface, color: C.parchment, minHeight: 44, cursor: 'pointer' }}
         >
           add
         </button>
@@ -571,7 +581,9 @@ function InitiativePanel({
         }
         disabled={draft.length === 0}
       >
-        Begin the encounter ⚔
+        <span className="inline-flex items-center gap-2">
+          Begin the encounter <Spark size={14} />
+        </span>
       </Btn>
     </div>
   )
@@ -643,14 +655,14 @@ function BargainComposer({
 
   return (
     <div>
-      <Eyebrow>Strike a bargain — the illuminated contract ⚖</Eyebrow>
+      <Eyebrow>⚖ Strike a bargain — the illuminated contract</Eyebrow>
       <div className="grid gap-2 mt-1">
         <select
           aria-label="Bargain target"
           value={target}
           onChange={(e) => setTarget(e.target.value)}
-          className="rounded-md px-3 py-2"
-          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+          className="rounded-md px-3 py-2 outline-none"
+          style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
         >
           <option value="">Who signs?</option>
           {roster
@@ -667,10 +679,18 @@ function BargainComposer({
         <TextInput value={price} onChange={setPrice} placeholder="What is owed (this burns gold in their ledger)" />
         <TextArea rows={4} value={terms} onChange={setTerms} placeholder="The terms — or let the quill write them…" />
         <Btn secondary onClick={() => setTerms(legalese(characterName, counterparty, boon, price))}>
-          Let the quill write the legalese ✒
+          <span className="inline-flex items-center gap-2">
+            Let the quill write the legalese <Icon name="quill" size={15} style={{ color: C.brassDim }} />
+          </span>
         </Btn>
         <Btn shimmer onClick={send} disabled={!ready}>
-          {sent ? 'The contract flies to their phone ✦' : target ? `Offer it to ${characterName}` : 'Offer the contract'}
+          {sent ? (
+            <span className="inline-flex items-center gap-2">The contract flies to their phone <Spark size={14} /></span>
+          ) : target ? (
+            `Offer it to ${characterName}`
+          ) : (
+            'Offer the contract'
+          )}
         </Btn>
         {!store.shared && (
           <p className="text-xs" style={{ color: C.faint }}>
@@ -736,11 +756,12 @@ function LevelUpComposer({
             key={n}
             type="button"
             onClick={() => setLevel(n)}
+            aria-pressed={level === n}
             className="rounded-md px-3 py-2 text-sm"
             style={{
-              background: level === n ? C.gold : C.night,
-              color: level === n ? C.ink : C.parchment,
-              border: `1px solid ${level === n ? C.gold : C.panelEdge}`,
+              ...(level === n ? onState : { ...wellSurface, color: C.parchment }),
+              ...numerals,
+              minWidth: 44,
               minHeight: 44,
               cursor: 'pointer',
               opacity: n <= current ? 0.5 : 1,
@@ -751,7 +772,11 @@ function LevelUpComposer({
         ))}
       </div>
       <Btn onClick={send} disabled={level <= current} shimmer>
-        {sent ? `Level ${sent} announced ✦` : `Announce level ${level} to the party`}
+        {sent ? (
+          <span className="inline-flex items-center gap-2">Level {sent} announced <Spark size={14} /></span>
+        ) : (
+          `Announce level ${level} to the party`
+        )}
       </Btn>
     </div>
   )
@@ -821,7 +846,11 @@ function WheelPanel({
         <div className="flex gap-2 mt-3">
           {wheel.phase === 'end' && (
             <Btn onClick={whisper} shimmer>
-              {sent ? 'Fortune whispered ✦' : `Whisper the fortune to ${wheel.spunBy ?? 'them'}`}
+              {sent ? (
+                <span className="inline-flex items-center gap-2">Fortune whispered <Spark size={14} /></span>
+              ) : (
+                `Whisper the fortune to ${wheel.spunBy ?? 'them'}`
+              )}
             </Btn>
           )}
           <Btn secondary onClick={onClear}>
@@ -840,7 +869,7 @@ function WheelPanel({
       <div className="grid gap-1 mt-2">
         {wedges.map((w, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="text-xs" style={{ color: C.gold, width: 18, textAlign: 'right' }}>
+            <span className="text-xs" style={{ ...numerals, color: C.gold, width: 18, textAlign: 'right' }}>
               {i + 1}
             </span>
             <TextInput value={w} onChange={(v) => setWedge(i, v)} placeholder={`Fortune ${i + 1}`} />
@@ -852,8 +881,8 @@ function WheelPanel({
           aria-label="Who spins"
           value={spinner}
           onChange={(e) => setSpinner(e.target.value)}
-          className="rounded-md px-3 py-2"
-          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+          className="rounded-md px-3 py-2 outline-none"
+          style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
         >
           <option value="">Anyone may spin</option>
           {roster.map((r) => (
@@ -866,8 +895,8 @@ function WheelPanel({
           aria-label="Where it lands"
           value={rig}
           onChange={(e) => setRig(Number(e.target.value))}
-          className="rounded-md px-3 py-2"
-          style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+          className="rounded-md px-3 py-2 outline-none"
+          style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
         >
           <option value={-1}>Fate decides</option>
           {wedges.map((_, i) => (
@@ -878,7 +907,9 @@ function WheelPanel({
         </select>
       </div>
       <Btn onClick={arm} disabled={!store.shared || roster.length === 0} shimmer>
-        Arm the wheel 🎡
+        <span className="inline-flex items-center gap-2">
+          Arm the wheel <Icon name="wheel" size={16} />
+        </span>
       </Btn>
       {!store.shared && (
         <p className="text-xs mt-1" style={{ color: C.faint }}>
@@ -947,16 +978,15 @@ function SongComposer({ store, channelRef }: { store: Store; channelRef: { curre
                   disabled={on}
                   title={p.where}
                   onClick={() => light(song.key, p.key, p.label, song.name)}
-                  className="rounded-md px-2.5 py-1.5 text-xs text-left"
+                  aria-pressed={on}
+                  className="rounded-md px-2.5 py-1.5 text-xs text-left inline-flex items-center gap-1.5"
                   style={{
-                    background: on ? `${C.gold}33` : C.night,
-                    color: on ? C.gold : C.parchment,
-                    border: `1px solid ${on ? C.gold : C.panelEdge}`,
-                    minHeight: 40,
+                    ...(on ? onState : { ...wellSurface, color: C.parchment }),
+                    minHeight: 44,
                     cursor: on ? 'default' : 'pointer',
                   }}
                 >
-                  {on ? '✦ ' : '· '}
+                  {on ? <Spark size={11} /> : <span aria-hidden="true" style={{ color: C.brassDim }}>·</span>}
                   {p.label}
                 </button>
               )
@@ -965,8 +995,8 @@ function SongComposer({ store, channelRef }: { store: Store; channelRef: { curre
         </div>
       ))}
       {sent && (
-        <p className="text-xs" style={{ color: C.sea }}>
-          Lit on every phone ✦
+        <p className="text-xs inline-flex items-center gap-1.5" style={{ color: C.sea }}>
+          Lit on every phone <Spark size={11} />
         </p>
       )}
     </div>
@@ -1025,8 +1055,8 @@ function HandoutComposer({
             aria-label="Handout target"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="flex-1 rounded-md px-3 py-2"
-            style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+            className="flex-1 rounded-md px-3 py-2 outline-none"
+            style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
           >
             <option value="">Everyone at the table</option>
             {roster.map((r) => (
@@ -1052,7 +1082,7 @@ function HandoutComposer({
             type="button"
             onClick={() => fileRef.current?.click()}
             className="rounded-md px-3"
-            style={{ background: C.panelEdge, color: C.parchment, border: 'none', minHeight: 44, cursor: 'pointer' }}
+            style={{ ...(image ? seaLit : panelSurface), color: image ? C.sea : C.parchment, minHeight: 44, cursor: 'pointer' }}
           >
             {image ? 'image ✓' : '+ image'}
           </button>
@@ -1067,7 +1097,13 @@ function HandoutComposer({
           Fades 60 seconds after the seal breaks (dreams & whispers)
         </label>
         <Btn onClick={send} disabled={!title.trim() && !bodyText.trim() && !image}>
-          {sent ? 'Sent on lantern-light ✦' : target ? `Send secretly to ${target}` : 'Send to everyone'}
+          {sent ? (
+            <span className="inline-flex items-center gap-2">Sent on lantern-light <Spark size={14} /></span>
+          ) : target ? (
+            `Send secretly to ${target}`
+          ) : (
+            'Send to everyone'
+          )}
         </Btn>
         {!store.shared && (
           <p className="text-xs" style={{ color: C.faint }}>

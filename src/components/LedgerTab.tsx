@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import type { Bargain } from '../types'
 import { ContractView } from './Contract'
-import { C, Eyebrow, H, HintOnce, display } from './ui'
+import { C, Eyebrow, H, HintOnce, display, eyebrow, onState, panelSurface } from './ui'
+import { Icon, Spark } from './icons'
 
 const STATUS_LABEL: Record<Bargain['status'], string> = {
   offered: 'awaiting your hand',
@@ -50,16 +51,15 @@ export function LedgerTab({ bargains, onSign }: LedgerTabProps) {
               onClick={() => setOpenId(b.id)}
               className="text-left rounded-xl p-4 w-full"
               style={{
-                background: C.panel,
-                border: `1px solid ${b.status === 'offered' ? C.gold : C.panelEdge}`,
-                boxShadow: b.status === 'offered' ? `0 0 16px ${C.gold}44` : 'none',
+                ...(b.status === 'offered' ? { ...onState, boxShadow: `${onState.boxShadow}, 0 0 16px rgba(240,181,79,0.18)` } : panelSurface),
                 color: C.parchment,
+                minHeight: 44,
                 cursor: 'pointer',
               }}
             >
-              <div className="flex items-center justify-between">
-                <strong style={{ ...display, fontSize: 19 }}>{b.title}</strong>
-                <span className="text-xs" style={{ color: b.status === 'offered' ? C.gold : C.faint }}>
+              <div className="flex items-center justify-between gap-2">
+                <strong style={{ ...display, fontSize: 19, color: b.status === 'offered' ? C.goldHi : C.parchment }}>{b.title}</strong>
+                <span className="text-xs" style={{ color: b.status === 'offered' ? C.goldHi : C.faint }}>
                   {STATUS_LABEL[b.status]}
                 </span>
               </div>
@@ -67,10 +67,10 @@ export function LedgerTab({ bargains, onSign }: LedgerTabProps) {
                 with {b.counterparty}
               </p>
               <p className="text-sm mt-2">
-                <span className="text-xs uppercase tracking-widest" style={{ color: C.gold }}>
+                <span style={{ ...eyebrow, color: b.status === 'offered' ? C.goldHi : C.brassDim }}>
                   owed:{' '}
                 </span>
-                <span style={{ color: C.gold }}>{b.price}</span>
+                <span style={{ color: b.status === 'offered' ? C.goldHi : C.parchment }}>{b.price}</span>
               </p>
             </button>
           ))}
@@ -79,7 +79,7 @@ export function LedgerTab({ bargains, onSign }: LedgerTabProps) {
 
       {settled.length > 0 && (
         <>
-          <p className="text-xs uppercase tracking-widest mt-5 mb-2" style={{ color: C.faint, letterSpacing: '0.2em' }}>
+          <p className="mt-5 mb-2" style={{ ...eyebrow, color: C.faint }}>
             The settled pages
           </p>
           <div className="flex flex-col gap-2">
@@ -90,19 +90,18 @@ export function LedgerTab({ bargains, onSign }: LedgerTabProps) {
                 onClick={() => setOpenId(b.id)}
                 className="text-left rounded-xl p-3 w-full"
                 style={{
-                  background: C.panel,
-                  border: `1px solid ${C.panelEdge}`,
+                  ...panelSurface,
                   color: C.faint,
-                  opacity: 0.85,
+                  minHeight: 44,
                   cursor: 'pointer',
                 }}
               >
-                <div className="flex items-center justify-between">
-                  <span style={{ ...display, fontSize: 17, textDecoration: b.status === 'fulfilled' ? 'line-through' : 'none' }}>
-                    {b.status === 'broken' ? '💔 ' : '✦ '}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5" style={{ ...display, fontSize: 17, textDecoration: b.status === 'fulfilled' ? 'line-through' : 'none' }}>
+                    {b.status === 'broken' ? <Icon name="heartBroken" size={15} style={{ color: C.blood }} /> : <Spark size={13} style={{ color: C.brassDim }} />}
                     {b.title}
                   </span>
-                  <span className="text-xs">{STATUS_LABEL[b.status]}</span>
+                  <span className="text-xs" style={{ color: b.status === 'broken' ? C.blood : C.faint }}>{STATUS_LABEL[b.status]}</span>
                 </div>
               </button>
             ))}

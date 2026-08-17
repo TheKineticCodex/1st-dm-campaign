@@ -11,7 +11,8 @@ import { ABILITIES, CLASSES, type AbilityKey } from '../data/rules'
 import { CLASS_LEVELS, FEATS, SPECIES_BY_LEVEL, SUBCLASSES, toFeature, type Feature } from '../data/levels'
 import { asiLevels, computeSheet } from '../lib/compute'
 import type { CharacterBuild } from '../types'
-import { Btn, C, Eyebrow, Section, display } from './ui'
+import { Btn, C, Eyebrow, Section, display, eyebrow, onState, wellSurface } from './ui'
+import { Spark } from './icons'
 
 interface LevelUpProps {
   build: CharacterBuild
@@ -79,16 +80,15 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
     onSeal(next)
   }
 
+  // picks are LIT (ember), never filled; at rest they sit in a small well
   const chip = (selected: boolean) => ({
-    background: selected ? C.gold : C.night,
-    color: selected ? C.ink : C.parchment,
-    border: `1px solid ${selected ? C.gold : C.panelEdge}`,
+    ...(selected ? onState : { ...wellSurface, boxShadow: 'none', color: C.parchment }),
     minHeight: 44,
     cursor: 'pointer',
   })
 
   return (
-    <Section style={{ border: `1px solid ${C.gold}`, boxShadow: `0 0 24px ${C.gold}22`, animation: 'cardRise .5s ease-out' }}>
+    <Section style={{ borderColor: C.gold, boxShadow: `inset 0 1px 0 ${C.hairline}, 0 0 24px ${C.gold}22`, animation: 'cardRise .5s ease-out' }}>
       <Eyebrow>✦ the Feywild notices you</Eyebrow>
       <h2 style={{ ...display, fontSize: 26, fontWeight: 700, color: C.gold }}>
         {to > from ? `Level ${to}` : `A choice awaits`}
@@ -102,7 +102,7 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
       {gained.map((g) => (
         <div key={g.level} className="mt-3">
           {gained.length > 1 && (
-            <p className="text-xs uppercase tracking-widest" style={{ color: C.sea }}>
+            <p style={{ ...eyebrow, color: C.sea }}>
               level {g.level}
             </p>
           )}
@@ -136,17 +136,18 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
                   key={name}
                   type="button"
                   onClick={() => setSubclass(selected ? null : name)}
+                  aria-pressed={selected}
                   className="text-left rounded-lg p-3"
                   style={{
-                    background: selected ? `${C.gold}22` : C.night,
-                    border: `1px solid ${selected ? C.gold : C.panelEdge}`,
+                    ...(selected ? onState : { ...wellSurface, boxShadow: 'none' }),
                     color: C.parchment,
+                    minHeight: 44,
                     cursor: 'pointer',
                   }}
                 >
                   <div className="flex items-center justify-between">
-                    <strong style={{ ...display, fontSize: 18, color: selected ? C.gold : C.parchment }}>{name}</strong>
-                    <span style={{ color: C.gold }}>{selected ? '✦' : ''}</span>
+                    <strong style={{ ...display, fontSize: 18, color: selected ? C.goldHi : C.parchment }}>{name}</strong>
+                    {selected && <Spark size={14} style={{ color: C.gold }} />}
                   </div>
                   <p className="text-sm mt-1" style={{ opacity: 0.9 }}>
                     {sc.blurb}
@@ -188,6 +189,7 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
                   setAsiA(null)
                   setAsiB(null)
                 }}
+                aria-pressed={featName === f.name}
                 className="rounded-md px-3 py-2 text-sm"
                 style={chip(featName === f.name)}
               >
@@ -196,7 +198,7 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
             ))}
           </div>
           {feat && (
-            <div className="mt-3 rounded-lg p-3" style={{ background: C.night, border: `1px solid ${C.panelEdge}` }}>
+            <div className="mt-3 rounded-lg p-3" style={{ background: C.nightDeep, border: `1px solid ${C.gold}44` }}>
               <strong style={{ ...display, fontSize: 18, color: C.gold }}>{feat.name}</strong>
               <p className="text-sm mt-1">{feat.text}</p>
               <p className="text-xs mt-1 italic" style={{ color: C.sea }}>
@@ -224,7 +226,8 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
                             else if (asiB === null) setAsiB(a)
                             else setAsiA(a)
                           }}
-                          className="rounded-md py-2 text-xs"
+                          aria-pressed={sel}
+                          className="rounded-md py-2 text-xs num"
                           style={chip(sel)}
                         >
                           {a}
@@ -245,7 +248,7 @@ export function LevelUp({ build, targetLevel, onSeal }: LevelUpProps) {
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {(feat.bump === 'any' ? ABILITIES : feat.bump).map((a) => (
-                        <button key={a} type="button" onClick={() => setFeatBump(a)} className="rounded-md px-3 py-2 text-xs" style={chip(featBump === a)}>
+                        <button key={a} type="button" aria-pressed={featBump === a} onClick={() => setFeatBump(a)} className="rounded-md px-3 py-2 text-xs num" style={chip(featBump === a)}>
                           {a} {abilities?.[a]}
                         </button>
                       ))}

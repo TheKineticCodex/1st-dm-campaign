@@ -4,7 +4,7 @@
 
 import { AURAS, CLASS_SIGILS, DEFAULT_AURA, SPECIES_GLYPHS } from './glyphs'
 import type { CharacterBuild } from '../types'
-import { C, display } from './ui'
+import { C, body, display } from './ui'
 
 interface CharacterCardProps {
   build: CharacterBuild
@@ -38,19 +38,20 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
             position: 'absolute',
             inset: compact ? -4 : -10,
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${aura.color}55 0%, ${aura.color}18 55%, transparent 75%)`,
+            // the aura is a held glow, not a lamp: it must not out-shout the brass action
+            background: `radial-gradient(circle, ${aura.color}33 0%, ${aura.color}0F 55%, transparent 75%)`,
             animation: 'glow-pulse 3.2s ease-in-out infinite',
           }}
         />
-        {/* medallion ring — the mirror's portrait once seen, sigil before */}
+        {/* medallion ring — brass rim caught by the lantern above, aura light inside */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             borderRadius: '50%',
             border: `2px solid ${aura.color}`,
-            background: `radial-gradient(circle at 50% 35%, #2B1E55 0%, ${C.night} 80%)`,
-            boxShadow: `0 0 ${compact ? 10 : 24}px ${aura.color}44, inset 0 0 ${compact ? 8 : 18}px ${aura.color}22`,
+            background: `radial-gradient(circle at 50% 32%, ${C.panelLift} 0%, ${C.nightDeep} 82%)`,
+            boxShadow: `inset 0 1px 0 ${C.goldHi}44, 0 0 ${compact ? 8 : 18}px ${aura.color}33, inset 0 0 ${compact ? 8 : 18}px ${aura.color}1F`,
             display: 'grid',
             placeItems: 'center',
             padding: build.portraitUrl ? 0 : compact ? 12 : 26,
@@ -83,9 +84,9 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
               width: badge,
               height: badge,
               borderRadius: '50%',
-              background: C.panel,
+              background: `linear-gradient(180deg, ${C.panelLift} 0%, ${C.panel} 60%)`,
               border: `1.5px solid ${aura.color}`,
-              boxShadow: `0 0 8px ${aura.color}55`,
+              boxShadow: `inset 0 1px 0 ${C.hairline}, 0 0 8px ${aura.color}44`,
               padding: compact ? 4 : 8,
               color: C.parchment,
             }}
@@ -109,12 +110,13 @@ export function CharacterCard({ build, size = 'full' }: CharacterCardProps) {
         >
           {build.name || 'A stranger, so far'}
         </p>
-        <p className="text-xs" style={{ color: C.faint }}>
+        <p style={{ ...body, fontSize: compact ? 13 : 15, color: C.faint, lineHeight: 1.4 }}>
           {[build.species, build.klass].filter(Boolean).join(' ') || 'the lanterns are still guessing'}
           {build.bg ? ` · ${build.bg}` : ''}
         </p>
         {!compact && (
-          <p className="text-xs mt-1 italic" style={{ color: aura.color }}>
+          /* the aura line — the lanterns' voice, in Vollkorn italic */
+          <p className="mt-1" style={{ ...body, fontSize: 13, fontStyle: 'italic', color: aura.color, lineHeight: 1.4 }}>
             {aura.name} — {aura.word}
           </p>
         )}

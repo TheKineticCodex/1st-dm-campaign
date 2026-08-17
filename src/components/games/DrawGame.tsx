@@ -4,7 +4,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { DrawInput, DrawState, Stroke } from '../../lib/games'
-import { C, display } from '../ui'
+import { C, display, eyebrow, goldAction, numerals, wellSurface } from '../ui'
+import { Spark } from '../icons'
 
 // ------------------------------------------------------------ canvas (shared)
 
@@ -14,11 +15,11 @@ function paint(canvas: HTMLCanvasElement, strokes: Stroke[], live?: Stroke | nul
   const W = canvas.width
   const H = canvas.height
   ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = '#F2E9D8'
+  ctx.fillStyle = '#F1E6CF'
   ctx.fillRect(0, 0, W, H)
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
-  ctx.strokeStyle = '#241A42'
+  ctx.strokeStyle = '#2A1C11'
   const draw = (s: Stroke) => {
     if (s.p.length < 2) return
     ctx.lineWidth = s.w * Math.min(W, H)
@@ -99,7 +100,7 @@ export function DrawPhone({ state, me, send }: { state: DrawState; me: string; s
 
   return (
     <div className="w-full flex flex-col items-center">
-      <p className="text-xs uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.25em' }}>
+      <p style={{ ...eyebrow, ...numerals, color: C.sea }}>
         round {state.round}/{state.totalRounds} · {state.timeLeft}s · party {state.score}
       </p>
       {state.phase === 'intro' && <p className="text-sm mt-2" style={{ color: C.faint }}>The stall-keeper hands {state.artist} a stick of charcoal…</p>}
@@ -149,9 +150,9 @@ export function DrawPhone({ state, me, send }: { state: DrawState; me: string; s
                 onKeyDown={(e) => e.key === 'Enter' && submitGuess()}
                 placeholder="What is it?"
                 className="flex-1 rounded-md px-3 py-2"
-                style={{ background: C.night, color: C.parchment, border: `1px solid ${C.panelEdge}`, minHeight: 44 }}
+                style={{ ...wellSurface, color: C.parchment, minHeight: 44 }}
               />
-              <button type="button" onClick={submitGuess} className="rounded-md px-4" style={{ background: C.gold, color: C.ink, border: 'none', minHeight: 44, cursor: 'pointer', fontWeight: 700 }}>
+              <button type="button" onClick={submitGuess} className="rounded-md px-4" style={{ ...display, fontSize: 18, ...goldAction, minHeight: 44, cursor: 'pointer', fontWeight: 600 }}>
                 Guess
               </button>
             </div>
@@ -181,7 +182,7 @@ export function DrawStage({ state }: { state: DrawState }) {
         <DrawCanvas strokes={state.strokes} size={size} />
       </div>
       <div style={{ maxWidth: 380 }}>
-        <p className="text-sm uppercase tracking-widest" style={{ color: C.sea, letterSpacing: '0.3em' }}>
+        <p style={{ ...eyebrow, fontSize: 14, letterSpacing: '0.3em' }}>
           the carnival presents
         </p>
         <h1 style={{ ...display, fontSize: 44, fontWeight: 700, color: C.gold, lineHeight: 1.05 }}>Draw the Missing Piece</h1>
@@ -191,13 +192,13 @@ export function DrawStage({ state }: { state: DrawState }) {
         <p style={{ ...display, fontSize: 40, letterSpacing: '0.2em', color: state.phase === 'reveal' || state.phase === 'end' ? C.gold : C.parchment, marginTop: 8 }}>
           {state.phase === 'reveal' || state.phase === 'end' ? state.word : blanks}
         </p>
-        <p style={{ ...display, fontSize: 64, fontWeight: 700, color: state.timeLeft <= 10 ? '#E0928F' : C.parchment, lineHeight: 1 }}>{state.phase === 'drawing' ? state.timeLeft : ''}</p>
+        <p style={{ ...display, ...numerals, fontSize: 64, fontWeight: 700, color: state.timeLeft <= 10 ? C.blood : C.parchment, lineHeight: 1 }}>{state.phase === 'drawing' ? state.timeLeft : ''}</p>
         <p className="mt-2" style={{ color: C.faint }}>party {state.score} · {state.phase === 'end' ? 'the end' : ''}</p>
         <div className="mt-3">
           {state.guesses.slice(-6).map((g, i) => (
-            <p key={i} style={{ color: g.right ? C.sea : C.faint, fontSize: 18 }}>
-              {g.by}: {g.text}
-              {g.right ? ' ✦' : ''}
+            <p key={i} className="flex items-center gap-1.5" style={{ color: g.right ? C.sea : C.faint, fontSize: 18 }}>
+              <span>{g.by}: {g.text}</span>
+              {g.right ? <Spark size={14} /> : null}
             </p>
           ))}
         </div>
