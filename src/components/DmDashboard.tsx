@@ -15,6 +15,7 @@ import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { CheatSheet } from './CheatSheet'
 import { RunbookSection } from './RunbookSection'
 import { BeforeTheLanterns } from './BeforeTheLanterns'
+import { NightPath } from './NightPath'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
 import { TonightSection } from './TonightSection'
@@ -278,6 +279,7 @@ function HomeSection({
       <H>The Book opens</H>
 
       <div className="mt-3">
+        <NightPath roster={roster} />
         <BeforeTheLanterns store={store} roster={roster} />
       </div>
 
