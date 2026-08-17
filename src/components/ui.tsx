@@ -30,7 +30,7 @@
 // `.paper` (+ `.sea-paper-ruled`), ink text, brass-ink labels, Btn tone="paper".
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { applyCalm, isCalm, readCache, writeCache } from '../lib/storage'
 import { EMOJI_TO_ICON, Icon, type IconName } from './icons'
@@ -302,13 +302,25 @@ export function Fold({
 }) {
   const [open, setOpen] = useState(() => forceOpen || (readCache<boolean>(`fold:${id}`) ?? defaultOpen))
   const [glyph, label] = splitLeadGlyph(title)
+  const box = useRef<HTMLDivElement | null>(null)
+
+  // "Jump there and it opens." forceOpen used to be read once, at mount, so
+  // every send-me-there affordance in the Book worked only as a side effect of
+  // the target unmounting first. Now the panel opens whenever it is asked to —
+  // and walks itself into view, because a fold that opened eight screens down
+  // is the same as a fold that did not open.
+  useEffect(() => {
+    if (!forceOpen) return
+    setOpen(true)
+    box.current?.scrollIntoView({ behavior: isCalm() ? 'auto' : 'smooth', block: 'start' })
+  }, [forceOpen])
   const toggle = () => {
     const next = !open
     setOpen(next)
     writeCache(`fold:${id}`, next)
   }
   return (
-    <div className="rounded-xl mb-3 overflow-hidden" style={panelSurface}>
+    <div ref={box} className="rounded-xl mb-3 overflow-hidden" style={panelSurface}>
       <button
         type="button"
         onClick={toggle}

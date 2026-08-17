@@ -33,6 +33,11 @@ export interface Checkpoint {
   minutes: string
   /** One breath: what this scene IS. */
   oneBreath: string
+  /**
+   * The ACT1_SCENES key this checkpoint's cue buttons come from. Copied byte
+   * for byte from that file — never join these two by display title again.
+   */
+  scene: string
   /** The gold words — the only thing you read aloud. */
   readAloud: string
   /** The two or three things to actually do. */
@@ -163,6 +168,7 @@ export const NIGHT_PATH: Night = {
     {
       id: 'gate',
       title: 'The Gate of Paper Lanterns',
+      scene: 'The Gate of Paper Lanterns',
       where: 'A mile out on the wet sand',
       minutes: '20–30 min',
       oneBreath: 'A fence of paper lanterns, a gate, and two figures — Hush with the slate, Hum half-singing.',
@@ -185,7 +191,7 @@ export const NIGHT_PATH: Night = {
         { if: 'They refuse to go in', then: 'The lanterns wait. So does the tide, which has not come back. Let the silence do the work.' },
         { if: 'They ask about the tide', then: 'Hush writes one word: SOON. Hum stops humming for exactly one beat.' },
         { if: 'They count the lanterns', then: 'There is one for every person inside. Let them do that arithmetic themselves.' },
-        { if: 'They investigate the Twins', then: '10 — ghost-words under the wiped slate, every one a name. 15 — the tally: five chalk marks made BEFORE they walked up, and beside them A SET. NOT YET SORTED (fresh chalk, counted tonight as they crossed the sand). 20 — Hush’s slate is in Hum’s handwriting, and the paper fence keeps promises in, not people out. (Full card: Cheat → the Twins.)' },
+        { if: 'They investigate the Twins', then: '10 — ghost-words under the wiped slate, every one a name. 15 — the tally: five chalk marks made BEFORE they walked up, and beside them A SET. NOT YET SORTED (fresh chalk, counted tonight as they crossed the sand). 20 — Hush’s slate is in Hum’s handwriting, and the paper fence keeps promises in, not people out. (Full card: Look it up → who is who.)' },
         { if: 'They ask what the Twins gave away', then: 'Hum hums. Hush writes nothing at all, and wipes the slate. Between them they make one whole speaker — he has the words, she has the sound. Never confirm it out loud.' },
       ],
       lands: [{ who: 'Everyone', note: 'Five honest answers on paper. This is the campaign’s last scene, seeded tonight.' }],
@@ -194,6 +200,7 @@ export const NIGHT_PATH: Night = {
     {
       id: 'midway',
       title: 'The Games of the Midway',
+      scene: 'The Games of the Midway',
       where: 'The Midway — stalls, snails, prizes a little wrong',
       minutes: '40–60 min',
       oneBreath: 'Everything glitters, nothing has a price tag, and every stall-keeper knows their name before they say it.',
@@ -223,7 +230,8 @@ export const NIGHT_PATH: Night = {
     },
     {
       id: 'greygill',
-      title: 'Grandmother Grey-Gill’s Tent',
+      title: "Grandmother Grey-Gill's Tent",
+      scene: "Grandmother Grey-Gill's Tent",
       where: 'A tent that smells of salt and low tide',
       minutes: '25–35 min · the heart of the night',
       oneBreath: 'A woman with a shawl pinned high at the neck, eyes like the last hour before a storm, who knows them already.',
@@ -257,6 +265,7 @@ export const NIGHT_PATH: Night = {
     {
       id: 'note',
       title: 'The Missing Note',
+      scene: 'The Missing Note',
       where: 'The carousel',
       minutes: '15–25 min',
       oneBreath: 'The organ plays the Sea’s song and skips one note, every single time. The operator weeps and does not notice.',
@@ -290,6 +299,7 @@ export const NIGHT_PATH: Night = {
     {
       id: 'whispers',
       title: 'Whispers in the Dark',
+      scene: 'Whispers in the Dark',
       where: 'The Fair, lanterns dimmed for the midnight show',
       minutes: '10–15 min',
       oneBreath: 'Five visions, one each, and every one of them is walking toward the back fence.',
@@ -316,6 +326,7 @@ export const NIGHT_PATH: Night = {
     {
       id: 'gates',
       title: 'The Three Gates',
+      scene: 'The Three Gates',
       where: 'The back fence',
       minutes: '20 min · the END of the night',
       oneBreath: 'Three gates in the back fence. The slate: ONE OPENS TONIGHT. THE OTHERS REMEMBER BEING CHOSEN LAST.',
