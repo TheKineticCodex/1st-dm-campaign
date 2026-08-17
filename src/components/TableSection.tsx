@@ -1061,7 +1061,10 @@ function HandoutComposer({
 }) {
   const [title, setTitle] = useState(prefill?.title ?? '')
   const [bodyText, setBodyText] = useState(prefill?.body ?? '')
-  const [target, setTarget] = useState<string>(prefill?.target ?? '') // '' = everyone
+  // null = nothing chosen yet. '' = deliberately everyone. The difference is
+  // the whole point: a sealed reading meant for one player used to become a
+  // note in all five keepsakes if this box was never touched.
+  const [target, setTarget] = useState<string | null>(prefill?.target ?? null)
   const [image, setImage] = useState<string | undefined>()
   const [ephemeral, setEphemeral] = useState(false)
   const [sent, setSent] = useState(false)
@@ -1069,6 +1072,9 @@ function HandoutComposer({
 
   const send = () => {
     if (!title.trim() && !bodyText.trim() && !image) return
+    // Nothing leaves the Book until somebody has been named — even if a
+    // keypress finds its way here around the disabled button.
+    if (target === null) return
     const h: Handout = {
       id: crypto.randomUUID(),
       target: target || null,
@@ -1096,11 +1102,18 @@ function HandoutComposer({
         <div className="flex items-center gap-2">
           <select
             aria-label="Handout target"
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
+            value={target ?? 'unchosen'}
+            onChange={(e) => setTarget(e.target.value === 'unchosen' ? null : e.target.value)}
             className="flex-1 rounded-md px-3 py-2 outline-none"
-            style={{ ...wellSurface, ...body, color: C.parchment, minHeight: 44 }}
+            style={{
+              ...wellSurface,
+              ...body,
+              color: target === null ? C.gold : C.parchment,
+              borderColor: target === null ? C.brassDim : undefined,
+              minHeight: 44,
+            }}
           >
+            <option value="unchosen">Who is this for?</option>
             <option value="">Everyone at the table</option>
             {roster.map((r) => (
               <option key={r.playerId} value={r.playerName}>
@@ -1139,13 +1152,18 @@ function HandoutComposer({
           />
           Fades 60 seconds after the seal breaks (dreams & whispers)
         </label>
-        <Btn onClick={send} disabled={!title.trim() && !bodyText.trim() && !image}>
+        <Btn
+          onClick={send}
+          disabled={target === null || (!title.trim() && !bodyText.trim() && !image)}
+        >
           {sent ? (
             <span className="inline-flex items-center gap-2">Sent on lantern-light <Spark size={14} /></span>
+          ) : target === null ? (
+            'Choose who this is for'
           ) : target ? (
             `Send secretly to ${target}`
           ) : (
-            'Send to everyone'
+            'Send to everyone at the table'
           )}
         </Btn>
         {!store.shared && (
