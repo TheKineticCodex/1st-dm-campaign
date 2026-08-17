@@ -958,6 +958,7 @@ export function StageControls({
   overlays?: StageOverlays
 }) {
   const [stage, setStage] = useState<StageState>(EMPTY_STAGE)
+  const [loaded, setLoaded] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [fogRadius, setFogRadius] = useState(0.14)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -970,7 +971,9 @@ export function StageControls({
     let cancelled = false
     ;(async () => {
       const s = await store.getStage()
-      if (!cancelled && s && s.mode) setStage(s)
+      if (cancelled) return
+      if (s && s.mode) setStage(s)
+      setLoaded(true)
     })()
     return () => {
       cancelled = true
@@ -978,6 +981,9 @@ export function StageControls({
   }, [store])
 
   const push = (next: StageState, throttled = false) => {
+    // Never write before we have read: an unloaded remount holds EMPTY_STAGE,
+    // and pushing that wipes the map and every token on the table's screen.
+    if (!loaded) return
     setStage(next)
     const now = Date.now()
     if (!throttled || now - lastSent.current > 100) {
@@ -1016,14 +1022,12 @@ export function StageControls({
   // agree with StageScreen's own order or the Book would lie to him.
   const showing = overlays?.finale
     ? { what: 'The finale — the Moon', tone: C.gold }
-    : overlays?.wheel
-      ? { what: 'The Fortune Wheel', tone: C.gold }
-      : overlays?.game
-        ? { what: 'A carnival game', tone: C.gold }
-        : stage.mode === 'map' && stage.mapUrl
-          ? { what: 'The battle map', tone: C.sea }
-          : { what: 'The title screen', tone: C.faint }
-  const covered = !!(overlays?.finale || overlays?.wheel || overlays?.game)
+    : overlays?.game
+      ? { what: 'A carnival game', tone: C.gold }
+      : stage.mode === 'map' && stage.mapUrl
+        ? { what: 'The battle map', tone: C.sea }
+        : { what: 'The title screen', tone: C.faint }
+  const covered = !!(overlays?.finale || overlays?.game)
   const anythingUp = covered || (stage.mode === 'map' && !!stage.mapUrl)
 
   const backToTitle = () => {
@@ -1061,6 +1065,11 @@ export function StageControls({
           {covered && stage.mode === 'map' && stage.mapUrl && (
             <span className="block text-xs" style={{ color: C.faint }}>
               your map is still loaded, underneath
+            </span>
+          )}
+          {overlays?.wheel && (
+            <span className="block text-xs" style={{ color: C.faint }}>
+              the wheel is up on their phones, not the iPad
             </span>
           )}
         </span>
