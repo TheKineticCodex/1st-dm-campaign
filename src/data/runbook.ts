@@ -68,7 +68,7 @@ export const RUN_PRIMER: { title: string; lines: string[] }[] = [
     ],
   },
   {
-    title: 'The three rules of the Fair (say them when asked)',
+    title: 'The three rules of the bargain (say them when asked)',
     lines: [
       '1 · They never take. They get you to say yes.',
       '2 · You can only give away what is yours. Give away something others hold pieces of too, and the promise has a crack in it — the day the real owners stand together and ask, it comes home.',
