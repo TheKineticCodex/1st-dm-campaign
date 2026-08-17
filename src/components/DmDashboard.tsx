@@ -14,7 +14,7 @@ import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { CheatSheet } from './CheatSheet'
 import { RunbookSection } from './RunbookSection'
-import { NightOne } from './NightOne'
+import { BeforeTheLanterns } from './BeforeTheLanterns'
 import { StageScreen } from './StageScreen'
 import { TableSection } from './TableSection'
 import { TonightSection } from './TonightSection'
@@ -278,7 +278,7 @@ function HomeSection({
       <H>The Book opens</H>
 
       <div className="mt-3">
-        <NightOne store={store} roster={roster} />
+        <BeforeTheLanterns store={store} roster={roster} />
       </div>
 
       <Section>
