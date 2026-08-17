@@ -13,6 +13,8 @@ import type { GameState } from '../lib/games'
 import { NIGHT_PATH } from '../data/nightPath'
 import { AmbientMode } from './AmbientMode'
 import { StageCardView, cardCoversTheScreen } from './StageCardView'
+import { RaceBoardView } from './RaceBoardView'
+import { reduceRace, type RaceBoard } from '../lib/race'
 import { FogOverlay, InitiativeRail, StageTokenView, TintOverlay, activeTokenId, vitalsFor } from './Battlefield'
 import { GameStageBoard } from './games/GameShell'
 import { FinaleStage } from './Finale'
@@ -37,6 +39,12 @@ export function StageScreen({ store, roster, onClose, locked }: StageScreenProps
   const [enc, setEnc] = useState<Encounter | null>(null)
   const [live, setLive] = useState<Record<string, VitalsEvent>>({})
   const [finale, setFinale] = useState<FinaleEvent | null>(null)
+  // The derby is broadcast, not pushed: the phones send taps and everyone
+  // watching rebuilds the lanes from the same events, with the same reducer
+  // the Book uses, so the two screens cannot disagree about a finish.
+  const [board, setBoard] = useState<RaceBoard | null>(null)
+  const rosterRef = useRef<RosterEntry[]>(roster)
+  rosterRef.current = roster
   const closeRef = useRef(() => {})
 
   useEffect(() => {
@@ -48,6 +56,7 @@ export function StageScreen({ store, roster, onClose, locked }: StageScreenProps
       if (active) setEnc(active)
       const channel = joinTableChannel(channelId, {
         stage: (s) => setStage(s),
+        race: (r) => setBoard((cur) => reduceRace(cur, r, rosterRef.current.map((x) => x.playerName))),
         encounter: (e) => setEnc(e.active ? e : null),
         vitals: (v) => setLive((cur) => ({ ...cur, [v.playerName]: v })),
         game: (g) => {
@@ -93,6 +102,15 @@ export function StageScreen({ store, roster, onClose, locked }: StageScreenProps
     return (
       <div className="fixed inset-0" style={{ background: '#05040F', zIndex: 90 }}>
         <FinaleStage event={finale} />
+        {closeButton}
+      </div>
+    )
+  }
+
+  if (board && !board.ended) {
+    return (
+      <div className="fixed inset-0" style={{ background: C.nightDeep, zIndex: 90 }}>
+        <RaceBoardView board={board} roster={roster} />
         {closeButton}
       </div>
     )

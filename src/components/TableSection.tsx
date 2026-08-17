@@ -15,6 +15,7 @@ import { StageControls } from './TonightSection'
 import { BattleCard } from './NightPath'
 import { battlesHere, partyLevel, readNightProgress } from '../lib/night'
 import { createHost, type Host } from '../lib/gameHost'
+import { RACE_GOAL } from '../lib/race'
 import type { GameEvent, GameState } from '../lib/games'
 import { GamesPanel } from './games/GamesPanel'
 import { FinalePanel } from './Finale'
@@ -31,7 +32,6 @@ interface DmRace {
   ended: boolean
 }
 
-const RACE_GOAL = 40
 
 export interface WhisperPrefill {
   target: string
@@ -304,6 +304,7 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
           channelRef={channelRef}
           overlays={{
             game: !!game,
+            racing: !!race && !race.ended,
             wheel: !!wheel,
             finale: !!finale,
             fighting: !!encounter?.active && encounter.order.length > 0,

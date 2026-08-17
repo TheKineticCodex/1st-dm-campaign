@@ -944,6 +944,7 @@ export interface StageOverlays {
   finale: boolean
   fighting: boolean
   clearGame: () => void
+  racing: boolean
   clearWheel: () => void
   clearFinale: () => void
 }
@@ -1049,8 +1050,10 @@ export function StageControls({
   const held = stage.card
   const showing = overlays?.finale
     ? { what: 'The finale — the Moon', tone: C.gold }
-    : overlays?.game
-      ? { what: 'A carnival game', tone: C.gold }
+    : overlays?.racing
+      ? { what: 'The Snail Derby', tone: C.gold }
+      : overlays?.game
+        ? { what: 'A carnival game', tone: C.gold }
       : held && held.kind === 'slate'
         ? { what: `The slate — ${held.lines.join(' ')}`, tone: C.parchment }
         : held && held.kind === 'gates'
@@ -1058,7 +1061,7 @@ export function StageControls({
       : stage.mode === 'map' && stage.mapUrl
         ? { what: 'The battle map', tone: C.sea }
         : { what: 'The title screen', tone: C.faint }
-  const covered = !!(overlays?.finale || overlays?.game || (held && held.kind !== 'note'))
+  const covered = !!(overlays?.finale || overlays?.racing || overlays?.game || (held && held.kind !== 'note'))
   const anythingUp = covered || !!held || (stage.mode === 'map' && !!stage.mapUrl)
 
   const backToTitle = () => {
