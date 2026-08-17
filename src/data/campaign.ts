@@ -18,6 +18,33 @@ export const partyWord = NUMBER_WORDS[PARTY_SIZE] ?? String(PARTY_SIZE)
  * contract between the Book and the table — spell them the way the Roster
  * spells them, and change them in one place only.
  */
+/**
+ * THE STAGE DEVICE — the screen on the stand that the table looks at.
+ *
+ * Type the Lantern-Keeper's code with this on the end (LANTERNKEEPER-STAGE)
+ * and the app hands that device one screen and locks the door behind it: no
+ * Book, no cheat sheet, no story. Tapping ✕ signs it out to the gate rather
+ * than opening the Book, so a player who picks the iPad up finds nothing.
+ *
+ * Honest about what this is: the same credential wearing a different hat, so
+ * the separation is in the app and not in the database. A curious player
+ * cannot get through it; someone with developer tools could. That is the
+ * right trade for a screen sitting on a table in your living room.
+ */
+export const STAGE_SUFFIX = '-STAGE'
+
+/**
+ * Strip the suffix off a typed code, forgiving however a thumb typed it —
+ * a dash, a space, a slash, or nothing at all. Returns null if it isn't a
+ * stage code, and never returns a code with no letters left in it.
+ */
+export function readStageCode(typed: string): string | null {
+  const m = typed.trim().toUpperCase().replace(/\s+/g, '').match(/^(.*?)[-/:]?STAGE$/)
+  if (!m) return null
+  const base = m[1]!.replace(/[-/:]+$/, '')
+  return /[A-Z0-9]/.test(base) ? base : null
+}
+
 export const PEACHES = 'Peaches capiche'
 export const BILLY = 'William Blackwood'
 export const PHILIP = 'Philip'

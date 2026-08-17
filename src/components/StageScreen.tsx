@@ -21,9 +21,15 @@ interface StageScreenProps {
   store: Store
   roster: RosterEntry[]
   onClose: () => void
+  /**
+   * True on the iPad that IS the stage. The corner ✕ stays (it asks first),
+   * but the screen itself stops being one big button — on the DM's own laptop
+   * tapping anywhere is a convenience, on the table's screen it is a hazard.
+   */
+  locked?: boolean
 }
 
-export function StageScreen({ store, roster, onClose }: StageScreenProps) {
+export function StageScreen({ store, roster, onClose, locked }: StageScreenProps) {
   const [stage, setStage] = useState<StageState>({ mode: 'ambient', mapUrl: null, tokens: [] })
   const [game, setGame] = useState<GameState | null>(null)
   const [enc, setEnc] = useState<Encounter | null>(null)
@@ -63,7 +69,7 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
     <button
       type="button"
       onClick={onClose}
-      aria-label="Leave the stage"
+      aria-label="Take this screen off the stage"
       className="absolute rounded-full inline-flex items-center justify-center"
       style={{
         top: 'calc(10px + env(safe-area-inset-top))',
@@ -104,7 +110,7 @@ export function StageScreen({ store, roster, onClose }: StageScreenProps) {
   if (stage.mode !== 'map' || !stage.mapUrl) {
     return (
       <div>
-        <AmbientMode roster={roster} onClose={onClose} />
+        <AmbientMode roster={roster} onClose={locked ? undefined : onClose} />
         {rail && (
           <div className="fixed inset-0" style={{ zIndex: 91, pointerEvents: 'none' }}>
             {rail}

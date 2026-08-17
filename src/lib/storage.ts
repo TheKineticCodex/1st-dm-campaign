@@ -12,7 +12,13 @@ export interface DeviceSession {
   campaignCode: string
   playerName: string
   deviceToken: string
-  role: 'player' | 'dm'
+  /**
+   * 'stage' is the screen the table looks at — the iPad on its stand. It signs
+   * in with the Lantern-Keeper's code plus the STAGE suffix, and the app then
+   * gives it exactly one screen and no way back into the Book. See
+   * STAGE_SUFFIX in data/campaign.ts.
+   */
+  role: 'player' | 'dm' | 'stage'
 }
 
 function key(name: string): string {

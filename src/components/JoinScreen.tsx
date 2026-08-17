@@ -4,6 +4,7 @@
 // marks; the legal line sits clear of the card's shadow at full --faint.
 
 import { useEffect, useState } from 'react'
+import { readStageCode } from '../data/campaign'
 import { mintDeviceToken, saveDeviceSession, type DeviceSession } from '../lib/storage'
 import { getStore } from '../lib/store'
 import { Btn, C, Lanterns, TextInput, body, display, eyebrow, nightGround, panelSurface, wellSurface } from './ui'
@@ -27,14 +28,18 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
     return () => root.classList.remove('gate')
   }, [])
 
+  // The stage is a screen, not a person: it asks for no name.
+  const stageBase = readStageCode(code)
+
   async function handleJoin() {
-    const trimmedCode = code.trim().toUpperCase()
-    const trimmedName = name.trim()
+    const asStage = readStageCode(code)
+    const trimmedCode = asStage ?? code.trim().toUpperCase()
+    const trimmedName = asStage ? 'The stage' : name.trim()
     if (!trimmedCode) {
       setError('The lanterns need a word to light your way. Enter your invitation code.')
       return
     }
-    if (!trimmedName) {
+    if (!asStage && !trimmedName) {
       setError('Every traveler owes the carnival a name — even a borrowed one.')
       return
     }
@@ -51,7 +56,12 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
       setError('The lanterns do not recognize that word. Check the code your Dungeon Master sent you.')
       return
     }
-    const session: DeviceSession = { ...provisional, role }
+    // Only the Lantern-Keeper can hang a lantern over the table.
+    if (asStage && role !== 'dm') {
+      setError('That is the travellers’ code. The stage is lit with the Lantern-Keeper’s.')
+      return
+    }
+    const session: DeviceSession = { ...provisional, role: asStage ? 'stage' : role }
     saveDeviceSession(session)
     onJoined(session)
   }
@@ -156,15 +166,25 @@ export function JoinScreen({ onJoined }: JoinScreenProps) {
             />
           </label>
 
-          <label className="grid gap-1">
-            <span style={{ ...eyebrow, letterSpacing: '0.18em' }}>Your name</span>
-            <TextInput
-              value={name}
-              onChange={setName}
-              placeholder="What shall the lanterns call you?"
-              onEnter={() => void handleJoin()}
-            />
-          </label>
+          {stageBase ? (
+            <p className="text-sm flex items-start gap-2" style={{ color: C.sea }}>
+              <Lantern size={18} style={{ flexShrink: 0, marginTop: 1 }} />
+              <span>
+                This device becomes <strong>the stage</strong> — the screen the table looks at. It
+                shows only what the Book sends it, and it cannot open the Book. No name needed.
+              </span>
+            </p>
+          ) : (
+            <label className="grid gap-1">
+              <span style={{ ...eyebrow, letterSpacing: '0.18em' }}>Your name</span>
+              <TextInput
+                value={name}
+                onChange={setName}
+                placeholder="What shall the lanterns call you?"
+                onEnter={() => void handleJoin()}
+              />
+            </label>
+          )}
 
           {error && (
             <p role="alert" className="text-sm" style={{ color: C.gold }}>

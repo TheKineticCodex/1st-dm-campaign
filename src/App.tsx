@@ -6,6 +6,8 @@ import { getDeviceSession, initCalm, type DeviceSession } from './lib/storage'
 // The DM's Book is one device's worth of code; players never download it.
 const DmDashboard = lazy(() => import('./components/DmDashboard').then((m) => ({ default: m.DmDashboard })))
 const TabShell = lazy(() => import('./components/TabShell').then((m) => ({ default: m.TabShell })))
+// The stage never downloads the Book.
+const StageDevice = lazy(() => import('./components/StageDevice').then((m) => ({ default: m.StageDevice })))
 
 const Lighting = () => (
   <p style={{ color: '#B3AA97', textAlign: 'center', marginTop: 80, fontFamily: "'Vollkorn', Georgia, serif" }}>The lanterns are lighting…</p>
@@ -18,6 +20,10 @@ function App() {
 
   const screen = !session ? (
     <JoinScreen onJoined={setSession} />
+  ) : session.role === 'stage' ? (
+    <Suspense fallback={<Lighting />}>
+      <StageDevice session={session} onLeave={() => setSession(null)} />
+    </Suspense>
   ) : session.role === 'dm' ? (
     <Suspense fallback={<Lighting />}>
       <DmDashboard session={session} onLeave={() => setSession(null)} />

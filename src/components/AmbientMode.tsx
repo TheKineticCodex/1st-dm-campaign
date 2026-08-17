@@ -10,7 +10,8 @@ import { Lantern, SparkRule } from './icons'
 
 interface AmbientModeProps {
   roster: RosterEntry[]
-  onClose: () => void
+  /** Absent on the stage device: a stray elbow must not take the screen down. */
+  onClose?: () => void
 }
 
 const DRIFT_SPOTS = [
@@ -24,16 +25,19 @@ const DRIFT_SPOTS = [
 export function AmbientMode({ roster, onClose }: AmbientModeProps) {
   const portraits = roster.filter((r) => r.character?.build.portraitUrl)
 
+  // On the DM's own screen the whole thing is a way back to the Book. On the
+  // stage device there is no way back, so it is not a button at all — an
+  // elbow on the iPad must not take the table's screen down mid-scene.
+  const Tag = (onClose ? 'button' : 'div') as 'button' | 'div'
+
   return (
-    <button
-      type="button"
-      onClick={onClose}
-      aria-label="Ambient mode — tap to return to the Book"
+    <Tag
+      {...(onClose ? { type: 'button' as const, onClick: onClose, 'aria-label': 'Ambient mode — tap to return to the Book' } : {})}
       className="fixed inset-0 overflow-hidden text-center"
       style={{
         zIndex: 90,
         border: 'none',
-        cursor: 'pointer',
+        cursor: onClose ? 'pointer' : 'default',
         background: `radial-gradient(1200px 700px at 50% -18%, rgba(240,181,79,0.22) 0%, rgba(240,181,79,0.06) 40%, transparent 68%), radial-gradient(1600px 1000px at 50% 115%, ${C.nightDeep} 0%, transparent 60%), ${C.night}`,
         color: C.parchment,
       }}
@@ -110,8 +114,8 @@ export function AmbientMode({ roster, onClose }: AmbientModeProps) {
         className="absolute left-0 right-0 text-xs"
         style={{ ...body, bottom: 'calc(18px + env(safe-area-inset-bottom))', color: C.faint, pointerEvents: 'none' }}
       >
-        tap anywhere to open the Book
+        {onClose ? 'tap anywhere to open the Book' : 'the stage'}
       </span>
-    </button>
+    </Tag>
   )
 }
