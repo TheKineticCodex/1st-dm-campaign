@@ -13,7 +13,13 @@ export default defineConfig({
     // comes from Supabase (or the device cache) — the service worker only
     // caches the app itself. Audio is synthesized, so nothing big to cache.
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt', not 'autoUpdate'. autoUpdate skips the waiting state, so a
+      // new worker activates silently and the page has no moment to notice —
+      // which is exactly why "The Book has new pages" never once appeared.
+      // Waiting also means no phone reloads itself out from under a player
+      // mid-scene: they tap the pill, or the Lantern-Keeper turns every page
+      // at once from the Table.
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
         name: 'The Song the Sea Forgot',

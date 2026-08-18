@@ -1,67 +1,84 @@
-// "The Book has new pages" — detects a newer deployed build and offers a
-// one-tap refresh. Kills the stale-cache class of bug (blank Run the
-// Night, missing spellbook) that bit us on Night One.
+/// <reference types="vite-plugin-pwa/react" />
+// "The Book has new pages" — noticing a newer build, and actually taking it.
 //
-// Mechanism: the built index.html references a content-hashed JS bundle.
-// We refetch index.html (cache-bypassed) and compare its bundle hash to
-// the one this page actually loaded. Checks run every few minutes and
-// whenever the app returns to the foreground (the moment staleness bites).
+// THE OLD VERSION NEVER FIRED. It compared the loaded bundle against a
+// `fetch('/index.html', { cache: 'no-store' })` — but index.html is precached
+// by the service worker, and no-store bypasses the HTTP cache, not the worker.
+// The worker answered with its own stale copy, so the check compared the old
+// build against itself forever. And `location.reload()` re-served the same
+// cached shell, which is why refreshing by hand did nothing either.
+//
+// This uses the worker's own lifecycle instead: when a new one is waiting,
+// updateServiceWorker(true) skips the wait, claims the page, and reloads onto
+// the new build. It also listens for the Lantern-Keeper's "turn the page",
+// so five phones can be brought forward without asking five people to do
+// anything.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useRegisterSW } from 'virtual:pwa-register/react'
+import { getDeviceSession } from '../lib/storage'
+import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
+import { getStore } from '../lib/store'
 import { C, display, goldAction } from './ui'
 import { Spark } from './icons'
 
-const CHECK_MS = 4 * 60_000
-
-function loadedBundle(): string | null {
-  const script = document.querySelector<HTMLScriptElement>('script[src*="/assets/index-"]')
-  return script ? new URL(script.src, location.href).pathname : null
-}
-
-async function deployedBundle(): Promise<string | null> {
-  try {
-    const res = await fetch('/index.html', { cache: 'no-store' })
-    if (!res.ok) return null
-    const html = await res.text()
-    const m = html.match(/src="(\/assets\/index-[^"]+\.js)"/)
-    return m ? m[1] : null
-  } catch {
-    return null
-  }
-}
+/** Ask the worker whether anything newer has landed. */
+const CHECK_MS = 60_000
 
 export function NewPages() {
-  const [fresh, setFresh] = useState(false)
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_url, r) {
+      if (!r) return
+      const look = () => void r.update().catch(() => {})
+      const onVisible = () => {
+        if (document.visibilityState === 'visible') look()
+      }
+      setInterval(look, CHECK_MS)
+      document.addEventListener('visibilitychange', onVisible)
+    },
+  })
 
+  // The Book can turn everybody's page at once. A device with nothing new
+  // waiting simply reloads, which is harmless and still shakes off a stale
+  // shell; a device with an update waiting takes it.
+  const [told, setTold] = useState(false)
+  const channel = useRef<TableChannel | null>(null)
   useEffect(() => {
-    const current = loadedBundle()
-    if (!current) return
+    const session = getDeviceSession()
+    if (!session) return
     let cancelled = false
-
-    const check = async () => {
-      const latest = await deployedBundle()
-      if (!cancelled && latest && latest !== current) setFresh(true)
-    }
-
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void check()
-    }
-
-    const timer = setInterval(check, CHECK_MS)
-    document.addEventListener('visibilitychange', onVisible)
-    void check()
+    ;(async () => {
+      const id = await getStore(session).getChannelId()
+      if (cancelled || !id) return
+      channel.current = joinTableChannelLazy(Promise.resolve(id), {
+        reload: () => setTold(true),
+      })
+    })()
     return () => {
       cancelled = true
-      clearInterval(timer)
-      document.removeEventListener('visibilitychange', onVisible)
+      channel.current?.close()
     }
   }, [])
 
-  if (!fresh) return null
+  useEffect(() => {
+    if (!told) return
+    // If a new worker is waiting this reloads onto it. If there is nothing new
+    // on this device, updateServiceWorker resolves without doing anything —
+    // so reload anyway a moment later, which still shakes off a stale shell.
+    void updateServiceWorker(true).catch(() => {})
+    const t = setTimeout(() => location.reload(), 1500)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [told])
+
+  if (!needRefresh) return null
   return (
     <button
       type="button"
-      onClick={() => location.reload()}
+      onClick={() => void updateServiceWorker(true)}
       className="fixed left-1/2 rounded-full px-5 py-2.5 inline-flex items-center gap-2"
       style={{
         ...display,

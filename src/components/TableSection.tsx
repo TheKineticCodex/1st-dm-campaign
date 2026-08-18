@@ -167,6 +167,7 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
   const finaleRef = useRef<FinaleEvent | null>(null)
   finaleRef.current = finale
   const [finaleReady, setFinaleReady] = useState<Set<string>>(new Set())
+  const [turned, setTurned] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -296,6 +297,31 @@ export function TableSection({ store, roster, whisperPrefill, onPrefillUsed, ope
       <Fold id="dm-initiative" title="⚔ Initiative" defaultOpen forceOpen={openFold === 'dm-initiative'}>
         {loaded && <InitiativePanel encounter={encounter} pcRows={pcRows} onChange={update} />}
       </Fold>
+
+      <div className="rounded-xl p-4 mb-3" style={panelSurface}>
+        <Eyebrow>every phone at once</Eyebrow>
+        <p className="text-sm mb-2" style={{ color: C.faint }}>
+          After the Book has been updated, this brings every phone and the stage onto the new
+          pages — so nobody has to be told how to refresh.
+        </p>
+        <Btn
+          secondary
+          disabled={!store.shared}
+          onClick={() => {
+            channelRef.current?.sendReload()
+            setTurned(true)
+            setTimeout(() => setTurned(false), 3000)
+          }}
+        >
+          <Icon name="book" size={15} style={{ color: C.brassDim, marginRight: 6 }} />
+          {turned ? 'turning their pages…' : 'turn everyone’s page'}
+        </Btn>
+        {!store.shared && (
+          <p className="text-xs mt-1" style={{ color: C.faint }}>
+            (Needs the campaign lantern — Supabase — to reach the phones.)
+          </p>
+        )}
+      </div>
 
       <Fold id="dm-stage" title="🎪 The stage — what the iPad shows the table" defaultOpen forceOpen={openFold === 'dm-stage'}>
         <StageControls

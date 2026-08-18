@@ -19,6 +19,8 @@ export interface TableEvents {
   wheel: (w: WheelEvent) => void
   game: (g: GameEvent) => void
   finale: (f: FinaleEvent) => void
+  /** "Turn the page" — the Book telling every device to take the new build. */
+  reload: (r: { at: string }) => void
 }
 
 export interface TableChannel {
@@ -33,10 +35,11 @@ export interface TableChannel {
   sendWheel(w: WheelEvent): void
   sendGame(g: GameEvent): void
   sendFinale(f: FinaleEvent): void
+  sendReload(): void
   close(): void
 }
 
-const EVENTS = ['encounter', 'handout', 'roll', 'condition', 'race', 'bargain', 'stage', 'vitals', 'wheel', 'game', 'finale'] as const
+const EVENTS = ['encounter', 'handout', 'roll', 'condition', 'race', 'bargain', 'stage', 'vitals', 'wheel', 'game', 'finale', 'reload'] as const
 type EventName = (typeof EVENTS)[number]
 
 /**
@@ -100,6 +103,7 @@ const INERT: TableChannel = {
   sendWheel: () => {},
   sendGame: () => {},
   sendFinale: () => {},
+  sendReload: () => {},
   close: () => {},
 }
 
@@ -130,6 +134,7 @@ export function joinTableChannel(campaignId: string | null, on: Partial<TableEve
     sendWheel: (w) => send('wheel', w),
     sendGame: (g) => send('game', g),
     sendFinale: (f) => send('finale', f),
+    sendReload: () => send('reload', { at: new Date().toISOString() }),
     close() {
       if (!open) return
       open = false
@@ -174,6 +179,7 @@ export function joinTableChannelLazy(campaignId: Promise<string | null>, on: Par
     sendWheel: (w) => via((c) => c.sendWheel(w)),
     sendGame: (g) => via((c) => c.sendGame(g)),
     sendFinale: (f) => via((c) => c.sendFinale(f)),
+    sendReload: () => via((c) => c.sendReload()),
     close() {
       closed = true
       queue.length = 0
