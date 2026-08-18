@@ -5,6 +5,7 @@
 // are present, and mirrors writes into LocalStore as the offline cache.
 
 import { supabase } from './supabase'
+import { carryHome, isWorthKeeping, quizWorthKeeping, type RescueOutcome } from './rescue'
 import { readCache, writeCache, type DeviceSession } from './storage'
 import type {
   Clue,
@@ -237,13 +238,93 @@ class SupabaseStore implements Store {
     return 'invalid' as const
   }
 
+  /**
+   * What happened the last time this device tried to carry a character home.
+   * Read by the Book's chairs panel so a rescue is never merely assumed.
+   */
+  lastRescue: RescueOutcome | null = null
+
+  /** One seat-reclaim per sign-in: enough to heal, never enough to loop. */
+  private reclaimed = false
+
+  /**
+   * Put this browser's character on the server, and prove it landed.
+   *
+   * Two things make a bare `save_character` untrustworthy here. It returns
+   * void, so an error and a success look identical; and it quietly does
+   * nothing when the device token is not on any player row — which is exactly
+   * what happens to a Safari session after the same person opens the
+   * home-screen app, because joining re-binds the seat's token to whoever
+   * asked last. So: push, read back, and if the seat was taken, take it back
+   * by name and push again.
+   */
+  private async pushCharacter(c: SavedCharacter): Promise<boolean> {
+    const landed = async () =>
+      !!(await this.rpc<SavedCharacter>('get_character', { p_device_token: this.token }))
+    const send = () =>
+      this.rpc('save_character', {
+        p_device_token: this.token,
+        p_build: c.build,
+        p_state: c.state,
+        p_private_notes: c.notes,
+      })
+
+    await send()
+    if (await landed()) return true
+
+    // The seat answers to a different browser now. Claiming it back is the
+    // same call this device already makes at the gate, so nothing new is
+    // being risked — and the character rides on the seat, not the browser.
+    await this.joinCampaign(this.dmCode, this.session.playerName, this.token)
+    await send()
+    return landed()
+  }
+
+  private async pushQuiz(q: QuizResult): Promise<boolean> {
+    const send = () =>
+      this.rpc('save_quiz', {
+        p_device_token: this.token,
+        p_answers: { ...q.answers, _topSpecies: q.topSpecies ?? [] },
+        p_top_classes: q.topClasses,
+      })
+    await send()
+    if (await this.rpc<QuizResult>('get_quiz', { p_device_token: this.token })) return true
+    await this.joinCampaign(this.dmCode, this.session.playerName, this.token)
+    await send()
+    return !!(await this.rpc<QuizResult>('get_quiz', { p_device_token: this.token }))
+  }
+
   async getCharacter() {
     const remote = await this.rpc<SavedCharacter>('get_character', { p_device_token: this.token })
     if (remote) {
       await this.local.saveCharacter(remote)
       return remote
     }
-    return this.local.getCharacter()
+    // The server has nobody in this seat. If this browser is still holding the
+    // character it forged before the database was replaced, carry it up now —
+    // this is the only copy left, and Safari deletes it after a week idle.
+    const local = await this.local.getCharacter()
+    if (isWorthKeeping(local)) {
+      this.lastRescue = await carryHome(remote, local, isWorthKeeping, (c) => this.pushCharacter(c))
+      return local
+    }
+
+    // Neither side has anything — but "neither side" can be a lie. A browser
+    // whose storage was wiped keeps asking with a token no seat answers to
+    // any more, and gets silence back even though the character is sitting
+    // safely on the server. Claim the seat by name once and look again; this
+    // is the same call the gate makes, and the character rides on the seat.
+    if (!this.reclaimed && this.session.playerName) {
+      this.reclaimed = true
+      await this.joinCampaign(this.dmCode, this.session.playerName, this.token)
+      const second = await this.rpc<SavedCharacter>('get_character', { p_device_token: this.token })
+      if (second) {
+        await this.local.saveCharacter(second)
+        return second
+      }
+    }
+    this.lastRescue = { kind: 'nothing-to-carry' }
+    return local
   }
   async saveCharacter(c: SavedCharacter) {
     await this.local.saveCharacter(c)
@@ -261,7 +342,11 @@ class SupabaseStore implements Store {
       await this.local.saveQuizResult(normalized)
       return normalized
     }
-    return this.local.getQuizResult()
+    // Their own words, carried up the same way. This is the vault the finale
+    // reads back to them, so it is worth exactly as much as the sheet.
+    const local = await this.local.getQuizResult()
+    await carryHome(remote, local, quizWorthKeeping, (q) => this.pushQuiz(q))
+    return local
   }
   async saveQuizResult(r: QuizResult) {
     await this.local.saveQuizResult(r)
