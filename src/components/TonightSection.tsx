@@ -971,7 +971,6 @@ export function StageControls({
   // Where the night is standing. The progress is a localStorage cache on this
   // same laptop with nobody to notify, so it is re-read rather than subscribed.
   const [at, setAt] = useState<string | null>(() => readNightProgress().at)
-  const sentAt = useRef<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const dragging = useRef<string | null>(null)
@@ -1005,19 +1004,13 @@ export function StageControls({
     persistTimer.current = setTimeout(() => void store.saveStage(next), 800)
   }
 
+  // The room is pushed by the shell (lib/stageLink), which is mounted all
+  // evening. This only follows along so the chip row knows which checkpoint's
+  // cards to offer.
   useEffect(() => {
     const t = setInterval(() => setAt(readNightProgress().at), 2000)
     return () => clearInterval(t)
   }, [])
-
-  // Tell the stage which room it is in — six times a night, not every two
-  // seconds. A new room also wipes whatever was held up for the last one.
-  useEffect(() => {
-    if (!loaded || !at || sentAt.current === at) return
-    sentAt.current = at
-    push({ ...stage, at, card: null })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [at, loaded])
 
   useEffect(() => {
     if (!loaded) return

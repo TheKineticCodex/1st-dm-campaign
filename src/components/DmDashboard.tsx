@@ -31,6 +31,7 @@ import { TableSection } from './TableSection'
 import { PartyStrip, RunNight, StoryTimeline, TheThingWithNoName } from './TonightSection'
 import { NIGHT_PATH } from '../data/nightPath'
 import { readNightProgress } from '../lib/night'
+import { checkpointNow, tellStageWhereWeAre } from '../lib/stageLink'
 import { PANIC_LINES } from '../data/cheatSheet'
 import type { VitalsEvent } from '../types'
 import { Btn, C, CalmToggle, Eyebrow, Fold, H, Section, TextArea, TextInput, body, display, eyebrow, nightGround, onState, seaLit, bloodLit, wellSurface, numerals } from './ui'
@@ -116,6 +117,25 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   useEffect(() => {
     if (!seen[section]) setSeen((cur) => ({ ...cur, [section]: true }))
   }, [section, seen])
+
+  // Keep the table's screen told which room it is in, for the whole evening —
+  // not only while a particular panel on another tab happens to be open.
+  const toldStage = useRef<string | null>(null)
+  useEffect(() => {
+    const ch = joinTableChannelLazy(store.getChannelId(), {})
+    const tick = () => {
+      const at = checkpointNow()
+      if (!at || toldStage.current === at) return
+      toldStage.current = at
+      void tellStageWhereWeAre(store, ch, at)
+    }
+    tick()
+    const t = setInterval(tick, 2000)
+    return () => {
+      clearInterval(t)
+      ch.close()
+    }
+  }, [store])
 
   // Roster keeps itself fresh — no more tapping refresh to see a new player.
   useEffect(() => {

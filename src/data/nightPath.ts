@@ -34,6 +34,12 @@ export interface Checkpoint {
   /** One breath: what this scene IS. */
   oneBreath: string
   /**
+   * Who is standing in front of him here. Matched loosely against the
+   * "who's who" cards so their whole card can sit inside the checkpoint —
+   * session 3 was run with the Twins and Grey-Gill a tab away.
+   */
+  who?: string[]
+  /**
    * The ACT1_SCENES key this checkpoint's cue buttons come from. Copied byte
    * for byte from that file — never join these two by display title again.
    */
@@ -169,6 +175,7 @@ export const NIGHT_PATH: Night = {
       id: 'gate',
       title: 'The Gate of Paper Lanterns',
       scene: 'The Gate of Paper Lanterns',
+      who: ['Twins'],
       where: 'A mile out on the wet sand',
       minutes: '20–30 min',
       oneBreath: 'A fence of paper lanterns, a gate, and two figures — Hush with the slate, Hum half-singing.',
@@ -232,6 +239,7 @@ export const NIGHT_PATH: Night = {
       id: 'greygill',
       title: "Grandmother Grey-Gill's Tent",
       scene: "Grandmother Grey-Gill's Tent",
+      who: ['Grey-Gill'],
       where: 'A tent that smells of salt and low tide',
       minutes: '25–35 min · the heart of the night',
       oneBreath: 'A woman with a shawl pinned high at the neck, eyes like the last hour before a storm, who knows them already.',
@@ -266,6 +274,7 @@ export const NIGHT_PATH: Night = {
       id: 'note',
       title: 'The Missing Note',
       scene: 'The Missing Note',
+      who: ['carousel operator'],
       where: 'The carousel',
       minutes: '15–25 min',
       oneBreath: 'The organ plays the Sea’s song and skips one note, every single time. The operator weeps and does not notice.',
@@ -327,6 +336,7 @@ export const NIGHT_PATH: Night = {
       id: 'gates',
       title: 'The Three Gates',
       scene: 'The Three Gates',
+      who: ['Twins'],
       where: 'The back fence',
       minutes: '20 min · the END of the night',
       oneBreath: 'Three gates in the back fence. The slate: ONE OPENS TONIGHT. THE OTHERS REMEMBER BEING CHOSEN LAST.',

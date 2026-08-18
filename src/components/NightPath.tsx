@@ -20,12 +20,13 @@ import { EMPTY_NIGHT, readNightProgress, writeNightProgress, type NightProgress 
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { isCarouselPlaying, subscribeSong } from '../lib/song'
 import { seatNameFor } from '../data/campaign'
+import { whoCard } from '../data/cheatSheet'
 import type { RosterEntry, Store } from '../lib/store'
 import { Btn, C, display, eyebrow, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
 import { Icon, Spark } from './icons'
 
-export function BattleCard({ b, level, heads }: { b: NightBattle; level: number; heads: number }) {
-  const [open, setOpen] = useState(false)
+export function BattleCard({ b, level, heads, startOpen }: { b: NightBattle; level: number; heads: number; startOpen?: boolean }) {
+  const [open, setOpen] = useState(!!startOpen)
   const w = weigh(b.xp, level, heads)
   const boss = b.kind === 'boss'
   return (
@@ -229,6 +230,33 @@ function CueRow({ store, roster, cues, ambience, note }: {
   )
 }
 
+/**
+ * Whoever is standing in front of him, and everything the Book knows about
+ * them — in the checkpoint, not on another tab. Open by default: this is the
+ * thing he was hunting for mid-scene, so it does not get to be a fold.
+ */
+function WhoIsHere({ keys }: { keys: string[] }) {
+  const cards = keys.map(whoCard).filter((c): c is NonNullable<typeof c> => !!c)
+  if (!cards.length) return null
+  return (
+    <div className="mt-3">
+      <p className="text-xs uppercase mb-1" style={{ ...eyebrow, fontSize: 10.5, letterSpacing: '0.18em', color: C.copper }}>
+        Who is in front of you
+      </p>
+      {cards.map((c) => (
+        <div key={c.title} className="rounded-lg px-3 py-2.5 mb-1.5" style={{ ...wellSurface, borderLeft: `3px solid ${C.copper}` }}>
+          <p style={{ ...display, fontSize: 17, fontWeight: 600, color: C.parchment }}>{c.title}</p>
+          {c.lines.map((l, i) => (
+            <p key={i} className="text-sm mt-1" style={{ color: C.parchment, lineHeight: 1.45 }}>
+              <span style={{ color: C.copper }}>·</span> {l}
+            </p>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function NightPath({ store, roster, onGo, onWalked }: {
   store: Store
   roster: RosterEntry[]
@@ -374,12 +402,15 @@ export function NightPath({ store, roster, onGo, onWalked }: {
             </p>
           )}
 
-          {/* the fights available here */}
+          {current.who && <WhoIsHere keys={current.who} />}
+
+          {/* the fights available here — open, because hunting for AC mid-fight
+              was one of the four things that made session 3 messy */}
           {current.doors
             .map((d) => battleFor(d.battle))
             .filter((b): b is NightBattle => !!b)
             .map((b) => (
-              <BattleCard key={b.id} b={b} level={level} heads={heads} />
+              <BattleCard key={b.id} b={b} level={level} heads={heads} startOpen />
             ))}
 
           <p className="text-xs uppercase mt-3 mb-1.5" style={{ ...eyebrow, fontSize: 10.5, letterSpacing: '0.18em' }}>

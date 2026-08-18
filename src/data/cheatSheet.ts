@@ -267,3 +267,14 @@ export const PANIC_LINES = [
   'Draw a Wonder card.',
   'Pookie stares at the water.',
 ]
+
+
+/**
+ * The "who's who" card for whoever is standing in front of him, found by a
+ * loose match on the card title. Session 3's messiest moments were spent
+ * looking for the Twins and Grey-Gill on another tab while five people waited.
+ */
+export function whoCard(key: string): CheatCard | null {
+  const k = key.trim().toLowerCase()
+  return WHO_IS_WHO.find((c) => c.title.toLowerCase().includes(k)) ?? null
+}
