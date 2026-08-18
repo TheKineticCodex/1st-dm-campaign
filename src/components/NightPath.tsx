@@ -29,6 +29,7 @@ export function BattleCard({ b, level, heads, startOpen }: { b: NightBattle; lev
   const [open, setOpen] = useState(!!startOpen)
   const w = weigh(b.xp, level, heads)
   const boss = b.kind === 'boss'
+  const outgrown = level > NIGHT_PATH.writtenFor
   return (
     <div className="rounded-xl mt-2" style={{ ...panelSurface, border: `1px solid ${boss ? C.blood : C.brassDim}` }}>
       <button
@@ -89,9 +90,20 @@ export function BattleCard({ b, level, heads, startOpen }: { b: NightBattle; lev
             <span style={{ color: C.blood }}>If they lose: </span>
             <span style={{ color: C.parchment }}>{b.loss}</span>
           </p>
-          <p className="text-xs" style={{ color: C.faint }}>
-            {b.ifStronger}
-          </p>
+          {outgrown ? (
+            /* The party has passed the level this fight was written for, so the
+               line that fixes it stops being a footnote. Session 3 ended with
+               everyone levelled early — which quietly turned the boss of the
+               night from "hard, but survivable" into "easy for them". */
+            <p className="text-sm rounded-lg px-3 py-2" style={{ ...seaLit }}>
+              <span style={{ color: C.sea }}>They have outgrown this fight — run it like this: </span>
+              <span style={{ color: C.parchment }}>{b.ifStronger}</span>
+            </p>
+          ) : (
+            <p className="text-xs" style={{ color: C.faint }}>
+              {b.ifStronger}
+            </p>
+          )}
 
           <div className="grid gap-2 mt-1">
             {b.foes.map((f) => (

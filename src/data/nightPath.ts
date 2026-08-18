@@ -345,7 +345,7 @@ export const NIGHT_PATH: Night = {
       doThis: [
         'Green pulls Freya Sun and Philip · silver pulls Billy and Philip · blue pulls Peaches and Freya Moon. Each gate wants its two.',
         'Let them argue. Do not help. This is the biggest choice they have made.',
-        'As they cross: level the party to 2, play the carousel, and let it fade behind them. End there — the music ends the session, not you.',
+        'As they cross: play the carousel, and let it fade behind them. End there — the music ends the session, not you. (They were levelled to 2 after session 3 — do not level them again here.)',
       ],
       doors: [
         { id: 'green', label: 'Green — the Whispering Causeway (the Bog)', then: 'Freya Sun and Philip walk in front. Next session opens on the causeway, and the hedge that hushes.', goes: 'END', marks: 'took the green gate' },
