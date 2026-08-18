@@ -16,9 +16,9 @@ import { QUIZ } from '../data/quiz'
 import { CONDITIONS, fmt, mod } from '../data/rules'
 import { computeSheet, skillMod } from '../lib/compute'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
-import { clearDeviceSession, type DeviceSession } from '../lib/storage'
+import { clearDeviceSession, readCache, writeCache, type DeviceSession } from '../lib/storage'
 import { keepGlassLit } from '../lib/wakeLock'
-import { PARTY_SIZE, partyWord } from '../data/campaign'
+import { PARTY_SIZE, atTheTable, isTestSeat, partyWord } from '../data/campaign'
 import { getStore, type RosterEntry, type Store } from '../lib/store'
 import type { Clue, LostThing, Npc, SessionNote } from '../types'
 import { CheatSheet } from './CheatSheet'
@@ -79,7 +79,13 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
   const store = useMemo(() => getStore(session), [session])
   const [section, setSection] = useState<DmSection>('tonight')
   const [openFold, setOpenFold] = useState<string | null>(null)
-  const [roster, setRoster] = useState<RosterEntry[]>([])
+  // Everything the campaign knows about, and the seats that belong at the
+  // table tonight. Spare devices are hidden by one filter here rather than by
+  // fifteen filters spread across the Book.
+  const [allSeats, setAllSeats] = useState<RosterEntry[]>([])
+  const [showTest, setShowTest] = useState(() => readCache<boolean>('show-test-seats') === true)
+  const roster = atTheTable(allSeats, showTest)
+  const hiddenSeats = allSeats.filter((r) => isTestSeat(r.playerName)).length
   const [loaded, setLoaded] = useState(false)
   const [whisperPrefill, setWhisperPrefill] = useState<WhisperPrefill | null>(null)
   const [ambient, setAmbient] = useState(false)
@@ -117,7 +123,7 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
     const load = async () => {
       const r = await store.listRoster()
       if (!cancelled) {
-        setRoster(r)
+        setAllSeats(r)
         setLoaded(true)
       }
     }
@@ -129,7 +135,12 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
     }
   }, [store])
 
-  const refreshRoster = async () => setRoster(await store.listRoster())
+  const refreshRoster = async () => setAllSeats(await store.listRoster())
+
+  const revealTestSeats = (on: boolean) => {
+    setShowTest(on)
+    writeCache('show-test-seats', on)
+  }
 
   /** Take him anywhere, by any name the Book has ever used for it. */
   const go = (id: string) => {
@@ -257,6 +268,9 @@ export function DmDashboard({ session, onLeave }: DmDashboardProps) {
                   onForgeWhisper={forgeWhisper}
                   onRefresh={refreshRoster}
                   openFold={openFold}
+                  hiddenSeats={hiddenSeats}
+                  showTest={showTest}
+                  onShowTest={revealTestSeats}
                 />
               </div>
             )}
@@ -418,12 +432,18 @@ function LookTab({
   onForgeWhisper,
   onRefresh,
   openFold,
+  hiddenSeats,
+  showTest,
+  onShowTest,
 }: {
   store: Store
   roster: RosterEntry[]
   onForgeWhisper: (target: string, quote: string) => void
   onRefresh: () => void
   openFold: string | null
+  hiddenSeats: number
+  showTest: boolean
+  onShowTest: (on: boolean) => void
 }) {
   const open = (id: string) => openFold === id
   return (
@@ -452,7 +472,7 @@ function LookTab({
         <NotesSection store={store} />
       </Fold>
       <Fold id="look-chairs" title="❖ The chairs — who has joined, who has forged" forceOpen={open('look-chairs')}>
-        <Chairs roster={roster} onRefresh={onRefresh} />
+        <Chairs roster={roster} onRefresh={onRefresh} hidden={hiddenSeats} showTest={showTest} onShowTest={onShowTest} />
       </Fold>
       <SeedTheBook store={store} />
     </div>
@@ -460,7 +480,13 @@ function LookTab({
 }
 
 /** One chair per protagonist, always — the Equal Protagonists rule, visible. */
-function Chairs({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh: () => void }) {
+function Chairs({ roster, onRefresh, hidden, showTest, onShowTest }: {
+  roster: RosterEntry[]
+  onRefresh: () => void
+  hidden: number
+  showTest: boolean
+  onShowTest: (on: boolean) => void
+}) {
   const seatCount = Math.max(PARTY_SIZE, roster.length)
   const seats = Array.from({ length: seatCount }, (_, i) => roster[i] ?? null)
   return (
@@ -476,6 +502,20 @@ function Chairs({ roster, onRefresh }: { roster: RosterEntry[]; onRefresh: () =>
           look again
         </button>
       </div>
+      {(hidden > 0 || showTest) && (
+        <button
+          type="button"
+          role="switch"
+          aria-checked={showTest}
+          onClick={() => onShowTest(!showTest)}
+          className="text-xs mt-1"
+          style={{ ...body, color: showTest ? C.sea : C.faint, background: 'none', border: 'none', padding: 0, minHeight: 36, cursor: 'pointer', textDecoration: 'underline' }}
+        >
+          {showTest
+            ? 'hide the spare devices again'
+            : `show ${hidden} spare device${hidden === 1 ? '' : 's'} (for testing)`}
+        </button>
+      )}
       <div className="grid gap-2 mt-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
         {seats.map((r, i) => (
           <div

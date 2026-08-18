@@ -50,3 +50,22 @@ export const BILLY = 'William Blackwood'
 export const PHILIP = 'Philip'
 export const FREYA = 'Freya'
 export const FREYA_MOON = 'Freya Moon'
+
+/**
+ * A TEST SEAT — a device at the table that is not one of the five.
+ *
+ * A leading underscore marks it. The convention is already in the repo: the
+ * live specs join as `_gametest` and `_wheeltest`, and the stray `_moon` from
+ * a rehearsal sits in the campaign now. The Book hides these by default so a
+ * spare phone is never a sixth chair, never a whisper target, and never a lane
+ * in the derby — but the device itself works exactly as any player's does, so
+ * it stays usable for testing whenever the Lantern-Keeper asks to see it.
+ */
+export function isTestSeat(playerName: string): boolean {
+  return playerName.trim().startsWith('_')
+}
+
+/** The seats that belong at the table tonight. */
+export function atTheTable<T extends { playerName: string }>(roster: T[], showTest = false): T[] {
+  return showTest ? roster : roster.filter((r) => !isTestSeat(r.playerName))
+}

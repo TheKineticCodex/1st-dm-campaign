@@ -8,6 +8,7 @@
 // It keeps the glass awake, because a stage that sleeps is a dark table.
 
 import { useEffect, useState } from 'react'
+import { atTheTable } from '../data/campaign'
 import { getStore, type RosterEntry } from '../lib/store'
 import { clearDeviceSession, type DeviceSession } from '../lib/storage'
 import { keepGlassLit } from '../lib/wakeLock'
@@ -28,7 +29,9 @@ export function StageDevice({ session, onLeave }: { session: DeviceSession; onLe
     const load = async () => {
       const r = await store.listRoster().catch(() => [])
       if (cancelled) return
-      setRoster(r)
+      // The table's own screen never shows a spare device — a test phone must
+      // not become a sixth face in front of five players.
+      setRoster(atTheTable(r))
       setReady(true)
     }
     void load()

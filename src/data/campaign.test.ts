@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BILLY, FREYA, FREYA_MOON, PEACHES, PHILIP, readStageCode } from './campaign'
+import { BILLY, FREYA, FREYA_MOON, PEACHES, PHILIP, atTheTable, isTestSeat, readStageCode } from './campaign'
 
 describe('the stage code', () => {
   it('recognises the suffix, however it gets typed on an iPad', () => {
@@ -42,5 +42,30 @@ describe('the five seats', () => {
       'Freya',
       'Freya Moon',
     ])
+  })
+})
+
+describe('spare devices', () => {
+  it('knows a test seat by its underscore', () => {
+    expect(isTestSeat('_moon')).toBe(true)
+    expect(isTestSeat('_gametest')).toBe(true)
+    expect(isTestSeat('  _wheeltest')).toBe(true)
+    expect(isTestSeat('Freya Moon')).toBe(false)
+    expect(isTestSeat('Peaches capiche')).toBe(false)
+  })
+
+  it('keeps them out of the table by default', () => {
+    const seats = [{ playerName: 'Peaches capiche' }, { playerName: '_moon' }, { playerName: 'Philip' }]
+    expect(atTheTable(seats).map((s) => s.playerName)).toEqual(['Peaches capiche', 'Philip'])
+  })
+
+  it('hands them back when he asks to see them', () => {
+    const seats = [{ playerName: 'Philip' }, { playerName: '_moon' }]
+    expect(atTheTable(seats, true)).toHaveLength(2)
+  })
+
+  it('never hides one of the five', () => {
+    const five = [PEACHES, BILLY, PHILIP, FREYA, FREYA_MOON].map((playerName) => ({ playerName }))
+    expect(atTheTable(five)).toHaveLength(5)
   })
 })
