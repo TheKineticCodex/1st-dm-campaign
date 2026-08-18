@@ -27,6 +27,7 @@ import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { SFX } from '../lib/sfx'
 import { fireCue } from '../lib/cues'
 import { readNightProgress } from '../lib/night'
+import { seatNameFor } from '../data/campaign'
 import { cardsFor } from '../data/stageCards'
 import { readCache, writeCache } from '../lib/storage'
 import { SCENES, ambienceVolume, currentScene, duck, setScene, setVolume, subscribeAmbience, type SceneId } from '../lib/ambience'
@@ -122,7 +123,7 @@ export function RunNight({
   const nextInAct = current
     ? nodes.find((n) => n.act === current.act && n.ord === current.ord + 1)
     : null
-  const rosterNames = new Set(roster.map((r) => r.playerName))
+  const seatFor = (wanted?: string | null) => (wanted ? seatNameFor(roster, wanted) : null)
 
   const note = (msg: string) => {
     setSentNote(msg)
@@ -298,7 +299,7 @@ export function RunNight({
             <div className="flex flex-wrap gap-2 mt-4">
               {guide.cues.map((cue) => {
                 const missing =
-                  cue.kind === 'whisper' && cue.whisper?.target && !rosterNames.has(cue.whisper.target)
+                  cue.kind === 'whisper' && !!cue.whisper?.target && !seatFor(cue.whisper.target)
                 const label =
                   cue.kind === 'song' && cue.song === 'carousel' && carouselOn ? '■ stop the carousel' : cue.label
                 return (
@@ -306,7 +307,10 @@ export function RunNight({
                     key={label}
                     type="button"
                     disabled={!!missing}
-                    onClick={() => fire(cue)}
+                    onClick={() => {
+                      const seat = cue.kind === 'whisper' ? seatFor(cue.whisper?.target) : null
+                      fire(seat && cue.whisper ? { ...cue, whisper: { ...cue.whisper, target: seat } } : cue)
+                    }}
                     title={missing ? `${cue.whisper!.target} hasn't joined yet` : undefined}
                     className="rounded-lg px-3 py-2 text-sm"
                     style={{

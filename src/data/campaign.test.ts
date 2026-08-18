@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BILLY, FREYA, FREYA_MOON, PEACHES, PHILIP, atTheTable, isTestSeat, readStageCode } from './campaign'
+import { BILLY, FREYA, FREYA_MOON, PEACHES, PHILIP, atTheTable, isTestSeat, readStageCode, sameSeat, seatNameFor } from './campaign'
 
 describe('the stage code', () => {
   it('recognises the suffix, however it gets typed on an iPad', () => {
@@ -67,5 +67,27 @@ describe('spare devices', () => {
   it('never hides one of the five', () => {
     const five = [PEACHES, BILLY, PHILIP, FREYA, FREYA_MOON].map((playerName) => ({ playerName }))
     expect(atTheTable(five)).toHaveLength(5)
+  })
+})
+
+describe('a name typed at a table', () => {
+  it('matches however it was capitalised or spaced', () => {
+    // The exact failure of session 3: she joined as "Freya moon".
+    expect(sameSeat('Freya Moon', 'Freya moon')).toBe(true)
+    expect(sameSeat('  peaches capiche ', 'Peaches capiche')).toBe(true)
+    expect(sameSeat('William  Blackwood', 'William Blackwood')).toBe(true)
+  })
+
+  it('still tells two different people apart', () => {
+    expect(sameSeat('Freya', 'Freya Moon')).toBe(false)
+    expect(sameSeat('Philip', 'Phillip')).toBe(false)
+    expect(sameSeat('', 'Freya')).toBe(false)
+    expect(sameSeat(null, null)).toBe(false)
+  })
+
+  it('resolves to the name the server actually knows, so a send is not dropped', () => {
+    const roster = [{ playerName: 'Freya moon' }, { playerName: 'Freya' }]
+    expect(seatNameFor(roster, 'Freya Moon')).toBe('Freya moon')
+    expect(seatNameFor(roster, 'Peaches capiche')).toBeNull()
   })
 })

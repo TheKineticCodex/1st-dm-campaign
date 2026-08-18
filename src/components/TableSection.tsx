@@ -8,6 +8,7 @@ import { computeSheet } from '../lib/compute'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import type { RosterEntry, Store } from '../lib/store'
 import { SONGS } from '../data/songPieces'
+import { sameSeat } from '../data/campaign'
 import { readCache, writeCache } from '../lib/storage'
 import type { Bargain, Encounter, FinaleEvent, Handout, InitiativeRow, RaceEvent, RollEvent, VitalsEvent, WheelEvent } from '../types'
 import { MapBoard } from './MapBoard'
@@ -708,7 +709,7 @@ function BargainComposer({
   const [terms, setTerms] = useState('')
   const [sent, setSent] = useState(false)
 
-  const targetEntry = roster.find((r) => r.playerName === target)
+  const targetEntry = roster.find((r) => sameSeat(r.playerName, target))
   const characterName = targetEntry?.character?.build.name ?? target
   const ready = target && title.trim() && price.trim()
 

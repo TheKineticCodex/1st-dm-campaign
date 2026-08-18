@@ -69,3 +69,25 @@ export function isTestSeat(playerName: string): boolean {
 export function atTheTable<T extends { playerName: string }>(roster: T[], showTest = false): T[] {
   return showTest ? roster : roster.filter((r) => !isTestSeat(r.playerName))
 }
+
+/**
+ * MATCHING A SEAT BY NAME.
+ *
+ * Session 3 lost every one of Freya Moon's sealed readings because she joined
+ * as "Freya moon" and the Book compared names with ===. A person typing their
+ * own name into a phone at a table will not reproduce a string exactly, and it
+ * is not their job to. Compare with this instead, everywhere.
+ */
+export function sameSeat(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return false
+  return a.trim().toLowerCase().replace(/\s+/g, ' ') === b.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+/**
+ * The name a device actually joined with, given the name the campaign expects.
+ * Whispers must be addressed with the string the server knows, or the send is
+ * silently dropped — so resolve before sending, never after.
+ */
+export function seatNameFor<T extends { playerName: string }>(roster: T[], wanted: string): string | null {
+  return roster.find((r) => sameSeat(r.playerName, wanted))?.playerName ?? null
+}

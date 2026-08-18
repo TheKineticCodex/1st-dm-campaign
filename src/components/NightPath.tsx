@@ -19,6 +19,7 @@ import { fireCue } from '../lib/cues'
 import { EMPTY_NIGHT, readNightProgress, writeNightProgress, type NightProgress } from '../lib/night'
 import { joinTableChannelLazy, type TableChannel } from '../lib/realtime'
 import { isCarouselPlaying, subscribeSong } from '../lib/song'
+import { seatNameFor } from '../data/campaign'
 import type { RosterEntry, Store } from '../lib/store'
 import { Btn, C, display, eyebrow, numerals, onState, panelSurface, seaLit, splitLeadGlyph, wellSurface } from './ui'
 import { Icon, Spark } from './icons'
@@ -177,7 +178,7 @@ function CueRow({ store, roster, cues, ambience, note }: {
     }
   }, [store])
 
-  const names = new Set(roster.map((r) => r.playerName))
+  const seatFor = (wanted?: string | null) => (wanted ? seatNameFor(roster, wanted) : null)
   const room = SCENES.find((s) => s.id === ambience)
   if (!cues.length && !room) return null
 
@@ -195,7 +196,8 @@ function CueRow({ store, roster, cues, ambience, note }: {
         </button>
       )}
       {cues.map((cue) => {
-        const away = cue.kind === 'whisper' && cue.whisper?.target && !names.has(cue.whisper.target)
+        const seat = cue.kind === 'whisper' ? seatFor(cue.whisper?.target) : null
+        const away = cue.kind === 'whisper' && !!cue.whisper?.target && !seat
         const text = cue.kind === 'song' && cue.song === 'carousel' && carouselOn ? '■ stop the carousel' : cue.label
         const [glyph, words] = splitLeadGlyph(text)
         return (
@@ -203,7 +205,12 @@ function CueRow({ store, roster, cues, ambience, note }: {
             key={cue.label}
             type="button"
             disabled={!!away}
-            onClick={() => fireCue(cue, { store, channel: channel.current, note })}
+            onClick={() =>
+              fireCue(
+                seat && cue.whisper ? { ...cue, whisper: { ...cue.whisper, target: seat } } : cue,
+                { store, channel: channel.current, note },
+              )
+            }
             title={away ? `${cue.whisper!.target} hasn’t joined yet` : undefined}
             className="rounded-lg px-3 py-2 text-sm inline-flex items-center gap-1.5"
             style={{

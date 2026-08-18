@@ -5,6 +5,7 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { joinTableChannel, type TableChannel } from '../lib/realtime'
 import type { GameEvent, GameInput, GameState } from '../lib/games'
+import { sameSeat } from '../data/campaign'
 import { readCache, writeCache } from '../lib/storage'
 import type { Store } from '../lib/store'
 import type { Bargain, Encounter, FinaleEvent, Handout, RaceEvent, VitalsEvent, WheelEvent } from '../types'
@@ -110,7 +111,7 @@ export function PlayerLive({
     const markSeen = (id: string) => writeCache('handouts-seen', [...seen(), id])
 
     const enqueue = (h: Handout) => {
-      if (h.target && h.target !== playerName) return
+      if (h.target && !sameSeat(h.target, playerName)) return
       // Level-ups are recorded even if the envelope was already opened.
       if (h.level) onLevelRef.current?.(h.level)
       if (seen().has(h.id)) return
@@ -138,10 +139,10 @@ export function PlayerLive({
           encounter: (e) => setEncounter(e.active ? e : null),
           handout: enqueue,
           condition: (c) => {
-            if (c.targetPlayer === playerName) onConditionRef.current(c.condition, c.active)
+            if (sameSeat(c.targetPlayer, playerName)) onConditionRef.current(c.condition, c.active)
           },
           bargain: (b) => {
-            if (b.targetPlayer !== playerName) return
+            if (!sameSeat(b.targetPlayer, playerName)) return
             onBargainResolveRef.current(b.bargainId, b.outcome)
             setCeremony({ outcome: b.outcome, title: b.title ?? 'The bargain' })
           },
