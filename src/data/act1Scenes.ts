@@ -545,7 +545,7 @@ export const ACT1_SCENES: Record<string, SceneGuide> = {
         whisper: {
           target: null,
           title: 'The other side of the gate',
-          body: 'The lanterns of the carnival go out behind you, all at once, like a held breath finally let go. Something very large and very patient has noticed you. Welcome to the road. — You feel stronger. (Level 2 — your sheet already knows.)',
+          body: 'The lanterns of the carnival go out behind you, all at once, like a held breath finally let go. Something very large and very patient has noticed you. Welcome to the road.',
         },
       },
     ],
